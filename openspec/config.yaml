@@ -15,7 +15,7 @@ context: |
 
 rules:
   tasks:
-    - Each task names the test that proves it (TDD: red, then green)
+    - "Each task names the test that proves it (TDD: red, then green)"
   proposal:
     - Always include a Non-goals section (e.g. parallel view, verse-number mapping)
 
