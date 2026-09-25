@@ -37,7 +37,7 @@
 
 ## Що далі (для агента)
 1. PR `feature/01-bible-reader-mvp` → `main` (гілка запушена), коли користувач скаже.
-2. Паралельно: пишемо PRD наступного етапу разом з користувачем.
+2. PRD продукту: [docs/product-specs/prd.md](../../product-specs/prd.md) (чернетка). Обговорити з користувачем пріоритети й відкриті питання, потім перший пункт роадмапу (v1.1) оформити через `/opsx:propose`.
 3. Після мержу: `/opsx:archive`, план `docs/exec-plans/active/bible-reader-mvp.md` перенести в `completed/`.
 4. Далі за планом: крок 8 (харнес: `.claude/agents/reviewer.md`, `make check`) і крок 9 (README сабмішену, відео робить користувач).
 
