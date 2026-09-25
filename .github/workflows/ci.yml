@@ -1,0 +1,59 @@
+# CI — адаптація шаблону Project Factory під Swift/macOS.
+# Дзеркалить локальні гейти: якщо тут не зелено, то не готово.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # check-trajectory читає трейлери Slice: з історії
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install -g @fission-ai/openspec
+
+      # --- статичні, швидкі, детерміновані ---
+      - name: Traceability chain (і свіжість звіту)
+        run: |
+          node scripts/check-traceability.mjs --check-fresh
+          node scripts/check-traceability.mjs ${{ github.ref_name == 'main' && '--release' || '' }}
+      - name: Trajectory process audit (і свіжість звіту)
+        run: |
+          node scripts/check-trajectory.mjs --check-fresh
+          node scripts/check-trajectory.mjs ${{ github.ref_name == 'main' && '--release' || '' }}
+      - name: Factory integrity lock
+        run: node scripts/check-factory-integrity.mjs
+      - name: OpenSpec strict validation
+        run: openspec validate --all --strict
+
+      # --- тести ---
+      - name: Swift tests + coverage
+        run: make coverage
+      - name: Coverage ratchet
+        run: node scripts/check-coverage-ratchet.mjs
+
+      # --- збірка додатка ---
+      - name: Build app
+        run: |
+          brew install xcodegen
+          (cd BibleReaderApp && xcodegen generate)
+          xcodebuild -quiet -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build CODE_SIGNING_ALLOWED=NO
+
+      # --- докази ---
+      - name: Upload QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-evidence
+          path: |
+            docs/qa/traceability-report.md
+            trace/trace.json
+            coverage/coverage-summary.json
+          if-no-files-found: ignore

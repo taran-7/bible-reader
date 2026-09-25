@@ -2,31 +2,37 @@ import Testing
 @testable import BibleCore
 
 @Suite struct ReferenceParseTests {
+    // @trace FR-8
     @Test func testRussianAbbrevWithVerse() {
         #expect(Reference.parse("Ин 3:16") == Reference(book: 43, chapter: 3, verseStart: 16))
     }
 
+    // @trace FR-8
     @Test func testEnglishChapterOnly() {
         #expect(Reference.parse("John 3") == Reference(book: 43, chapter: 3))
         #expect(Reference.parse("  john   3 ") == Reference(book: 43, chapter: 3))
     }
 
+    // @trace FR-8
     @Test func testRange() {
         #expect(Reference.parse("ин. 3:16-18") == Reference(book: 43, chapter: 3, verseStart: 16, verseEnd: 18))
         #expect(Reference.parse("John 3:16–18") == Reference(book: 43, chapter: 3, verseStart: 16, verseEnd: 18))
     }
 
+    // @trace FR-8
     @Test func testNumberedBooks() {
         #expect(Reference.parse("1 Кор 13:4") == Reference(book: 46, chapter: 13, verseStart: 4))
         #expect(Reference.parse("1 Cor 13:4") == Reference(book: 46, chapter: 13, verseStart: 4))
         #expect(Reference.parse("1Ин 4:8") == Reference(book: 62, chapter: 4, verseStart: 8))
     }
 
+    // @trace FR-8
     @Test func testMultiWordNames() {
         #expect(Reference.parse("От Иоанна 3:16") == Reference(book: 43, chapter: 3, verseStart: 16))
         #expect(Reference.parse("Song of Solomon 2") == Reference(book: 22, chapter: 2))
     }
 
+    // @trace FR-8
     @Test func testNotAReference() {
         #expect(Reference.parse("любовь") == nil)
         #expect(Reference.parse("Xyz 3:16") == nil)
@@ -36,6 +42,7 @@ import Testing
         #expect(Reference.parse("") == nil)
     }
 
+    // @trace FR-8
     @Test func testAllBooksRoundTrip() {
         for book in Book.all {
             for spelling in book.spellings {

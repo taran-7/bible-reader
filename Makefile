@@ -7,7 +7,7 @@ TEST_FLAGS := -Xswiftc -F$(FW) -Xswiftc -Xfrontend -Xswiftc -disable-cross-impor
 	-Xlinker -rpath -Xlinker $(CLT)/Library/Developer/usr/lib
 endif
 
-.PHONY: test db check
+.PHONY: test db check coverage
 
 test:
 	swift test $(TEST_FLAGS)
@@ -16,3 +16,8 @@ db:
 	swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite
 
 check: test
+
+# Покриття Sources/ для check-coverage-ratchet (див. scripts/swift-coverage-summary.mjs).
+coverage:
+	swift test --enable-code-coverage $(TEST_FLAGS)
+	node scripts/swift-coverage-summary.mjs
