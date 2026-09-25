@@ -5,6 +5,7 @@ Bible Reader: нативний macOS-додаток (SwiftUI) для читан�
 Цей файл є картою, а не енциклопедією. Деталі лежать у `docs/`.
 
 ## Куди дивитися
+- **Почни з [docs/exec-plans/active/HANDOFF.md](docs/exec-plans/active/HANDOFF.md)**: поточний стан і наступний крок.
 - [ARCHITECTURE.md](ARCHITECTURE.md): модулі, межі, потік даних.
 - [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md): принципи, яких тримаємося.
 - [docs/product-specs/](docs/product-specs/index.md): що будуємо (поведінка для користувача).
