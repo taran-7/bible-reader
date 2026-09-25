@@ -6,7 +6,7 @@ Capstone курсу вимагає власний невеликий проєк�
 Репозиторій: `bible-reader` (окремий від форку курсу; у форку лише README з посиланням). Структура: `Package.swift`, `BibleReaderApp/`, `data/`, `docs/`, `openspec/`, `.claude/`.
 
 ## Кроки
-1. **Специфікація**: OpenSpec change `bible-reader-mvp` (`/opsx:propose`) + `docs/product-specs/bible-reader-mvp.md` з погодженим дизайном; коміт на гілці `oleksandr-taraniuk`.
+1. **Специфікація**: OpenSpec change `bible-reader-mvp` (`/opsx:propose`) + `docs/product-specs/bible-reader-mvp.md` з погодженим дизайном; коміт на гілці `feature/01-bible-reader-mvp` (нумерація гілок: `feature/NN-<change>` за OpenSpec change).
 2. **План реалізації** через скіл writing-plans (задачі TDD: червоний тест → зелений).
 3. **Дані**: `data/raw/en_kjv.json`, `data/raw/ru_synodal.json` з `thiagobodruk/bible` (однаковий формат для обох, суспільне надбання), `data/raw/SOURCE.md` з посиланням і ліцензією.
 4. **Package.swift**: таргети `BibleCore` (lib, залежить від GRDB), `bible-import` (executable), `BibleCoreTests`. macOS 14+.
