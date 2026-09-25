@@ -20,7 +20,8 @@ Bible Reader: нативний macOS-додаток (SwiftUI) для читан�
 - Логіка живе в `BibleCore`; SwiftUI-шар тільки відображає стан і викликає `BibleRepository`.
 
 ## Команди
-- `make test`: `swift test` (з Command Line Tools без Xcode додає шляхи до Swift Testing). Тести пишемо на Swift Testing (`import Testing`).
+- `make test`: `swift test` (якщо активні лише Command Line Tools, додає шляхи до Swift Testing). Тести пишемо на Swift Testing (`import Testing`).
 - `make db`: `swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite`.
 - `python3 scripts/convert_synodal.py RusSynodal.json data/raw/ru_synodal.json`: перегенерувати Синодальний (див. `data/raw/SOURCE.md`).
-- `xcodebuild -scheme BibleReader build`: збірка додатка (потрібен Xcode).
+- `cd BibleReaderApp && xcodegen generate`: перегенерувати `BibleReader.xcodeproj` з `project.yml` (руками `.xcodeproj` не правити).
+- `xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build`: збірка додатка; база генерується pre-build скриптом, якщо її немає.
