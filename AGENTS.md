@@ -5,6 +5,7 @@ Bible Reader: нативний macOS-додаток (SwiftUI) для читан�
 Цей файл є картою, а не енциклопедією. Деталі лежать у `docs/`.
 
 ## Куди дивитися
+- **Почни з [docs/exec-plans/active/HANDOFF.md](docs/exec-plans/active/HANDOFF.md)**: поточний стан і наступний крок.
 - [ARCHITECTURE.md](ARCHITECTURE.md): модулі, межі, потік даних.
 - [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md): принципи, яких тримаємося.
 - [docs/product-specs/](docs/product-specs/index.md): що будуємо (поведінка для користувача).
@@ -20,4 +21,8 @@ Bible Reader: нативний macOS-додаток (SwiftUI) для читан�
 - Логіка живе в `BibleCore`; SwiftUI-шар тільки відображає стан і викликає `BibleRepository`.
 
 ## Команди
-Код ще не створено. Команди (`swift test`, `swift run bible-import …`, `xcodebuild …`) з'являться разом із `Package.swift`; тоді оновити цей розділ.
+- `make test`: `swift test` (якщо активні лише Command Line Tools, додає шляхи до Swift Testing). Тести пишемо на Swift Testing (`import Testing`).
+- `make db`: `swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite`.
+- `python3 scripts/convert_synodal.py RusSynodal.json data/raw/ru_synodal.json`: перегенерувати Синодальний (див. `data/raw/SOURCE.md`).
+- `cd BibleReaderApp && xcodegen generate`: перегенерувати `BibleReader.xcodeproj` з `project.yml` (руками `.xcodeproj` не правити).
+- `xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build`: збірка додатка; база генерується pre-build скриптом, якщо її немає.
