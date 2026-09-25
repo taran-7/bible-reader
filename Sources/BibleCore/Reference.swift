@@ -57,7 +57,7 @@ public struct Reference: Hashable, Sendable {
     }()
 }
 
-/// Цитата для буфера обміну: `«текст» (Ин. 3:16)`.
+/// Цитата для буфера обміну з повною назвою книги: `«текст» (От Иоанна 3:16)`.
 public enum Quote {
     /// Вірші одного розділу; непослідовні номери записуються як `16-17,19`.
     public static func format(_ verses: [Verse]) -> String? {
@@ -73,7 +73,7 @@ public enum Quote {
             }
         }
         let verseList = runs.map { $0.0 == $0.1 ? "\($0.0)" : "\($0.0)-\($0.1)" }.joined(separator: ",")
-        let label = Reference.bookLabel(first.book, in: first.translation)
+        let label = Book(number: first.book)?.name(in: first.translation) ?? "\(first.book)"
         let text = sorted.map(\.text).joined(separator: " ")
         return "«\(text)» (\(label) \(first.chapter):\(verseList))"
     }

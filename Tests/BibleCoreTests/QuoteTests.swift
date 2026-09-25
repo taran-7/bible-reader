@@ -15,12 +15,14 @@ import Testing
 
     @Test func testSingleVerseSynodal() {
         let quote = Quote.format([verse(.synodal, 16, "Ибо так возлюбил Бог мир…")])
-        #expect(quote == "«Ибо так возлюбил Бог мир…» (Ин. 3:16)")
+        #expect(quote == "«Ибо так возлюбил Бог мир…» (От Иоанна 3:16)")
     }
 
     @Test func testRangeKjv() {
         let quote = Quote.format([verse(.kjv, 16, "a"), verse(.kjv, 17, "b"), verse(.kjv, 18, "c")])
         #expect(quote?.hasSuffix("(John 3:16-18)") == true)
+        let kings = Quote.format([Verse(translation: .kjv, book: 12, chapter: 4, verse: 16, text: "a")])
+        #expect(kings == "«a» (2 Kings 4:16)")
     }
 
     @Test func testJoinsTextsWithSpace() {
