@@ -25,6 +25,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         ReaderViewModel { self.repository }
     }
 
+    // @trace FR-6
     @Test func testStartsAtGenesis1() {
         let model = makeModel()
         #expect(model.location == Location(book: 1, chapter: 1))
@@ -34,6 +35,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.canGoNext)
     }
 
+    // @trace FR-4
     @Test func testSwitchTranslationKeepsPlace() {
         let model = makeModel()
         model.open(Location(book: 43, chapter: 3))
@@ -42,6 +44,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.verses.first?.translation == .synodal)
     }
 
+    // @trace FR-6
     @Test func testNextCrossesBook() {
         let model = makeModel()
         model.open(Location(book: 1, chapter: 3))
@@ -51,6 +54,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.location == Location(book: 1, chapter: 3))
     }
 
+    // @trace FR-13
     @Test func testReferenceQueryNavigates() {
         let model = makeModel()
         model.query = "Ин 3:16"
@@ -61,6 +65,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results == nil)
     }
 
+    // @trace FR-11
     @Test func testTextQuerySearches() {
         let model = makeModel()
         model.query = "love"
@@ -69,6 +74,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results?.count == 1)
     }
 
+    // @trace FR-11
     @Test func testNothingFound() {
         let model = makeModel()
         model.query = "nothing"
@@ -76,6 +82,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results?.isEmpty == true)
     }
 
+    // @trace FR-11
     @Test func testSubmittedQueryIsKeptWhileTyping() {
         let model = makeModel()
         model.query = "nothing"
@@ -84,6 +91,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.submittedQuery == "nothing")
     }
 
+    // @trace FR-11
     @Test func testClearingQueryHidesResults() {
         let model = makeModel()
         model.query = "love"
@@ -93,6 +101,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results == nil)
     }
 
+    // @trace FR-14
     @Test func testOpenResult() throws {
         let model = makeModel()
         model.query = "love"
@@ -103,6 +112,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results == nil)
     }
 
+    // @trace FR-10
     @Test func testCopySelection() {
         let model = makeModel()
         model.translation = .synodal
@@ -111,6 +121,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.quote(for: []) == nil)
     }
 
+    // @trace FR-7
     @Test func testDatabaseError() {
         struct Boom: Error {}
         let model = ReaderViewModel { throw Boom() }
