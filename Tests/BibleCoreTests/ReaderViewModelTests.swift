@@ -76,6 +76,14 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.results?.isEmpty == true)
     }
 
+    @Test func testSubmittedQueryIsKeptWhileTyping() {
+        let model = makeModel()
+        model.query = "nothing"
+        model.submitSearch()
+        model.query = "love"
+        #expect(model.submittedQuery == "nothing")
+    }
+
     @Test func testClearingQueryHidesResults() {
         let model = makeModel()
         model.query = "love"
@@ -92,13 +100,14 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         model.open(try #require(model.results?.first))
         #expect(model.location == Location(book: 43, chapter: 3))
         #expect(model.focusedVerse == 16)
+        #expect(model.results == nil)
     }
 
     @Test func testCopySelection() {
         let model = makeModel()
         model.translation = .synodal
         model.open(Location(book: 43, chapter: 3))
-        #expect(model.quote(for: [3, 2]) == "«synodal 43:3:2 synodal 43:3:3» (Ин. 3:2-3)")
+        #expect(model.quote(for: [3, 2]) == "«synodal 43:3:2 synodal 43:3:3» (От Иоанна 3:2-3)")
         #expect(model.quote(for: []) == nil)
     }
 

@@ -23,14 +23,26 @@ CANON = [
 ]
 
 
+def verses_of(book, chapter):
+    """Тексти віршів розділу; порожні дозволені лише в кінці.
+
+    Імпорт нумерує вірші за позицією, тож порожній вірш посередині зсунув би номери.
+    """
+    texts = [v["text"].strip() for v in chapter["verses"]]
+    if [v["verse"] for v in chapter["verses"]] != list(range(1, len(texts) + 1)):
+        sys.exit(f"{book} {chapter['chapter']}: номери віршів не 1..N")
+    while texts and not texts[-1]:
+        texts.pop()
+    if not all(texts):
+        sys.exit(f"{book} {chapter['chapter']}: порожній вірш посередині розділу")
+    return texts
+
+
 def main(src, dst):
     books = {b["name"]: b for b in json.load(open(src, encoding="utf-8-sig"))["books"]}
     out = []
     for number, name in enumerate(CANON, start=1):
-        chapters = [
-            [v["text"].strip() for v in ch["verses"] if v["text"].strip()]
-            for ch in books[name]["chapters"]
-        ]
+        chapters = [verses_of(name, ch) for ch in books[name]["chapters"]]
         out.append({"abbrev": str(number), "name": name, "chapters": chapters})
     with open(dst, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)

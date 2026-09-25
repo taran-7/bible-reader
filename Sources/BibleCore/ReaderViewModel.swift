@@ -16,6 +16,8 @@ public final class ReaderViewModel {
     public var query = ""
     /// `nil`, коли пошук не активний; порожній масив означає «Нічого не знайдено».
     public private(set) var results: [SearchResult]?
+    /// Запит, за яким отримано `results` (поле пошуку могли вже змінити).
+    public private(set) var submittedQuery = ""
     public private(set) var loadError: String?
 
     private let repository: BibleRepository?
@@ -48,7 +50,9 @@ public final class ReaderViewModel {
         reload()
     }
 
+    /// Відкриває вірш і закриває список результатів.
     public func open(_ result: SearchResult) {
+        results = nil
         open(Location(book: result.verse.book, chapter: result.verse.chapter), focus: result.verse.verse)
     }
 
@@ -62,6 +66,7 @@ public final class ReaderViewModel {
             results = nil
             open(Location(book: reference.book, chapter: reference.chapter), focus: reference.verseStart)
         } else {
+            submittedQuery = text
             results = (try? repository.search(text, translation: translation, limit: 200)) ?? []
         }
     }

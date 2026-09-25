@@ -7,10 +7,10 @@ struct SearchResultsView: View {
 
     var body: some View {
         if results.isEmpty {
-            ContentUnavailableView.search(text: model.query)
-                .overlay(alignment: .bottom) {
-                    Text("Нічого не знайдено").font(.headline).padding()
-                }
+            ContentUnavailableView(
+                "Нічого не знайдено",
+                systemImage: "magnifyingglass",
+                description: Text("За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."))
         } else {
             List(results) { result in
                 Button { model.open(result) } label: {
