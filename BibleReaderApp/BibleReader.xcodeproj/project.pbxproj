@@ -1,0 +1,403 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10368275E0EC6A019126EBCE /* bible.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C438F53C73BE6A2DB8D0650F /* bible.sqlite */; };
+		2A65813327426C8F15346ED7 /* BookList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3CC1095AD1CF6E94F9D879 /* BookList.swift */; };
+		5C56C4271C726EEF58B005AE /* BibleReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */; };
+		6EE7558DC20375DFFB61127C /* ReaderToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */; };
+		8E6694DDF54665DA0CC8646B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0680B909E57955FF203BFA /* ContentView.swift */; };
+		9CA19D111B4DCB9F64FD418C /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38894779BE1FD47096475E87 /* SearchResultsView.swift */; };
+		AA1417D551D3328DCE86EC12 /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */; };
+		BBB7203A59A283D85162C283 /* BibleCore in Frameworks */ = {isa = PBXBuildFile; productRef = 28E1D81DB5C10704EA0FFF41 /* BibleCore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3646E6B4F9EC83DA1C91663F /* BibleReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BibleReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		38894779BE1FD47096475E87 /* SearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
+		5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderToolbar.swift; sourceTree = "<group>"; };
+		6E3CC1095AD1CF6E94F9D879 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
+		8995A9A58A07B7987DE95345 /* bible-reader */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "bible-reader"; path = ..; sourceTree = SOURCE_ROOT; };
+		BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleReaderApp.swift; sourceTree = "<group>"; };
+		C438F53C73BE6A2DB8D0650F /* bible.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = bible.sqlite; sourceTree = "<group>"; };
+		C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
+		DB0680B909E57955FF203BFA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		169B6B93B69130A2AA235A38 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBB7203A59A283D85162C283 /* BibleCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1804EF0D85C3FC1B4BE6C86D /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */,
+				6E3CC1095AD1CF6E94F9D879 /* BookList.swift */,
+				C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */,
+				DB0680B909E57955FF203BFA /* ContentView.swift */,
+				5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */,
+				38894779BE1FD47096475E87 /* SearchResultsView.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		448F41B74CC17CA6AAF10086 = {
+			isa = PBXGroup;
+			children = (
+				A4FE416725193964BF9D2433 /* Packages */,
+				C8CC1A4708CE470F42893416 /* Resources */,
+				1804EF0D85C3FC1B4BE6C86D /* Sources */,
+				C96187D7D8CEA86FCBA6667C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A4FE416725193964BF9D2433 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				8995A9A58A07B7987DE95345 /* bible-reader */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		C8CC1A4708CE470F42893416 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C438F53C73BE6A2DB8D0650F /* bible.sqlite */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C96187D7D8CEA86FCBA6667C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3646E6B4F9EC83DA1C91663F /* BibleReader.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6ECB204EC1D4E8E4DFDE8904 /* BibleReader */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A9EF628CF201A6BEA8B9FA4 /* Build configuration list for PBXNativeTarget "BibleReader" */;
+			buildPhases = (
+				99DC4C5B93A1A6434C9C2F7C /* Generate bible.sqlite */,
+				93D4A4C4FE28697A0AB45609 /* Sources */,
+				FA5DD93ECD78AB2D3DA55C5E /* Resources */,
+				169B6B93B69130A2AA235A38 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BibleReader;
+			packageProductDependencies = (
+				28E1D81DB5C10704EA0FFF41 /* BibleCore */,
+			);
+			productName = BibleReader;
+			productReference = 3646E6B4F9EC83DA1C91663F /* BibleReader.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29564D168BC3148AEC2300A3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 17D5CD6EA6FDE1B193138F99 /* Build configuration list for PBXProject "BibleReader" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 448F41B74CC17CA6AAF10086;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				04B59FE4EE88D684252BB9F3 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C96187D7D8CEA86FCBA6667C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6ECB204EC1D4E8E4DFDE8904 /* BibleReader */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FA5DD93ECD78AB2D3DA55C5E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10368275E0EC6A019126EBCE /* bible.sqlite in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		99DC4C5B93A1A6434C9C2F7C /* Generate bible.sqlite */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Generate bible.sqlite";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# База не комітиться: генеруємо з data/raw, якщо її ще немає.\nif [ ! -f \"$SRCROOT/Resources/bible.sqlite\" ]; then\n  cd \"$SRCROOT/..\" && make db\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		93D4A4C4FE28697A0AB45609 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C56C4271C726EEF58B005AE /* BibleReaderApp.swift in Sources */,
+				2A65813327426C8F15346ED7 /* BookList.swift in Sources */,
+				AA1417D551D3328DCE86EC12 /* ChapterView.swift in Sources */,
+				8E6694DDF54665DA0CC8646B /* ContentView.swift in Sources */,
+				6EE7558DC20375DFFB61127C /* ReaderToolbar.swift in Sources */,
+				9CA19D111B4DCB9F64FD418C /* SearchResultsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		293C14173E09FC3CC896E90D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Bible Reader";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.taraniuk.BibleReader;
+				PRODUCT_NAME = "Bible Reader";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		573441FA67B6F3042FDD699B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		725056F6FA6D63A330D216FE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Bible Reader";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.taraniuk.BibleReader;
+				PRODUCT_NAME = "Bible Reader";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		8CEAD7F295CD8AE59C25A9DA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		17D5CD6EA6FDE1B193138F99 /* Build configuration list for PBXProject "BibleReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				573441FA67B6F3042FDD699B /* Debug */,
+				8CEAD7F295CD8AE59C25A9DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7A9EF628CF201A6BEA8B9FA4 /* Build configuration list for PBXNativeTarget "BibleReader" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				293C14173E09FC3CC896E90D /* Debug */,
+				725056F6FA6D63A330D216FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		04B59FE4EE88D684252BB9F3 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		28E1D81DB5C10704EA0FFF41 /* BibleCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BibleCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 29564D168BC3148AEC2300A3 /* Project object */;
+}

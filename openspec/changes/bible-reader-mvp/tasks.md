@@ -38,7 +38,7 @@
 ## 7. SwiftUI-додаток
 
 - [x] 7.1 `ReaderViewModel` (`@Observable`): переклад, місце, вірші, пошук (посилання → перехід, інакше FTS), помилка; тести `ReaderViewModelTests.testSwitchTranslationKeepsPlace`, `testReferenceQueryNavigates`, `testTextQuerySearches` на фейковому репозиторії (view model у `BibleCore` або окремому тестованому таргеті)
-- [ ] 7.2 Xcode-проєкт `BibleReaderApp` з локальною залежністю на пакет і ресурсом `bible.sqlite`; перевірка: `xcodebuild -scheme BibleReader build` успішний
+- [x] 7.2 Xcode-проєкт `BibleReaderApp` (XcodeGen, `project.yml`) з локальною залежністю на пакет і ресурсом `bible.sqlite`; перевірка: `xcodebuild -scheme BibleReader build` успішний
 - [ ] 7.3 `NavigationSplitView`: книги СЗ/НЗ, текст розділу, вибір розділу, ◀ ▶, перемикач перекладу в тулбарі; ручна перевірка сценаріїв `bible-reading`
 - [ ] 7.4 `.searchable` з результатами і підсвіченими фрагментами, «Нічого не знайдено», клік відкриває вірш; ручна перевірка `love`/`любовь`, `Ин 3:16`
 - [ ] 7.5 Виділення віршів, ⌘C і контекстне меню «Копіювати»; ручна перевірка копіювання Ин 3:16-18

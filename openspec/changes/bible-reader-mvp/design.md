@@ -28,7 +28,7 @@
 
 7. **Тести на Swift Testing.** На машині лише Command Line Tools: XCTest там недоступний, а Swift Testing потребує явних `-F`/`rpath` і вимкнених cross-import overlays. `make test` додає ці прапорці тільки коли активні CLT; з Xcode це звичайний `swift test`.
 
-8. **Структура проєкту.** `Package.swift` у корені (таргети `BibleCore`, `bible-import`, `BibleCoreTests`); `BibleReaderApp/` Xcode-проєкт з локальною залежністю на пакет. `bible.sqlite` генерується в `BibleReaderApp/Resources/` і не комітиться (додати в `.gitignore`); тести генерують свою базу в тимчасовій теці.
+8. **Структура проєкту.** `Package.swift` у корені (таргети `BibleCore`, `bible-import`, `BibleCoreTests`); `BibleReaderApp/` Xcode-проєкт, згенерований XcodeGen з `project.yml` (редагований руками `.pbxproj` крихкий для агента), з локальною залежністю на пакет; `.xcodeproj` комітиться, щоб збірка не вимагала XcodeGen. Pre-build скрипт запускає `make db`, якщо бази немає. `bible.sqlite` генерується в `BibleReaderApp/Resources/` і не комітиться (додати в `.gitignore`); тести генерують свою базу в тимчасовій теці.
 
 ## Risks / Trade-offs
 
