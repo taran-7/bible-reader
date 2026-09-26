@@ -23,7 +23,7 @@ import { join } from "node:path";
 
 const SUMMARY = "coverage/coverage-summary.json";
 const BASELINE = "quality/coverage-baseline.json";
-const METRICS = ["lines", "statements", "functions", "branches"];
+const ALL_METRICS = ["lines", "statements", "functions", "branches"];
 const TOLERANCE = 0.1; // percentage points of float noise allowed
 const WAIVER_DIR = "docs/qa/waivers";
 
@@ -53,6 +53,11 @@ if (!existsSync(SUMMARY)) {
   process.exit(0);
 }
 const total = JSON.parse(readFileSync(SUMMARY, "utf8")).total;
+// PD-10: a metric with an empty scope (pct null, e.g. Swift has no branch
+// coverage) is printed as SKIP-pending and excluded — never ratcheted at 100%.
+const METRICS = ALL_METRICS.filter((m) => total[m] && total[m].pct !== null);
+for (const m of ALL_METRICS.filter((m) => !METRICS.includes(m)))
+  console.log(`SKIP-pending ${m}: 0 in scope (not collected) — excluded, NOT a pass`);
 const current = Object.fromEntries(METRICS.map((m) => [m, total[m].pct]));
 console.log(`Scope: ${METRICS.length} coverage metric(s)`);
 
@@ -104,6 +109,10 @@ if (process.argv.includes("--update")) {
 
 const baseline = JSON.parse(readFileSync(BASELINE, "utf8"));
 let failed = false;
+for (const m of ALL_METRICS.filter((m) => !METRICS.includes(m) && baseline[m] !== undefined)) {
+  console.error(`FAIL  coverage ratchet: ${m} is in the baseline (${baseline[m]}%) but has no scope now — a vanished metric is a drop`);
+  failed = true;
+}
 for (const m of METRICS) {
   const was = baseline[m] ?? 0;
   const now = current[m] ?? 0;
