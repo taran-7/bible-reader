@@ -57,6 +57,10 @@
 // Per-token entries merge over the built-in defaults; unknown tokens extend
 // the vocabulary. A corrupt config is a FAIL, not a silent fallback.
 //
+// FUTURE ROWS (PD-8, bible-reader): in artifact mode a `| Future |` row with
+// no artifact prints SKIP-pending and is excluded from the verdict; the
+// MVP rows alone decide PASS/FAIL. Promoting a row to MVP makes it hard again.
+//
 // WAIVERS (PD-7): a file under docs/qa/waivers/*.md suppresses a requirement's
 // failures only while it is OPEN. The matcher keys on the waiver's STATUS, not
 // on mere mention of the requirement id: a `Status: open` (or missing status,
@@ -160,6 +164,7 @@ const CONFIG_PATH = "quality/telemetry.config.json";
 
 const failures = [];
 const warnings = [];
+const futurePending = []; // PD-8: Future rows, visible, excluded from the MVP verdict
 const skips = []; // SKIP-pending lines (pre-phase emptiness, visible, never PASS)
 const waivedLines = [];
 const fail = (id, msg) => failures.push({ id, msg });
@@ -325,7 +330,7 @@ for (const d of CODE_DIRS) {
 // template / an authored file without the Verification column — exactly the
 // pixel-run shape), there is no acceptance contract to audit: over product
 // code that is NOT-EARNED (exit 1), never a clean PASS.
-console.log(`Scope: ${contracts.size} tagged requirement(s)`);
+console.log(`Scope: ${contracts.size} tagged requirement(s) (${[...contracts.values()].filter((c) => c.phase !== "Future").length} MVP, the rest Future)`);
 if (contracts.size === 0) {
   if (productCode) {
     console.error(
@@ -519,6 +524,11 @@ for (const e of entries) {
     e.status = "waived";
     waivedLines.push(`WAIVED [${e.id}] ${e.method}: ${e.problem} — suppressed by ${waivedIds.get(e.id)} (visible, never silent)`);
     warn(e.id, `${e.method} failure waived by ${waivedIds.get(e.id)}`);
+  } else if (mode === "artifact" && contracts.get(e.id)?.phase === "Future") {
+    // PD-8: a Future (roadmap) row is not built yet — visible SKIP-pending,
+    // never PASS. It turns hard again when a slice promotes it to MVP.
+    e.status = "future-pending";
+    futurePending.push(`SKIP-pending [${e.id}] ${e.method}: ${e.problem} (Future row — not built yet, NOT a pass)`);
   } else if (mode === "artifact" && !productCode) {
     // Pre-phase emptiness: the method is declared but the build hasn't started.
     // Visible SKIP-pending, never PASS (qa-verify/gate-status render it SKIP).
@@ -617,6 +627,7 @@ writeFileSync(
 );
 
 // ---------- report ----------
+for (const s of futurePending) console.log(s);
 for (const s of skips) console.log(s);
 for (const wline of waivedLines) console.log(wline);
 for (const cw of closedWaiverNotes)
@@ -624,7 +635,7 @@ for (const cw of closedWaiverNotes)
 for (const w of warnings) console.warn(`WARN  [${w.id}] ${w.msg}`);
 for (const f of failures) console.error(`FAIL  [${f.id}] ${f.msg}`);
 for (const d of drafted) console.log(`drafted ${d} — implement or waive before Phase 4`);
-console.log(`acceptance (${mode}): ${entries.length} contract(s) across ${contracts.size} requirement(s) — ${failures.length} failure(s), ${warnings.length} warning(s), ${skips.length} pending`);
+console.log(`acceptance (${mode}): ${entries.length} contract(s) across ${contracts.size} requirement(s) — ${failures.length} failure(s), ${warnings.length} warning(s), ${skips.length} pending, ${futurePending.length} Future pending (not counted as PASS)`);
 
 const result = failures.length ? "FAIL" : skips.length ? "SKIP-pending" : "PASS";
 console.log(`Result: ${result}${warnings.length ? `, ${warnings.length} warning(s)` : ""}`);
