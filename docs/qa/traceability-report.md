@@ -9,7 +9,7 @@ Result: PASS, 14 warning(s)
 | FR | Spec | Plan | Test trace | Recording |
 |---|---|---|---|---|
 | FR-1 | yes | yes | 12 | - |
-| FR-2 | yes | yes | 2 | - |
+| FR-2 | yes | yes | 6 | - |
 | FR-3 | yes | yes | 4 | - |
 | FR-4 | yes | yes | 2 | - |
 | FR-5 | yes | yes | 8 | - |
