@@ -4,17 +4,14 @@
     {
       "slice": "2026-09-25-bible-reader-mvp",
       "reviewEvidence": "clean",
-      "trailerCommits": 0,
-      "libDomains": [],
+      "trailerCommits": 1,
+      "libDomains": [
+        "BibleCore"
+      ],
       "processComplete": true
     }
   ],
   "overlaps": [],
   "failures": [],
-  "warnings": [
-    {
-      "check": "trailer",
-      "msg": "2026-09-25-bible-reader-mvp: no commit carries a \"Slice: bible-reader-mvp\" trailer"
-    }
-  ]
+  "warnings": []
 }
