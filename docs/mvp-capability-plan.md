@@ -18,12 +18,23 @@
 
 | # | Слайс (OpenSpec change) | Вимоги | Залежність | Паралельність |
 |---|---|---|---|---|
-| 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16, FR-17, FR-31, FR-32 | — | serialize |
-| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 | — | parallel-safe з 1 |
+| 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | parallel-safe |
+| 0a | `add-ui-tests` (XCUITest, tech debt #7) | FR-10, FR-14 (UI-докази), NFR-3 (запуск), NFR-4 (VoiceOver, клавіатура) | — | parallel-safe з 0 |
+| 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16, FR-17, FR-31, FR-32, NFR-4 (контраст) | — | serialize |
+| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | parallel-safe з 1 |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
 | 4 | `add-illustrations` (v1.4) | FR-33, FR-34, FR-35 | 1 (кнопка поруч із 6.3) | serialize |
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |
 | 6 | `add-translations` (v2.1) | FR-28, FR-29, FR-30 | 5 (для Огієнка) | serialize |
 
-NFR-1, NFR-2, NFR-4, NFR-5 стають MVP-рядками, коли відповідний слайс додає
-для них механізм перевірки.
+Механізми NFR (затверджено 2026-09-27):
+
+| NFR | Механізм |
+|---|---|
+| NFR-1 | Скрипт: `MACOSX_DEPLOYMENT_TARGET` у `project.yml` = 14.0 і `lipo -archs` бінарника містить arm64 і x86_64 |
+| NFR-2 | Тест `@trace NFR-2`: у `Sources/` немає `URLSession`/`Network`, крім модуля ілюстрацій (FR-33…35) |
+| NFR-3 | Пошук: тест з таймером на реальній базі (`improve-search`); запуск: вимір у XCUITest |
+| NFR-4 | XCUITest: accessibility labels і робота з клавіатури; контраст: тест токенів тем (FR-32) |
+| NFR-5 | Скрипт: розмір `.app` після `xcodebuild` < 60 МБ |
+
+NFR стає MVP-рядком разом зі слайсом, який додає його механізм.
