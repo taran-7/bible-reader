@@ -1,0 +1,24 @@
+{
+  "name": "bible-reader-factory",
+  "private": true,
+  "description": "Project Factory loop for Bible Reader (Swift). Node is used only for the check-* scripts; no runtime dependencies.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "test:run": "make test",
+    "test:coverage": "make coverage",
+    "build": "xcodebuild -quiet -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build",
+    "qa:verify": "node scripts/qa-verify.mjs",
+    "check:trace": "node scripts/check-traceability.mjs",
+    "check:coverage": "node scripts/check-coverage-ratchet.mjs",
+    "check:eval": "node scripts/check-eval-ratchet.mjs",
+    "check:trajectory": "node scripts/check-trajectory.mjs",
+    "gate:status": "node scripts/gate-status.mjs",
+    "correct": "node scripts/correct.mjs",
+    "retro:digest": "node scripts/ledger-report.mjs",
+    "check:acceptance": "node scripts/check-acceptance-methods.mjs --mode=existence",
+    "check:acceptance:artifact": "node scripts/check-acceptance-methods.mjs --mode=artifact",
+    "check:process": "node scripts/check-process-ratchet.mjs",
+    "check:integrity": "node scripts/check-factory-integrity.mjs"
+  }
+}

@@ -6,3 +6,8 @@ xcuserdata/
 *.xcuserstate
 *.sqlite
 *.sqlite.tmp
+
+# Project Factory: лише тимчасове (docs/qa/** комітимо як доказ)
+node_modules/
+coverage/
+**/raw/

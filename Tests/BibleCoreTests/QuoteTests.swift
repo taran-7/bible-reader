@@ -6,6 +6,7 @@ import Testing
         Verse(translation: t, book: 43, chapter: 3, verse: n, text: text)
     }
 
+    // @trace FR-9
     @Test func testReferenceFormat() {
         #expect(Reference(book: 43, chapter: 3, verseStart: 16).format(in: .synodal) == "Ин. 3:16")
         #expect(Reference(book: 46, chapter: 13, verseStart: 4, verseEnd: 7).format(in: .synodal) == "1 Кор. 13:4-7")
@@ -13,11 +14,13 @@ import Testing
         #expect(Reference(book: 1, chapter: 1, verseStart: 1).format(in: .kjv) == "Gen 1:1")
     }
 
+    // @trace FR-9
     @Test func testSingleVerseSynodal() {
         let quote = Quote.format([verse(.synodal, 16, "Ибо так возлюбил Бог мир…")])
         #expect(quote == "«Ибо так возлюбил Бог мир…» (От Иоанна 3:16)")
     }
 
+    // @trace FR-9
     @Test func testRangeKjv() {
         let quote = Quote.format([verse(.kjv, 16, "a"), verse(.kjv, 17, "b"), verse(.kjv, 18, "c")])
         #expect(quote?.hasSuffix("(John 3:16-18)") == true)
@@ -25,16 +28,19 @@ import Testing
         #expect(kings == "«a» (2 Kings 4:16)")
     }
 
+    // @trace FR-9
     @Test func testJoinsTextsWithSpace() {
         let quote = Quote.format([verse(.kjv, 17, "b"), verse(.kjv, 16, "a")])
         #expect(quote == "«a b» (John 3:16-17)")
     }
 
+    // @trace FR-9
     @Test func testNonContiguousSelection() {
         let quote = Quote.format([verse(.kjv, 16, "a"), verse(.kjv, 17, "b"), verse(.kjv, 19, "d")])
         #expect(quote == "«a b d» (John 3:16-17,19)")
     }
 
+    // @trace FR-9
     @Test func testEmptySelection() {
         #expect(Quote.format([]) == nil)
     }

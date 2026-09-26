@@ -1,0 +1,353 @@
+{
+  "generatedBy": "scripts/check-traceability.mjs",
+  "requirements": {
+    "FR-1": "MVP",
+    "FR-2": "MVP",
+    "FR-3": "MVP",
+    "FR-4": "MVP",
+    "FR-5": "MVP",
+    "FR-6": "MVP",
+    "FR-7": "MVP",
+    "FR-8": "MVP",
+    "FR-9": "MVP",
+    "FR-10": "MVP",
+    "FR-11": "MVP",
+    "FR-12": "MVP",
+    "FR-13": "MVP",
+    "FR-14": "MVP",
+    "FR-15": "Future",
+    "FR-16": "Future",
+    "FR-17": "Future",
+    "FR-18": "Future",
+    "FR-19": "Future",
+    "FR-20": "Future",
+    "FR-21": "Future",
+    "FR-22": "Future",
+    "FR-23": "Future",
+    "FR-24": "Future",
+    "FR-25": "Future",
+    "FR-26": "Future",
+    "FR-27": "Future",
+    "FR-28": "Future",
+    "FR-29": "Future",
+    "FR-30": "Future",
+    "NFR-1": "Future",
+    "NFR-2": "Future",
+    "NFR-3": "Future",
+    "NFR-4": "Future",
+    "NFR-5": "Future"
+  },
+  "links": [
+    {
+      "id": "FR-1",
+      "specs": [
+        "openspec/specs/bible-text-import/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/RealDataImportTests.swift",
+        "Tests/BibleCoreTests/RealDataImportTests.swift",
+        "Tests/BibleCoreTests/RealDataImportTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/RealDataImportTests.swift",
+        "tests/BibleCoreTests/RealDataImportTests.swift",
+        "tests/BibleCoreTests/RealDataImportTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-2",
+      "specs": [
+        "openspec/specs/bible-text-import/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-3",
+      "specs": [
+        "openspec/specs/bible-text-import/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-4",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-5",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/BookTests.swift",
+        "Tests/BibleCoreTests/BookTests.swift",
+        "Tests/BibleCoreTests/BookTests.swift",
+        "Tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleCoreTests/BookTests.swift",
+        "tests/BibleCoreTests/BookTests.swift",
+        "tests/BibleCoreTests/BookTests.swift",
+        "tests/BibleCoreTests/RepositoryTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-6",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/NavigatorTests.swift",
+        "Tests/BibleCoreTests/NavigatorTests.swift",
+        "Tests/BibleCoreTests/NavigatorTests.swift",
+        "Tests/BibleCoreTests/NavigatorTests.swift",
+        "Tests/BibleCoreTests/NavigatorTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/RepositoryTests.swift",
+        "Tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleCoreTests/NavigatorTests.swift",
+        "tests/BibleCoreTests/NavigatorTests.swift",
+        "tests/BibleCoreTests/NavigatorTests.swift",
+        "tests/BibleCoreTests/NavigatorTests.swift",
+        "tests/BibleCoreTests/NavigatorTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleCoreTests/RepositoryTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-7",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/RepositoryTests.swift",
+        "Tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleCoreTests/RepositoryTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-8",
+      "specs": [
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift",
+        "tests/BibleCoreTests/ReferenceParseTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-9",
+      "specs": [
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "Tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift",
+        "tests/BibleCoreTests/QuoteTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-10",
+      "specs": [
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-11",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-12",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchQueryTests.swift",
+        "tests/BibleCoreTests/SearchQueryTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-13",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-14",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+      ],
+      "recordings": []
+    }
+  ],
+  "failures": [],
+  "warnings": [
+    {
+      "check": "recording-evidence",
+      "msg": "FR-1 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-2 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-3 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-4 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-5 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-6 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-7 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-8 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-9 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-10 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-11 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-12 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-13 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-14 is not referenced by any recording manifest under docs/qa/"
+    }
+  ]
+}

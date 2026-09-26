@@ -3,6 +3,7 @@ import Testing
 @testable import BibleCore
 
 @Suite struct ImporterTests {
+    // @trace FR-1
     @Test func testImportsFixture() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir)
@@ -14,6 +15,7 @@ import Testing
         #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'synodal' AND book = 1 AND chapter = 1 AND verse = 1", in: out) == "В начале сотворил Бог небо и землю.")
     }
 
+    // @trace FR-1
     @Test func testStripsMarkup() throws {
         let dir = try TestSupport.tempDirectory()
         let kjv = "\u{FEFF}" + #"[{"abbrev":"gn","name":"Genesis","chapters":[["And the earth was {without} form."]]}]"#
@@ -24,6 +26,7 @@ import Testing
         #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'kjv'", in: out) == "And the earth was without form.")
     }
 
+    // @trace FR-2
     @Test func testFtsRowCountMatchesVerses() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir)
@@ -34,6 +37,7 @@ import Testing
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'НАЧАЛЕ'", in: out) == 1)
     }
 
+    // @trace FR-3
     @Test func testMissingFileFailsWithoutOutput() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir, synodal: "")
@@ -46,6 +50,7 @@ import Testing
         #expect(!FileManager.default.fileExists(atPath: out.path + ".tmp"))
     }
 
+    // @trace FR-3
     @Test func testMalformedJsonFails() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir, synodal: #"{"books": 1}"#)
@@ -57,6 +62,7 @@ import Testing
         #expect(!FileManager.default.fileExists(atPath: out.path))
     }
 
+    // @trace FR-1
     @Test func testReplacesExistingOutput() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir)
