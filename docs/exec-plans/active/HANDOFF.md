@@ -10,6 +10,7 @@
 - План MVP перенесено в `docs/exec-plans/completed/bible-reader-mvp.md`.
 - `swift test`: 57 тестів зелені. Xcode 27.0 і XcodeGen встановлено.
 - Продукт описано в PRD: [docs/product-specs/prd.md](../../product-specs/prd.md) (роадмап v1.1–v2.1).
+- У PRD додано 6.18 «Теми оформлення» у v1.1: Світла, Темна, Скло (Liquid Glass), Пастельна, Манускрипт; палітри з перевіреним контрастом WCAG.
 - У PRD додано v1.4 «Ілюстрації» (6.17): кнопка «Пошук ілюстрацій» поруч із «Копіювати», реальні історії до віршів (до 7), лише англомовні протестантські/баптистські джерела. Пошук безкоштовний: локальний індекс (sitemap/RSS у SQLite FTS) + живий пошук на сайтах allowlist. Стартовий allowlist/blocklist: [illustration-sources.md](../../product-specs/illustration-sources.md), домени ще не перевірені.
 
 ## Що далі (для агента)
