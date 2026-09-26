@@ -37,6 +37,21 @@ import Testing
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'НАЧАЛЕ'", in: out) == 1)
     }
 
+    // @trace FR-2
+    @Test func testFtsIgnoresDiacritics() throws {
+        let dir = try TestSupport.tempDirectory()
+        let kjv = #"[{"abbrev":"gn","name":"Genesis","chapters":[["A naïve café."]]}]"#
+        let synodal = #"[{"abbrev":"1","name":"Genesis","chapters":[["Всё ещё здесь."]]}]"#
+        try TestSupport.writeFixture(to: dir, kjv: kjv, synodal: synodal)
+        let out = dir.appendingPathComponent("bible.sqlite")
+        try BibleImporter.run(rawDirectory: dir, output: out)
+
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'cafe'", in: out) == 1)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'NAIVE'", in: out) == 1)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'все'", in: out) == 1)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'ЕЩЕ'", in: out) == 1)
+    }
+
     // @trace FR-3
     @Test func testMissingFileFailsWithoutOutput() throws {
         let dir = try TestSupport.tempDirectory()
