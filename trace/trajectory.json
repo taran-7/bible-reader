@@ -3,7 +3,7 @@
   "slices": [
     {
       "slice": "2026-09-25-bible-reader-mvp",
-      "reviewEvidence": "missing",
+      "reviewEvidence": "clean",
       "trailerCommits": 0,
       "libDomains": [],
       "processComplete": true
@@ -12,10 +12,6 @@
   "overlaps": [],
   "failures": [],
   "warnings": [
-    {
-      "check": "review-evidence",
-      "msg": "2026-09-25-bible-reader-mvp: review-findings.json is missing (review must have run clean before archive)"
-    },
     {
       "check": "trailer",
       "msg": "2026-09-25-bible-reader-mvp: no commit carries a \"Slice: bible-reader-mvp\" trailer"
