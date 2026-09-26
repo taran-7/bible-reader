@@ -4,17 +4,20 @@ import Testing
 @Suite struct RealDataImportTests {
     let db = TestSupport.realDatabase
 
+    // @trace FR-1
     @Test func testSixtySixBooksPerTranslation() throws {
         for translation in Translation.allCases {
             #expect(try TestSupport.count("SELECT COUNT(DISTINCT book) FROM verses WHERE translation = '\(translation.rawValue)'", in: db) == 66)
         }
     }
 
+    // @trace FR-1
     @Test func testKjvVerseCount() throws {
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'kjv'", in: db) == 31_102)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts", in: db) == TestSupport.count("SELECT COUNT(*) FROM verses", in: db))
     }
 
+    // @trace FR-1
     @Test func testControlVerses() throws {
         func text(_ t: Translation, _ b: Int, _ c: Int, _ v: Int) throws -> String {
             try TestSupport.string("SELECT text FROM verses WHERE translation = '\(t.rawValue)' AND book = \(b) AND chapter = \(c) AND verse = \(v)", in: db) ?? ""
