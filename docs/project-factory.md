@@ -32,8 +32,8 @@ Swift описано в [ADR-0001](adr/0001-adopt-swift-stack.md).
 
 ## Відкриті питання після онбордингу (2026-09-26)
 
-1. **Baseline sign-off.** Власник ще не підтвердив [requirements.md](requirements.md) (FR-1…FR-14 як ASSUMPTION) і [план слайсів](mvp-capability-plan.md). Поки цього немає, G1 і G3 стоять як «needs sign-off».
-2. **Нові пункти PRD не в ланцюгу.** 6.17 «Ілюстрації» (v1.4) і 6.18 «Теми оформлення» (v1.1) з'явилися в PRD після онбордингу. Їх треба додати в `requirements.md` як Future-рядки і розподілити по слайсах плану.
+1. ~~**Baseline sign-off.**~~ Закрито 2026-09-27: FR-1…FR-14 і план підтверджено, v1.3 перед v2.0. Було: власник ще не підтвердив [requirements.md](requirements.md) (FR-1…FR-14 як ASSUMPTION) і [план слайсів](mvp-capability-plan.md). Поки цього немає, G1 і G3 стоять як «needs sign-off».
+2. ~~**Нові пункти PRD не в ланцюгу.**~~ Закрито 2026-09-27: FR-31…FR-35, слайс `add-illustrations`, NFR-2 уточнено. Було: 6.17 «Ілюстрації» (v1.4) і 6.18 «Теми оформлення» (v1.1) з'явилися в PRD після онбордингу. Їх треба додати в `requirements.md` як Future-рядки і розподілити по слайсах плану.
 3. **Waivers для baseline.** Крок онбордингу 2b не зроблено: для MVP-вимог немає `docs/qa/waivers/*-baseline-*.md`, тому `check-acceptance-methods --mode=artifact` червоний. Набір waivers підтверджує власник разом із baseline.
 4. **Червоні G6/G7 через веб-специфічні гейти.** `gate-status` досі вимагає recordings і visual-fidelity, яких для нативного додатка немає. Треба вирішити: адаптувати `gate-status` (коміт з `Refs: PD-x`, бо скрипт під lock) чи закрити їх waiver-ами.
 5. **Докази UI.** FR-10 (⌘C, контекстне меню) і FR-14 (клік по результату) перевірено лише на рівні `ReaderViewModel`. Потрібен XCUITest або явний waiver; це пов'язано з tech debt #7.
