@@ -29,8 +29,8 @@ struct ChapterView: View {
                 return [NSItemProvider(object: quote as NSString)]
             }
             .onChange(of: model.location) { _, _ in selection = [] }
-            .onChange(of: model.focusedVerse, initial: true) { _, verse in
-                guard let verse else { return }
+            .onChange(of: model.focusRequest, initial: true) { _, _ in
+                guard let verse = model.focusedVerse else { return }
                 selection = [verse]
                 DispatchQueue.main.async { proxy.scrollTo(verse, anchor: .top) }
             }

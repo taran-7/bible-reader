@@ -22,7 +22,7 @@
 		38894779BE1FD47096475E87 /* SearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
 		5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderToolbar.swift; sourceTree = "<group>"; };
 		6E3CC1095AD1CF6E94F9D879 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
-		8995A9A58A07B7987DE95345 /* bible-reader */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "bible-reader"; path = ..; sourceTree = SOURCE_ROOT; };
+		7557EC908DC6181676EE028E /* agent-factory-open-questions-c0c4c0 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "agent-factory-open-questions-c0c4c0"; path = ..; sourceTree = SOURCE_ROOT; };
 		BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleReaderApp.swift; sourceTree = "<group>"; };
 		C438F53C73BE6A2DB8D0650F /* bible.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = bible.sqlite; sourceTree = "<group>"; };
 		C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
@@ -67,7 +67,7 @@
 		A4FE416725193964BF9D2433 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				8995A9A58A07B7987DE95345 /* bible-reader */,
+				7557EC908DC6181676EE028E /* agent-factory-open-questions-c0c4c0 */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -174,7 +174,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# База не комітиться: генеруємо з data/raw, якщо її ще немає.\nif [ ! -f \"$SRCROOT/Resources/bible.sqlite\" ]; then\n  cd \"$SRCROOT/..\" && make db\nfi\n";
+			shellScript = "# База не комітиться: make перебудовує її, якщо її немає або змінилися\n# data/raw чи код імпорту (інакше стара схема тихо лишається в додатку).\ncd \"$SRCROOT/..\" && make db\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

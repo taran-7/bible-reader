@@ -12,8 +12,13 @@ endif
 test:
 	swift test $(TEST_FLAGS)
 
-db:
-	swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite
+DB := BibleReaderApp/Resources/bible.sqlite
+
+# База перебудовується, коли змінилися тексти або код імпорту чи пошуку (схема).
+db: $(DB)
+
+$(DB): $(wildcard data/raw/*.json) $(wildcard Sources/BibleCore/*.swift) $(wildcard Sources/bible-import/*.swift)
+	swift run bible-import data/raw $(DB)
 
 check: test
 
