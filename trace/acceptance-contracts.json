@@ -87,7 +87,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/QuoteTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -95,7 +95,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "status": "artifact-ok"
       }
     ],
