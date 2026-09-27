@@ -17,7 +17,7 @@ Result: PASS, 1 warning(s)
 | 2026-09-27-add-themes | clean | 3 | yes | BibleCore |
 | 2026-09-27-add-translations | clean | 6 | yes | BibleCore |
 | 2026-09-27-add-ui-tests | clean | 3 | yes | BibleCore |
-| 2026-09-28-tweak-reading-ui | clean | 2 | yes | BibleCore |
+| 2026-09-28-tweak-reading-ui | clean | 3 | yes | BibleCore |
 
 ## Cross-slice module overlap
 
