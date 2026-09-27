@@ -170,4 +170,25 @@ final class ReaderUITests: XCTestCase {
         expectTitle("Romans 1")
         XCTAssertFalse(button.waitForExistence(timeout: 1), "новий розділ без виділення — кнопки немає")
     }
+
+    // @trace FR-28
+    // @trace FR-29
+    func testUkrainianAndCzechTranslations() {
+        launch()
+        let toolbarMenu = app.menuButtons["translation"]
+        XCTAssertTrue(toolbarMenu.waitForExistence(timeout: 5))
+        toolbarMenu.click()
+        app.menuItems["Огієнко — українська"].firstMatch.click()
+        expectTitle("Буття 1")
+        let firstVerse = app.descendants(matching: .any)["verse-1"].firstMatch
+        XCTAssertTrue(firstVerse.waitForExistence(timeout: 5))
+        wait(for: [expectation(for: NSPredicate(format: "value CONTAINS 'На початку Бог створив'"), evaluatedWith: firstVerse)], timeout: 5)
+
+        // ⌘⌥4 — Kralická; посилання чеською.
+        app.typeKey("4", modifierFlags: [.command, .option])
+        search("J 3:16")
+        expectTitle("Jan 3")
+        expectSelected(16)
+    }
 }
+

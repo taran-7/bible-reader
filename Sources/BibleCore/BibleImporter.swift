@@ -97,6 +97,8 @@ public enum BibleImporter {
             for (chapterIndex, verses) in book.chapters.enumerated() {
                 for (verseIndex, text) in verses.enumerated() {
                     let text = clean(text)
+                    // Порожній рядок — пропущений у джерелі вірш: не пишемо його, номери наступних зберігаються.
+                    guard !text.isEmpty else { continue }
                     let folded = SearchText.fold(text)
                     try statement.execute(arguments: [translation.rawValue, bookIndex + 1, chapterIndex + 1, verseIndex + 1, text,
                                                       folded == text ? nil : folded])
