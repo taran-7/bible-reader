@@ -41,16 +41,16 @@ public struct ThemeColor: Equatable, Hashable, Sendable {
         return ThemeColor(red: mix(red, background.red), green: mix(green, background.green), blue: mix(blue, background.blue))
     }
 
-    /// Найменше зміщення до чорного чи білого (що далі від фону), яке дає потрібний контраст.
-    func strengthened(toContrast target: Double, against background: ThemeColor) -> ThemeColor {
-        let pole = background.luminance > 0.18 ? ThemeColor(hex: 0x000000) : ThemeColor(hex: 0xFFFFFF)
-        var step = 0.0
-        var color = self
-        while color.contrast(with: background) < target, step < 1 {
-            step += 0.05
-            color = pole.composited(over: self, opacity: step)
+    /// Найменше зміщення до чорного чи білого (що далі від фонів), яке дає потрібний контраст на кожному з фонів.
+    /// На крайньому кроці колір стає чистим полюсом; якщо й це не досягає цілі, тест контрасту це покаже.
+    func strengthened(toContrast target: Double, against backgrounds: [ThemeColor]) -> ThemeColor {
+        let light = backgrounds.map(\.luminance).reduce(0, +) / Double(backgrounds.count) > 0.18
+        let pole = ThemeColor(hex: light ? 0x000000 : 0xFFFFFF)
+        for step in stride(from: 0.0, through: 1.0, by: 0.05) {
+            let color = pole.composited(over: self, opacity: step)
+            if backgrounds.allSatisfy({ color.contrast(with: $0) >= target }) { return color }
         }
-        return color
+        return pole
     }
 }
 
@@ -124,20 +124,29 @@ public struct ThemeTokens: Sendable, Equatable {
     public var verseNumber: ThemeColor
     public var searchHighlight: ThemeColor
     public var selection: ThemeColor
+    /// Фон вибраної книги в бічній панелі.
+    public var sidebarSelection: ThemeColor
     public var copyButton: ThemeColor
     public var font: ThemeFont
     public var colorScheme: ThemeColorScheme
     /// Непрозорість підкладки під віршами (Скло: 0,92 поверх розмитого тла).
     public var plateOpacity: Double = 1
+    /// Непрозорість кольору панелі поверх матеріалу/скла в бічній панелі й тулбарі (Скло: 0,92).
+    public var chromeOpacity: Double = 1
     public var usesGlass = false
     public var textureOpacity: Double = 0
     /// Додатковий інтервал між рядками в частках кегля: 0,5 → висота рядка 1,5.
     public var lineSpacing: Double = 0.5
 
     /// Фони, на яких реально опиняється текст віршів: для напівпрозорої підкладки — на чорному і на білому тлі.
-    public var effectiveBackgrounds: [ThemeColor] {
-        guard plateOpacity < 1 else { return [background] }
-        return [ThemeColor(hex: 0x000000), ThemeColor(hex: 0xFFFFFF)].map { background.composited(over: $0, opacity: plateOpacity) }
+    public var effectiveBackgrounds: [ThemeColor] { Self.onAnyBackdrop(background, opacity: plateOpacity) }
+
+    /// Те саме для бічної панелі й тулбара.
+    public var effectiveSidebars: [ThemeColor] { Self.onAnyBackdrop(sidebar, opacity: chromeOpacity) }
+
+    private static func onAnyBackdrop(_ color: ThemeColor, opacity: Double) -> [ThemeColor] {
+        guard opacity < 1 else { return [color] }
+        return [ThemeColor(hex: 0x000000), ThemeColor(hex: 0xFFFFFF)].map { color.composited(over: $0, opacity: opacity) }
     }
 }
 
@@ -146,6 +155,7 @@ public enum Theme {
         var t = base(id)
         if reduceTransparency {
             t.plateOpacity = 1
+            t.chromeOpacity = 1
             t.usesGlass = false
             t.textureOpacity = 0
         }
@@ -153,10 +163,8 @@ public enum Theme {
             let dark = t.colorScheme == .dark
             t.text = ThemeColor(hex: dark ? 0xFFFFFF : 0x000000)
             t.secondaryText = t.text
-            // Фон, на якому акцент найслабший (для Скла — чорне чи біле тло під підкладкою); масив ніколи не порожній.
-            let worst = t.effectiveBackgrounds.sorted { $0.contrast(with: t.accent) < $1.contrast(with: t.accent) }[0]
-            t.accent = t.accent.strengthened(toContrast: 7, against: worst)
-            t.verseNumber = t.verseNumber.strengthened(toContrast: 7, against: worst)
+            t.accent = t.accent.strengthened(toContrast: 7, against: t.effectiveBackgrounds)
+            t.verseNumber = t.verseNumber.strengthened(toContrast: 7, against: t.effectiveBackgrounds)
         }
         return t
     }
@@ -168,32 +176,32 @@ public enum Theme {
         case .light:
             ThemeTokens(
                 background: c(0xFFFFFF), sidebar: c(0xF5F5F7), results: c(0xFFFFFF),
-                text: c(0x1C1C1E), secondaryText: c(0x6E6E73), accent: c(0x0A66C2), verseNumber: c(0x6E6E73),
-                searchHighlight: c(0xFFE58F), selection: c(0xDCE9F9), copyButton: c(0xF2F2F7),
+                text: c(0x1C1C1E), secondaryText: c(0x6E6E73), accent: c(0x0A66C2), verseNumber: c(0x5F5F66),
+                searchHighlight: c(0xFFE58F), selection: c(0xDCE9F9), sidebarSelection: c(0xE3E3E8), copyButton: c(0xF2F2F7),
                 font: .newYork, colorScheme: .light)
         case .dark:
             ThemeTokens(
                 background: c(0x121214), sidebar: c(0x1C1C1F), results: c(0x121214),
-                text: c(0xE8E6E3), secondaryText: c(0x9A9AA0), accent: c(0x6CB4FF), verseNumber: c(0x9A9AA0),
-                searchHighlight: c(0x5C4A12), selection: c(0x1F3A5C), copyButton: c(0x2A2A2E),
+                text: c(0xE8E6E3), secondaryText: c(0x9A9AA0), accent: c(0x6CB4FF), verseNumber: c(0xAEAEB4),
+                searchHighlight: c(0x5C4A12), selection: c(0x1F3A5C), sidebarSelection: c(0x2E2E33), copyButton: c(0x2A2A2E),
                 font: .newYork, colorScheme: .dark)
         case .glass:
             ThemeTokens(
                 background: c(0xF2F4F8), sidebar: c(0xEEF1F6), results: c(0xF2F4F8),
                 text: c(0x101218), secondaryText: c(0x5A5F6B), accent: c(0x1F57C8), verseNumber: c(0x5A5F6B),
-                searchHighlight: c(0xFFE58F), selection: c(0xD6E2F7), copyButton: c(0xFFFFFF),
-                font: .sfPro, colorScheme: .light, plateOpacity: 0.92, usesGlass: true)
+                searchHighlight: c(0xFFE58F), selection: c(0xD6E2F7), sidebarSelection: c(0xDDE3EE), copyButton: c(0xFFFFFF),
+                font: .sfPro, colorScheme: .light, plateOpacity: 0.92, chromeOpacity: 0.92, usesGlass: true)
         case .pastel:
             ThemeTokens(
                 background: c(0xF7F3EE), sidebar: c(0xE3EDF7), results: c(0xE8F3EA),
                 text: c(0x2E3440), secondaryText: c(0x565A64), accent: c(0x3F5F92), verseNumber: c(0x565A64),
-                searchHighlight: c(0xFBE3A6), selection: c(0xF6E7EC), copyButton: c(0xEEE8F6),
+                searchHighlight: c(0xFBE3A6), selection: c(0xF6E7EC), sidebarSelection: c(0xCFDDEC), copyButton: c(0xEEE8F6),
                 font: .newYork, colorScheme: .light)
         case .manuscript:
             ThemeTokens(
                 background: c(0xEFE4CC), sidebar: c(0xE8DCC0), results: c(0xEFE4CC),
                 text: c(0x3B2A1A), secondaryText: c(0x6B5238), accent: c(0x8B2E1F), verseNumber: c(0x8B2E1F),
-                searchHighlight: c(0xE6C77A), selection: c(0xDCCBA4), copyButton: c(0xF5ECD8),
+                searchHighlight: c(0xE6C77A), selection: c(0xDCCBA4), sidebarSelection: c(0xDCCBA4), copyButton: c(0xF5ECD8),
                 font: .ebGaramond, colorScheme: .light, textureOpacity: 0.07)
         }
     }

@@ -49,7 +49,10 @@ final class ThemeUITests: XCTestCase {
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
         picker.click()
         picker.menuItems[theme].click()
-        app.typeKey(physicalKey(kVK_ANSI_W, fallback: "w"), modifierFlags: .command)
+        // Закриваємо саме вікно налаштувань: ⌘W міг би закрити головне вікно.
+        let settings = app.windows["com_apple_SwiftUI_Settings_window"]
+        settings.buttons[XCUIIdentifierCloseWindow].click()
+        XCTAssertTrue(settings.waitForNonExistence(timeout: 5))
     }
 
     private func search(_ text: String) {
@@ -136,5 +139,12 @@ final class ThemeUITests: XCTestCase {
 
         choose("Світла")
         expectBackground(0xFFFFFF, tolerance: 6, "light")
+
+        // Із фіксованої темної назад до «Як у системі»: вікно має повернутися до схеми macOS.
+        choose("Темна")
+        expectBackground(0x121214, tolerance: 6, "dark-again")
+        choose("Як у системі")
+        let systemIsDark = UserDefaults.standard.string(forKey: "AppleInterfaceStyle") == "Dark"
+        expectBackground(systemIsDark ? 0x121214 : 0xFFFFFF, tolerance: 6, "system")
     }
 }

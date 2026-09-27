@@ -30,6 +30,10 @@ struct BookList: View {
                 Text(book.name(in: model.translation))
                     .font(.system(size: fontSize))
                     .foregroundStyle(Color(theme.text))
+                    .listRowBackground(
+                        book.number == model.location.book
+                            ? RoundedRectangle(cornerRadius: 6).fill(Color(theme.sidebarSelection)).padding(.horizontal, 8)
+                            : nil)
                     .tag(book.number)
             }
         } header: {

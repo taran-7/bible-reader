@@ -23,6 +23,16 @@ import Testing
     }
 
     // @trace FR-32
+    @Test func testStrengthenStopsAtPole() {
+        let grey = ThemeColor(hex: 0x888888)
+        let white = ThemeColor(hex: 0xFFFFFF), black = ThemeColor(hex: 0x000000)
+        #expect(grey.strengthened(toContrast: 7, against: [white]).contrast(with: white) >= 7)
+        // Недосяжна ціль (понад 21:1) — чистий полюс, далі тест контрасту покаже провал.
+        #expect(grey.strengthened(toContrast: 30, against: [white]) == black)
+        #expect(grey.strengthened(toContrast: 30, against: [black]) == white)
+    }
+
+    // @trace FR-32
     @Test func testHexRoundTrip() {
         #expect(ThemeColor(hex: 0xEFE4CC).hex == 0xEFE4CC)
     }
@@ -64,14 +74,21 @@ import Testing
                 #expect(t.secondaryText.contrast(with: plate) >= 4.5, "\(context): другорядний/фон")
                 #expect(t.accent.contrast(with: plate) >= 4.5, "\(context): акцент/фон")
                 #expect(t.verseNumber.contrast(with: plate) >= 4.5, "\(context): номер вірша/фон")
-                #expect(t.text.contrast(with: t.selection) >= 7, "\(context): текст/виділення")
-                // Кнопка копіювання в спокої: підкладка 0,6 на фоні, іконка непрозора.
-                let button = t.copyButton.composited(over: plate, opacity: 0.6)
-                #expect(t.accent.contrast(with: button) >= 4.5, "\(context): кнопка копіювання")
             }
-            #expect(t.text.contrast(with: t.sidebar) >= 7, "\(context): текст/бічна панель")
-            #expect(t.secondaryText.contrast(with: t.sidebar) >= 4.5, "\(context): другорядний/бічна панель")
+            #expect(t.text.contrast(with: t.selection) >= 7, "\(context): текст/виділення")
+            #expect(t.verseNumber.contrast(with: t.selection) >= 4.5, "\(context): номер вірша/виділення")
+            // Кнопка копіювання стоїть на виділеному рядку: підкладка 0,6 на виділенні, іконка непрозора.
+            let button = t.copyButton.composited(over: t.selection, opacity: 0.6)
+            #expect(t.accent.contrast(with: button) >= 4.5, "\(context): кнопка копіювання")
+            // Бічна панель і тулбар: для Скла — колір панелі з непрозорістю хрому на чорному і білому тлі.
+            for sidebar in t.effectiveSidebars {
+                #expect(t.text.contrast(with: sidebar) >= 7, "\(context): текст/бічна панель")
+                #expect(t.secondaryText.contrast(with: sidebar) >= 4.5, "\(context): другорядний/бічна панель")
+                #expect(t.text.contrast(with: t.sidebarSelection) >= 7, "\(context): текст/вибрана книга")
+            }
             #expect(t.text.contrast(with: t.results) >= 7, "\(context): текст/результати")
+            #expect(t.secondaryText.contrast(with: t.results) >= 4.5, "\(context): другорядний/результати")
+            #expect(t.accent.contrast(with: t.results) >= 4.5, "\(context): посилання/результати")
             #expect(t.text.contrast(with: t.searchHighlight) >= 4.5, "\(context): текст/підсвітка")
             // Підсвітка помітна на фоні результатів.
             #expect(t.searchHighlight != t.results, "\(context): підсвітка видима")
@@ -91,7 +108,7 @@ import Testing
     // @trace FR-31
     @Test func testReduceTransparencyMakesGlassOpaque() {
         let t = Theme.tokens(for: .glass, reduceTransparency: true, increaseContrast: false)
-        #expect(t.plateOpacity == 1 && !t.usesGlass)
+        #expect(t.plateOpacity == 1 && t.chromeOpacity == 1 && !t.usesGlass)
         #expect(Theme.tokens(for: .manuscript, reduceTransparency: true, increaseContrast: false).textureOpacity == 0)
     }
 
@@ -101,6 +118,13 @@ import Testing
         let strong = Theme.tokens(for: .pastel, reduceTransparency: false, increaseContrast: true)
         #expect(strong.text.contrast(with: strong.background) > normal.text.contrast(with: normal.background))
         #expect(strong.accent.contrast(with: strong.background) >= 7)
+        for id in ThemeID.allCases {
+            let t = Theme.tokens(for: id, reduceTransparency: false, increaseContrast: true)
+            for plate in t.effectiveBackgrounds {
+                #expect(t.accent.contrast(with: plate) >= 7, "\(id): акцент")
+                #expect(t.verseNumber.contrast(with: plate) >= 7, "\(id): номер вірша")
+            }
+        }
         #expect(Theme.tokens(for: .dark, reduceTransparency: false, increaseContrast: true).text.hex == 0xFFFFFF)
     }
 

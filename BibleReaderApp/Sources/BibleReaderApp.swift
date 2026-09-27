@@ -21,15 +21,22 @@ struct BibleReaderApp: App {
             ContentView(model: model, preferences: preferences)
                 .frame(minWidth: 800, minHeight: 500)
         }
-        .commands { FontCommands(preferences: preferences) }
+        .commands {
+            FontCommands(preferences: preferences)
+            CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
+        }
 
         Settings {
             SettingsView(preferences: preferences)
+                .modifier(ThemedScene(preferences: preferences))
         }
     }
 
-    private static func makePreferences() -> PreferencesStore {
+    init() {
         ThemeFonts.register()
+    }
+
+    private static func makePreferences() -> PreferencesStore {
         let store = PreferencesStore(storage: UserDefaults.standard)
         #if DEBUG
         // UI-тести стартують зі стандартних налаштувань.
@@ -55,9 +62,6 @@ struct FontCommands: Commands {
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.isVerseFontDefault)
             Divider()
-            Picker("Тема", selection: Bindable(preferences).preferences.theme) {
-                ForEach(ThemeChoice.allCases, id: \.self) { Text($0.title).tag($0) }
-            }
         }
     }
 }

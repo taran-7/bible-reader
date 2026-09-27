@@ -5,31 +5,10 @@ struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
 
-    @Environment(\.colorScheme) private var systemScheme
-    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
-    @Environment(\.colorSchemeContrast) private var contrast
-
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
-    private var choice: ThemeChoice { preferences.preferences.theme }
-    private var theme: ThemeTokens {
-        Theme.tokens(
-            for: choice.resolve(systemIsDark: systemScheme == .dark),
-            reduceTransparency: reduceTransparency,
-            increaseContrast: contrast == .increased)
-    }
 
     var body: some View {
-        themed(content)
-    }
-
-    /// Для «Як у системі» схему не нав'язуємо, інакше `systemScheme` перестане відбивати macOS.
-    private func themed(_ view: some View) -> some View {
-        view
-            .environment(\.theme, theme)
-            .environment(\.interfaceScale, scale)
-            .foregroundStyle(Color(theme.text))
-            .tint(Color(theme.accent))
-            .preferredColorScheme(choice == .system ? nil : theme.preferredColorScheme)
+        content.modifier(ThemedScene(preferences: preferences))
     }
 
     @ViewBuilder private var content: some View {

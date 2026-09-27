@@ -1,0 +1,26 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-themes",
+  "change": "add-themes",
+  "baseRef": "0d44f76",
+  "headRef": "feature/add-themes",
+  "dimensions": {
+    "correctness": { "confirmed": 10, "contested": 1, "rejected": 0, "fixed": 9, "deferred": 1 }
+  },
+  "fixed": [
+    "M1: contrast test missed real pairs — added verse number/selection, copy button over selection, secondary and accent on results, sidebar at chrome opacity over black/white, selected book; the new pairs caught 3 real failures (light/dark verse number on selection, glass sidebar) and the colors were fixed (FR-32)",
+    "M2: Dark -> 'Як у системі' kept the dark appearance — scheme set via NSApp.appearance, UI test step fixed -> system (FR-31)",
+    "M3: sidebar selection, Settings window unthemed — sidebarSelection row background, ThemedScene applied to Settings; search field and Settings form background documented as tech debt #18 (FR-31)",
+    "L5: texture redrew ~2000 random strokes per resize and jumped — precomputed 512 pt tile, drawingGroup (FR-31)",
+    "L6: font registration failed silently, family name used — PostScript name, logged errors, serif fallback (FR-31)",
+    "L7: increase-contrast reused accent's worst background for verse numbers; silent give-up — per-colour check against all backdrops, pole fallback tested (FR-32)",
+    "L8: macOS 14 toolbar background not visible — .toolbarBackground(.visible) on all versions (FR-31)",
+    "L9: ⌘W could close the main window; no fixed->system step — close Settings by its close button, system step added (FR-31)",
+    "L11: duplicated theme picker and resolution — ThemePicker and ThemedScene shared (FR-31)"
+  ],
+  "contested": "M4: native List selection over the selection token — screenshot manuscript-selection shows the token colour, no system highlight",
+  "deferred": "L10 (Pastel highlight #FBE3A6 instead of PRD vanilla — documented in design.md); tech debt #18, #19",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T17:24:38Z"
+}
