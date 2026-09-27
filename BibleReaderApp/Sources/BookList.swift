@@ -4,6 +4,7 @@ import SwiftUI
 struct BookList: View {
     let model: ReaderViewModel
     let fontSize: Double
+    @Environment(\.theme) private var theme
 
     private var selection: Binding<Int?> {
         Binding(
@@ -20,15 +21,23 @@ struct BookList: View {
             section("Старий Заповіт", .old)
             section("Новий Заповіт", .new)
         }
+        .modifier(ChromeBackground(color: theme.sidebar))
     }
 
     private func section(_ title: String, _ testament: Testament) -> some View {
-        Section(title) {
+        Section {
             ForEach(model.books.filter { $0.testament == testament }) { book in
                 Text(book.name(in: model.translation))
                     .font(.system(size: fontSize))
+                    .foregroundStyle(Color(theme.text))
+                    .listRowBackground(
+                        book.number == model.location.book
+                            ? RoundedRectangle(cornerRadius: 6).fill(Color(theme.sidebarSelection)).padding(.horizontal, 8)
+                            : nil)
                     .tag(book.number)
             }
+        } header: {
+            Text(title).foregroundStyle(Color(theme.secondaryText))
         }
     }
 }

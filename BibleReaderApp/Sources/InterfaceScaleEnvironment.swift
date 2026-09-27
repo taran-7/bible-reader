@@ -25,13 +25,17 @@ struct MessageView: View {
     let systemImage: String
     let lines: [String]
     @Environment(\.interfaceScale) private var scale
+    @Environment(\.theme) private var theme
 
     var body: some View {
         ContentUnavailableView {
             Label(title, systemImage: systemImage)
                 .font(.system(size: scale.systemFontSize * 1.5, weight: .semibold))
+                .foregroundStyle(Color(theme.text))
         } description: {
-            ForEach(lines, id: \.self) { Text($0).font(.system(size: scale.systemFontSize)) }
+            ForEach(lines, id: \.self) {
+                Text($0).font(.system(size: scale.systemFontSize)).foregroundStyle(Color(theme.secondaryText))
+            }
         }
     }
 }

@@ -31,8 +31,8 @@
     "FR-28": "Future",
     "FR-29": "Future",
     "FR-30": "Future",
-    "FR-31": "Future",
-    "FR-32": "Future",
+    "FR-31": "MVP",
+    "FR-32": "MVP",
     "FR-33": "Future",
     "FR-34": "Future",
     "FR-35": "Future",
@@ -396,6 +396,48 @@
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-31",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleReaderUITests/ThemeUITests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleReaderUITests/ThemeUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-32",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "Tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift",
+        "tests/BibleCoreTests/ThemeTests.swift"
+      ],
+      "recordings": []
     }
   ],
   "failures": [],
@@ -467,6 +509,14 @@
     {
       "check": "recording-evidence",
       "msg": "FR-17 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-31 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }
