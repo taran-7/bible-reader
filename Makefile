@@ -10,6 +10,7 @@ endif
 .PHONY: test db check coverage ui-test
 
 test:
+	python3 scripts/test_convert_getbible.py
 	swift test $(TEST_FLAGS)
 
 DB := BibleReaderApp/Resources/bible.sqlite

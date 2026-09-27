@@ -5,7 +5,7 @@ archived slice took: review evidence, `Slice:` trailers, and module scope.
 It does NOT verify test-first ordering or test integrity (not derivable from
 one-commit-per-slice history) — those are graded by the trajectory-eval workflow.
 
-Scope: 5 archived slice(s).
+Scope: 6 archived slice(s).
 Result: PASS, 1 warning(s)
 
 | Slice | Review evidence | Trailer commits | design+tasks | lib domains touched |
@@ -14,11 +14,12 @@ Result: PASS, 1 warning(s)
 | 2026-09-27-add-copy-button | clean | 2 | yes | BibleCore |
 | 2026-09-27-add-reading-comfort | clean | 2 | yes | BibleCore |
 | 2026-09-27-add-themes | clean | 3 | yes | BibleCore |
+| 2026-09-27-add-translations | clean | 2 | yes | BibleCore |
 | 2026-09-27-add-ui-tests | clean | 3 | yes | BibleCore |
 
 ## Cross-slice module overlap
 
-- `lib/BibleCore/` touched by: 2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-ui-tests
+- `lib/BibleCore/` touched by: 2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests
 
 ## Failures
 
@@ -26,4 +27,4 @@ None.
 
 ## Warnings
 
-- **in-scope**: lib/BibleCore/ modified by 5 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-ui-tests) — review for scope drift
+- **in-scope**: lib/BibleCore/ modified by 6 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests) — review for scope drift

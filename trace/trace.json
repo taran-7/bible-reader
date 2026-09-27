@@ -28,8 +28,8 @@
     "FR-25": "Future",
     "FR-26": "Future",
     "FR-27": "Future",
-    "FR-28": "Future",
-    "FR-29": "Future",
+    "FR-28": "MVP",
+    "FR-29": "MVP",
     "FR-30": "Future",
     "FR-31": "MVP",
     "FR-32": "MVP",
@@ -398,6 +398,58 @@
       "recordings": []
     },
     {
+      "id": "FR-28",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md",
+        "openspec/specs/bible-text-import/spec.md",
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-29",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md",
+        "openspec/specs/bible-text-import/spec.md",
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ImporterTests.swift",
+        "Tests/BibleCoreTests/RealDataImportTests.swift",
+        "Tests/BibleCoreTests/TranslationTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ImporterTests.swift",
+        "tests/BibleCoreTests/RealDataImportTests.swift",
+        "tests/BibleCoreTests/TranslationTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
       "id": "FR-31",
       "specs": [
         "openspec/specs/bible-reading/spec.md"
@@ -512,15 +564,19 @@
     },
     {
       "check": "recording-evidence",
+      "msg": "FR-28 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-29 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
       "msg": "FR-31 is not referenced by any recording manifest under docs/qa/"
     },
     {
       "check": "recording-evidence",
       "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
-    },
-    {
-      "check": "active-changes",
-      "msg": "active change \"add-translations\" is not archived"
     }
   ]
 }
