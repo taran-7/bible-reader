@@ -8,6 +8,7 @@ public final class ReaderViewModel {
         didSet {
             guard translation != oldValue else { return }
             reload()
+            savePosition()
             // Той самий запит, що дав результати, а не недописаний текст у полі.
             if results != nil || searchError != nil { runSearch(submittedQuery) }
         }
@@ -45,8 +46,20 @@ public final class ReaderViewModel {
     public private(set) var searchError: String?
 
     private let repository: BibleRepository?
+    @ObservationIgnored private let positionStore: KeyValueStore?
 
-    public init(openRepository: () throws -> BibleRepository) {
+    /// Останнє місце читання (FR-25): переклад, книга, розділ.
+    struct Position: Codable {
+        let translation: Translation
+        let book: Int
+        let chapter: Int
+    }
+
+    public static let positionKey = "lastPosition"
+
+    /// `positionStore` зберігає останнє місце; без нього додаток відкривається на Бутті 1.
+    public init(positionStore: KeyValueStore? = nil, openRepository: () throws -> BibleRepository) {
+        self.positionStore = positionStore
         do {
             repository = try openRepository()
         } catch {
@@ -54,7 +67,23 @@ public final class ReaderViewModel {
             loadError = "\(error)"
             return
         }
+        if let data = positionStore?.data(forKey: Self.positionKey),
+           let position = try? JSONDecoder().decode(Position.self, from: data),
+           Book(number: position.book) != nil, position.chapter > 0 {
+            // Присвоєння в init не викликає didSet; розділ поза книгою обріже `reload`.
+            translation = position.translation
+            location = Location(book: position.book, chapter: position.chapter)
+        }
         reload()
+        // `reload` міг обрізати розділ — зберігаємо вже дійсне місце.
+        if positionStore != nil { savePosition() }
+    }
+
+    private func savePosition() {
+        guard let positionStore else { return }
+        let position = Position(translation: translation, book: location.book, chapter: location.chapter)
+        guard let data = try? JSONEncoder().encode(position) else { return }
+        positionStore.set(data, forKey: Self.positionKey)
     }
 
     public var canGoPrevious: Bool { navigator.previous(from: location) != nil }
@@ -73,6 +102,13 @@ public final class ReaderViewModel {
         focusedVerse = verse
         if verse != nil { focusRequest += 1 }
         reload()
+        savePosition()
+    }
+
+    /// Відкриває вірш, до якого знайдено нотатку, і закриває результати.
+    public func openNote(_ key: VerseKey) {
+        results = nil
+        open(Location(book: key.book, chapter: key.chapter), focus: key.verse)
     }
 
     /// Відкриває вірш і закриває список результатів.

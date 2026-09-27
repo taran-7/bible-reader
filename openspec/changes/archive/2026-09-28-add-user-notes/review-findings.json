@@ -1,0 +1,24 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-user-notes",
+  "change": "add-user-notes",
+  "baseRef": "a886d2b",
+  "headRef": "feature/add-user-notes",
+  "dimensions": {
+    "correctness": { "confirmed": 10, "contested": 0, "rejected": 0, "fixed": 8, "deferred": 2 }
+  },
+  "fixed": [
+    "H1: user database errors were never shown — banner above the reader, explicit 'not saved' when the database did not open (FR-24)",
+    "M2: memory changed before a failed write — write first, one transaction per batch, memory only after success (FR-23, FR-24)",
+    "M3: note button unreachable for VoiceOver — row label is number+text, marks in value, named action 'Нотатка' (NFR-4, FR-24)",
+    "M4: notes hidden when no verse matched — notes shown independently of verse results, computed once per body (FR-24)",
+    "L6: clamped position not saved on launch (FR-25)",
+    "L7: try! in position encoding replaced with guard",
+    "L8: bookmark menu item names the verse it bookmarks",
+    "L9: ⌘D moved from the toolbar button into a 'Закладки' menu command (FR-22)"
+  ],
+  "deferred": "M5 (notes keyed by number without translation — Synodal numbering differs; tech debt #24, closes with the v2.0 correspondence table); L10 (note editor sheet stays for the old verse when the chapter changes underneath — low confidence, no data loss)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T02:10:00Z"
+}

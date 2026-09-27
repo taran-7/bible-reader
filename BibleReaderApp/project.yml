@@ -33,6 +33,8 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "6.0"
         ENABLE_APP_SANDBOX: YES
+        # Експорт нотаток у файл, обраний користувачем (FR-24).
+        ENABLE_USER_SELECTED_FILES: readwrite
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         CODE_SIGN_IDENTITY: "-"
     preBuildScripts:
