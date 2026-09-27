@@ -1,0 +1,17 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-ui-tests",
+  "change": "add-ui-tests",
+  "baseRef": "071cc8d",
+  "headRef": "feature/add-ui-tests",
+  "dimensions": {
+    "correctness": { "confirmed": 1, "contested": 0, "rejected": 0, "fixed": 1, "deferred": 0 }
+  },
+  "fixed": [
+    "R1: .onChange(initial: true) made the verse list steal focus from the search field whenever ChapterView was re-created — takeFocus() consumes each focusRequest once (FR-10, FR-13)",
+    "T1 (found by UI test): ⌘C after a reference query copied the search text instead of the quote — list takes focus on focusRequest (FR-10)"
+  ],
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T14:15:53Z"
+}

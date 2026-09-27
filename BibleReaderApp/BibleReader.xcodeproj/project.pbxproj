@@ -15,15 +15,28 @@
 		9CA19D111B4DCB9F64FD418C /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38894779BE1FD47096475E87 /* SearchResultsView.swift */; };
 		AA1417D551D3328DCE86EC12 /* ChapterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */; };
 		BBB7203A59A283D85162C283 /* BibleCore in Frameworks */ = {isa = PBXBuildFile; productRef = 28E1D81DB5C10704EA0FFF41 /* BibleCore */; };
+		F6BFD8698AED18132FAB4E10 /* ReaderUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE88C05F234E2E28DCA84D79 /* ReaderUITests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		53B560991D2C5D8B20A4431A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29564D168BC3148AEC2300A3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6ECB204EC1D4E8E4DFDE8904;
+			remoteInfo = BibleReader;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		0DF67F4C03F5D9E2C94076D1 /* BibleReaderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BibleReaderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3646E6B4F9EC83DA1C91663F /* BibleReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BibleReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		38894779BE1FD47096475E87 /* SearchResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsView.swift; sourceTree = "<group>"; };
 		5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderToolbar.swift; sourceTree = "<group>"; };
 		6E3CC1095AD1CF6E94F9D879 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
 		7557EC908DC6181676EE028E /* agent-factory-open-questions-c0c4c0 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "agent-factory-open-questions-c0c4c0"; path = ..; sourceTree = SOURCE_ROOT; };
 		BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleReaderApp.swift; sourceTree = "<group>"; };
+		BE88C05F234E2E28DCA84D79 /* ReaderUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderUITests.swift; sourceTree = "<group>"; };
 		C438F53C73BE6A2DB8D0650F /* bible.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = bible.sqlite; sourceTree = "<group>"; };
 		C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
 		DB0680B909E57955FF203BFA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -57,11 +70,21 @@
 		448F41B74CC17CA6AAF10086 = {
 			isa = PBXGroup;
 			children = (
+				4FFCD36CF6B91726653ACD25 /* BibleReaderUITests */,
 				A4FE416725193964BF9D2433 /* Packages */,
 				C8CC1A4708CE470F42893416 /* Resources */,
 				1804EF0D85C3FC1B4BE6C86D /* Sources */,
 				C96187D7D8CEA86FCBA6667C /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		4FFCD36CF6B91726653ACD25 /* BibleReaderUITests */ = {
+			isa = PBXGroup;
+			children = (
+				BE88C05F234E2E28DCA84D79 /* ReaderUITests.swift */,
+			);
+			name = BibleReaderUITests;
+			path = ../Tests/BibleReaderUITests;
 			sourceTree = "<group>";
 		};
 		A4FE416725193964BF9D2433 /* Packages */ = {
@@ -84,6 +107,7 @@
 			isa = PBXGroup;
 			children = (
 				3646E6B4F9EC83DA1C91663F /* BibleReader.app */,
+				0DF67F4C03F5D9E2C94076D1 /* BibleReaderUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,6 +136,24 @@
 			productReference = 3646E6B4F9EC83DA1C91663F /* BibleReader.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A0E24572B1938FA45275EE93 /* BibleReaderUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEE46D32D624F3600C1E8790 /* Build configuration list for PBXNativeTarget "BibleReaderUITests" */;
+			buildPhases = (
+				6FD1E5C380AEA24779CD90E9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				970F05423455A2EEFF73DEE6 /* PBXTargetDependency */,
+			);
+			name = BibleReaderUITests;
+			packageProductDependencies = (
+			);
+			productName = BibleReaderUITests;
+			productReference = 0DF67F4C03F5D9E2C94076D1 /* BibleReaderUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -121,6 +163,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					A0E24572B1938FA45275EE93 = {
+						TestTargetID = 6ECB204EC1D4E8E4DFDE8904;
+					};
 				};
 			};
 			buildConfigurationList = 17D5CD6EA6FDE1B193138F99 /* Build configuration list for PBXProject "BibleReader" */;
@@ -141,6 +186,7 @@
 			projectRoot = "";
 			targets = (
 				6ECB204EC1D4E8E4DFDE8904 /* BibleReader */,
+				A0E24572B1938FA45275EE93 /* BibleReaderUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -179,6 +225,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6FD1E5C380AEA24779CD90E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F6BFD8698AED18132FAB4E10 /* ReaderUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93D4A4C4FE28697A0AB45609 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -194,7 +248,34 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		970F05423455A2EEFF73DEE6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6ECB204EC1D4E8E4DFDE8904 /* BibleReader */;
+			targetProxy = 53B560991D2C5D8B20A4431A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0E8712A0D23A32494A9720B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.taraniuk.BibleReaderUITests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET_NAME = BibleReader;
+			};
+			name = Debug;
+		};
 		293C14173E09FC3CC896E90D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -362,6 +443,25 @@
 			};
 			name = Release;
 		};
+		B31873DCABCEBCED4905DF07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.taraniuk.BibleReaderUITests;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 6.0;
+				TEST_TARGET_NAME = BibleReader;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -379,6 +479,15 @@
 			buildConfigurations = (
 				293C14173E09FC3CC896E90D /* Debug */,
 				725056F6FA6D63A330D216FE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BEE46D32D624F3600C1E8790 /* Build configuration list for PBXNativeTarget "BibleReaderUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E8712A0D23A32494A9720B7 /* Debug */,
+				B31873DCABCEBCED4905DF07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -37,6 +37,20 @@ targets:
           # База не комітиться: make перебудовує її, якщо її немає або змінилися
           # data/raw чи код імпорту (інакше стара схема тихо лишається в додатку).
           cd "$SRCROOT/.." && make db
+  BibleReaderUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: ../Tests/BibleReaderUITests
+    dependencies:
+      - target: BibleReader
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.taraniuk.BibleReaderUITests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "6.0"
+        CODE_SIGN_IDENTITY: "-"
+        TEST_TARGET_NAME: BibleReader
 schemes:
   BibleReader:
     build:
@@ -44,3 +58,7 @@ schemes:
         BibleReader: all
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - BibleReaderUITests

@@ -46,5 +46,7 @@ struct DatabaseErrorView: View {
             Text("Перезберіть додаток після `make db`.")
         }
         .textSelection(.enabled)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("database-error")
     }
 }

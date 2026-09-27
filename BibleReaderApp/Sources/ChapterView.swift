@@ -5,6 +5,8 @@ import SwiftUI
 struct ChapterView: View {
     let model: ReaderViewModel
     @State private var selection = Set<Int>()
+    /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
+    @FocusState private var listFocused: Bool
 
     private var title: String {
         let name = Book(number: model.location.book)?.name(in: model.translation) ?? ""
@@ -20,6 +22,7 @@ struct ChapterView: View {
                         .id(verse.verse)
                 }
             }
+            .focused($listFocused)
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)
@@ -30,8 +33,9 @@ struct ChapterView: View {
             }
             .onChange(of: model.location) { _, _ in selection = [] }
             .onChange(of: model.focusRequest, initial: true) { _, _ in
-                guard let verse = model.focusedVerse else { return }
+                guard let verse = model.takeFocus() else { return }
                 selection = [verse]
+                listFocused = true
                 DispatchQueue.main.async { proxy.scrollTo(verse, anchor: .top) }
             }
         }
@@ -59,5 +63,7 @@ struct VerseRow: View {
                 .fontWeight(isFocused ? .semibold : .regular)
         }
         .padding(.vertical, 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("verse-\(verse.verse)")
     }
 }
