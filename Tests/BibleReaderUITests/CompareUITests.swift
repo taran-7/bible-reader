@@ -78,7 +78,19 @@ final class CompareUITests: XCTestCase {
 
         // «+ Переклад» повертає закриту панель праворуч.
         window.descendants(matching: .any)["compare-add"].firstMatch.click()
-        app.menuItems["Kralická — čeština"].click()
+        // Такий самий пункт є в головному меню «Переклад» — беремо той, що відкритий.
+        let items = app.menuItems.matching(NSPredicate(format: "title == %@", "Kralická — čeština"))
+        let deadline = Date().addingTimeInterval(5)
+        var clicked = false
+        while !clicked, Date() < deadline {
+            if let item = items.allElementsBoundByIndex.first(where: \.isHittable) {
+                item.click()
+                clicked = true
+            } else {
+                RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            }
+        }
+        XCTAssertTrue(clicked, "пункт «Kralická — čeština»")
         XCTAssertEqual(panelOrder(in: window), ["kjv", "synodal", "ohienko", "bkr"])
     }
 }

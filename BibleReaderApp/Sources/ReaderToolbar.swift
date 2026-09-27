@@ -77,6 +77,7 @@ struct ReaderToolbar: ToolbarContent {
                 Text(model.translation.title)
             }
             .help("Переклад")
+            .accessibilityLabel("Переклад: \(model.translation.title)")
             .accessibilityIdentifier("translation")
             .controlSize(scale.controlSize)
         }
