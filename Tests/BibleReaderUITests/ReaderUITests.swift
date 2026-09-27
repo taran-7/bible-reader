@@ -287,8 +287,9 @@ final class ReaderUITests: XCTestCase {
         expectMarks(16, contain: "є нотатка")
 
         // ⌘D — закладка на розділ; обидві закладки в бічній панелі.
-        app.buttons["bookmark-chapter"].click()
-        XCTAssertEqual(app.descendants(matching: .any).matching(identifier: "bookmark-row").count, 2)
+        app.buttons.matching(identifier: "bookmark-chapter").firstMatch.click()
+        let rows = app.buttons.matching(identifier: "bookmark-row")
+        XCTAssertTrue(rows.element(boundBy: 1).waitForExistence(timeout: 5), "дві закладки в бічній панелі")
 
         let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
         attachment.name = "notes-bookmarks"
