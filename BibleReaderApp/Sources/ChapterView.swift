@@ -19,6 +19,14 @@ struct ChapterView: View {
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
                     VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize)
+                        // Праве поле завжди, щоб кнопка копіювання не перекривала текст і рядки не перескакували.
+                        .padding(.trailing, 36)
+                        .overlay(alignment: .topTrailing) {
+                            if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
+                                // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
+                                CopyButton { [verses = selection] in copy(verses) }
+                            }
+                        }
                         .tag(verse.verse)
                         .id(verse.verse)
                 }
