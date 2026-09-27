@@ -4,6 +4,7 @@ import SwiftUI
 
 struct ChapterView: View {
     let model: ReaderViewModel
+    let fontSize: Double
     @State private var selection = Set<Int>()
     /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
     @FocusState private var listFocused: Bool
@@ -17,7 +18,7 @@ struct ChapterView: View {
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
-                    VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse)
+                    VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize)
                         .tag(verse.verse)
                         .id(verse.verse)
                 }
@@ -51,15 +52,16 @@ struct ChapterView: View {
 struct VerseRow: View {
     let verse: Verse
     let isFocused: Bool
+    let fontSize: Double
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             Text("\(verse.verse)")
-                .font(.caption.monospacedDigit())
+                .font(.system(size: fontSize * 0.75).monospacedDigit())
                 .foregroundStyle(.secondary)
                 .frame(minWidth: 24, alignment: .trailing)
             Text(verse.text)
-                .font(.body)
+                .font(.system(size: fontSize))
                 .fontWeight(isFocused ? .semibold : .regular)
         }
         .padding(.vertical, 2)

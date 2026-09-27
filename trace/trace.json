@@ -15,8 +15,8 @@
     "FR-12": "MVP",
     "FR-13": "MVP",
     "FR-14": "MVP",
-    "FR-15": "Future",
-    "FR-16": "Future",
+    "FR-15": "MVP",
+    "FR-16": "MVP",
     "FR-17": "Future",
     "FR-18": "Future",
     "FR-19": "Future",
@@ -326,6 +326,52 @@
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-15",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleReaderUITests/ReadingComfortUITests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleReaderUITests/ReadingComfortUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-16",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "Tests/BibleReaderUITests/ReadingComfortUITests.swift",
+        "tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "tests/BibleReaderUITests/ReadingComfortUITests.swift"
+      ],
+      "recordings": []
     }
   ],
   "failures": [],
@@ -385,6 +431,14 @@
     {
       "check": "recording-evidence",
       "msg": "FR-14 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-15 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-16 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }
