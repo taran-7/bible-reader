@@ -11,7 +11,7 @@ Result: PASS, 1 warning(s)
 | Slice | Review evidence | Trailer commits | design+tasks | lib domains touched |
 |---|---|---|---|---|
 | 2026-09-25-bible-reader-mvp | clean | 1 | yes | BibleCore |
-| 2026-09-27-add-ui-tests | clean | 1 | yes | BibleCore |
+| 2026-09-27-add-ui-tests | clean | 3 | yes | BibleCore |
 
 ## Cross-slice module overlap
 
