@@ -23,9 +23,10 @@ struct BookList: View {
                 Section {
                     ForEach(userData.bookmarks) { bookmark in
                         Button {
-                            model.open(Location(book: bookmark.target.book, chapter: bookmark.target.chapter), focus: bookmark.target.verse)
+                            model.openCanonical(book: bookmark.target.book, chapter: bookmark.target.chapter, verse: bookmark.target.verse)
                         } label: {
-                            Label(bookmark.target.reference.format(in: model.translation),
+                            Label(model.localReference(book: bookmark.target.book, chapter: bookmark.target.chapter,
+                                                       verse: bookmark.target.verse).format(in: model.translation),
                                   systemImage: bookmark.target.verse == nil ? "book" : "bookmark")
                                 .font(.system(size: fontSize))
                                 .foregroundStyle(Color(theme.text))

@@ -282,6 +282,22 @@ public final class UserData {
 
     // MARK: Позначки розділу
 
+    /// Позначки вірша, що складається з одного чи кількох віршів KJV (злиті в Синодальному).
+    public func marks(for keys: [VerseKey]) -> VerseMarks {
+        var marks = VerseMarks()
+        for key in keys {
+            marks.highlight = marks.highlight ?? highlights[key]
+            marks.hasNote = marks.hasNote || notes[key] != nil
+            marks.isBookmarked = marks.isBookmarked || bookmarkTargets.contains(.init(book: key.book, chapter: key.chapter, verse: key.verse))
+        }
+        return marks
+    }
+
+    public func marks(for key: VerseKey) -> VerseMarks { marks(for: [key]) }
+
+    /// Множина для швидкої перевірки в кожному рядку розділу.
+    private var bookmarkTargets: Set<Bookmark.Target> { Set(bookmarks.map(\.target)) }
+
     public func marks(book: Int, chapter: Int) -> [Int: VerseMarks] {
         var marks: [Int: VerseMarks] = [:]
         for (key, color) in highlights where key.book == book && key.chapter == chapter {
