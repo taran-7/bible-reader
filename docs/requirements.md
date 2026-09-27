@@ -75,8 +75,8 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 | FR-25 | Future | Reading | Відкриття на останньому місці читання (PRD 6.11). | local-verifiable |
 | FR-26 | Future | Parallel | Два переклади поруч із синхронним прокручуванням (PRD 6.12). | local-verifiable |
 | FR-27 | Future | Parallel | Таблиця відповідностей нумерації KJV ↔ Синодальний (PRD 6.13). | local-verifiable |
-| FR-28 | Future | Import | Переклад Огієнка (PRD 6.14). | local-verifiable |
-| FR-29 | Future | Import | Біблія Кралицька 1613 (PRD 6.15). | local-verifiable |
+| FR-28 | MVP | Import | Переклад Огієнка (PRD 6.14). | local-verifiable |
+| FR-29 | MVP | Import | Біблія Кралицька 1613 (PRD 6.15). | local-verifiable |
 | FR-30 | Future | Import | Модулі перекладів: новий переклад без змін коду (PRD 6.16). | local-verifiable |
 | FR-31 | MVP | Themes | П'ять тем (Світла, Темна, Скло, Пастельна, Манускрипт) і «Як у системі»; тема змінює весь інтерфейс без перезапуску і зберігається між запусками (PRD 6.18). | local-verifiable |
 | FR-32 | MVP | Themes | Тема як набір токенів у `BibleCore`; кожна пара «текст/фон» кожної теми проходить контраст: основний текст ≥ 7:1, другорядний і акцент ≥ 4,5:1 (PRD 6.18). | local-verifiable |
