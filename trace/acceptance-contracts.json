@@ -283,6 +283,14 @@
         "status": "future-pending"
       }
     ],
+    "FR-36": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
+      }
+    ],
     "NFR-1": [
       {
         "method": "local-verifiable",

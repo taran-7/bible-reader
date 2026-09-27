@@ -36,6 +36,7 @@
     "FR-33": "Future",
     "FR-34": "Future",
     "FR-35": "Future",
+    "FR-36": "Future",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "Future",
@@ -336,8 +337,7 @@
     {
       "id": "FR-15",
       "specs": [
-        "openspec/specs/bible-reading/spec.md",
-        "openspec/changes/tweak-reading-ui/specs/bible-reading/spec.md"
+        "openspec/specs/bible-reading/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -383,8 +383,7 @@
     {
       "id": "FR-17",
       "specs": [
-        "openspec/specs/scripture-reference/spec.md",
-        "openspec/changes/tweak-reading-ui/specs/scripture-reference/spec.md"
+        "openspec/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -404,8 +403,7 @@
       "specs": [
         "openspec/specs/bible-reading/spec.md",
         "openspec/specs/bible-text-import/spec.md",
-        "openspec/specs/scripture-reference/spec.md",
-        "openspec/changes/tweak-reading-ui/specs/bible-reading/spec.md"
+        "openspec/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -437,8 +435,7 @@
       "specs": [
         "openspec/specs/bible-reading/spec.md",
         "openspec/specs/bible-text-import/spec.md",
-        "openspec/specs/scripture-reference/spec.md",
-        "openspec/changes/tweak-reading-ui/specs/bible-reading/spec.md"
+        "openspec/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -581,10 +578,6 @@
     {
       "check": "recording-evidence",
       "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
-    },
-    {
-      "check": "active-changes",
-      "msg": "active change \"tweak-reading-ui\" is not archived"
     }
   ]
 }

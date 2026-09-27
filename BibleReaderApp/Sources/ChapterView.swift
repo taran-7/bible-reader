@@ -9,6 +9,7 @@ struct ChapterView: View {
     /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
     @FocusState private var listFocused: Bool
     @Environment(\.theme) private var theme
+    @Environment(\.interfaceScale) private var scale
 
     private var title: String {
         let name = Book(number: model.location.book)?.name(in: model.translation) ?? ""
@@ -20,8 +21,8 @@ struct ChapterView: View {
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
                     VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize)
-                        // Праве поле завжди, щоб кнопка копіювання не перекривала текст і рядки не перескакували.
-                        .padding(.trailing, CopyButton.width + 8)
+                        // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
+                        .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection) ? CopyButton.width(for: scale) + 8 : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
