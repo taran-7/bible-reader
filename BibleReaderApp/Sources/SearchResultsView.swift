@@ -2,21 +2,59 @@ import BibleCore
 import SwiftUI
 
 struct SearchResultsView: View {
-    let model: ReaderViewModel
+    @Bindable var model: ReaderViewModel
     let results: [SearchResult]
     @Environment(\.interfaceScale) private var scale
     @Environment(\.theme) private var theme
 
     var body: some View {
-        if results.isEmpty {
-            MessageView(
-                title: "Нічого не знайдено",
-                systemImage: "magnifyingglass",
-                lines: ["За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."])
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(theme.results))
-        } else {
-            List(results) { result in
+        VStack(spacing: 0) {
+            header
+            if results.isEmpty {
+                MessageView(
+                    title: "Нічого не знайдено",
+                    systemImage: "magnifyingglass",
+                    lines: ["За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."])
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                list
+            }
+        }
+        .background(Color(theme.results))
+        .navigationTitle("Знайдено: \(model.resultTotal)")
+    }
+
+    /// Область пошуку (FR-19) і лічильник (FR-20).
+    private var header: some View {
+        HStack(spacing: 12) {
+            Picker("Де шукати", selection: $model.searchScope) {
+                Text("Уся Біблія").tag(SearchScope.bible)
+                Text("Старий Завіт").tag(SearchScope.oldTestament)
+                Text("Новий Завіт").tag(SearchScope.newTestament)
+                Text(bookTitle).tag(model.currentBookScope)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .accessibilityIdentifier("search-scope")
+            Spacer(minLength: 0)
+            Text("Знайдено: \(model.resultTotal)")
+                .foregroundStyle(Color(theme.secondaryText))
+                .accessibilityIdentifier("search-count")
+        }
+        .controlSize(scale.controlSize)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+
+    private var bookTitle: String {
+        guard case .book(let number) = model.currentBookScope, let book = Book(number: number) else { return "Книга" }
+        return book.name(in: model.translation)
+    }
+
+    private var list: some View {
+        List {
+            ForEach(results) { result in
                 Button { model.open(result) } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(Reference(book: result.verse.book, chapter: result.verse.chapter, verseStart: result.verse.verse)
@@ -33,10 +71,17 @@ struct SearchResultsView: View {
                 .listRowBackground(Color(theme.results))
                 .listRowSeparator(.hidden)
             }
-            .scrollContentBackground(.hidden)
-            .background(Color(theme.results))
-            .navigationTitle("Знайдено: \(results.count)")
+            if model.canLoadMore {
+                // Довантаження, коли прокрутили до кінця (FR-20).
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .onAppear { model.loadMore() }
+                    .accessibilityIdentifier("search-load-more")
+                    .listRowBackground(Color(theme.results))
+                    .listRowSeparator(.hidden)
+            }
         }
+        .scrollContentBackground(.hidden)
     }
 
     private func highlighted(_ segments: [SearchResult.Segment]) -> AttributedString {

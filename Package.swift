@@ -12,7 +12,9 @@ let package = Package(
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.0.0"),
     ],
     targets: [
-        .target(name: "BibleCore", dependencies: [.product(name: "GRDB", package: "GRDB.swift")]),
+        // Snowball (BSD-3): стемери en/ru для морфологічного пошуку (FR-18).
+        .target(name: "CSnowball", exclude: ["COPYING"]),
+        .target(name: "BibleCore", dependencies: ["CSnowball", .product(name: "GRDB", package: "GRDB.swift")]),
         .executableTarget(name: "bible-import", dependencies: ["BibleCore"]),
         .testTarget(name: "BibleCoreTests", dependencies: ["BibleCore"]),
     ]

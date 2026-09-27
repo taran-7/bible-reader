@@ -5,6 +5,8 @@ import Testing
 final class FakeRepository: BibleRepository, @unchecked Sendable {
     var searches: [String] = []
     var limits: [Int] = []
+    var offsets: [Int] = []
+    var scopes: [SearchScope] = []
     struct Boom: Error {}
 
     func books(translation: Translation) throws -> [Book] { Book.all }
@@ -12,13 +14,31 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
     func verses(book: Int, chapter: Int, translation: Translation) throws -> [Verse] {
         (1...5).map { Verse(translation: translation, book: book, chapter: chapter, verse: $0, text: "\(translation.rawValue) \(book):\(chapter):\($0)") }
     }
-    func search(_ query: String, translation: Translation, limit: Int) throws -> [SearchResult] {
+    /// «many» дає 250 збігів (вірші 1…250 Буття 1), інше — один Ин 3:16.
+    func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage {
         searches.append(query)
         limits.append(limit)
-        if query == "boom" { throw Boom() }
-        guard query != "nothing" else { return [] }
+        offsets.append(offset)
+        scopes.append(scope)
+        if query == "boom" || (query == "boom later" && offset > 0) { throw Boom() }
+        guard query != "nothing" else { return .empty }
+        if query == "shrinking" {
+            // База «змінилась»: обіцяно 150, а друга сторінка порожня.
+            return offset == 0 ? SearchPage(results: Array(repeating: SearchResult(
+                verse: Verse(translation: translation, book: 1, chapter: 1, verse: 1, text: "x"), segments: []), count: 100), total: 150) : .empty
+        }
+        if query == "boom later" {
+            return SearchPage(results: [SearchResult(verse: Verse(translation: translation, book: 1, chapter: 1, verse: 1, text: "x"), segments: [])], total: 5)
+        }
+        if query == "many" {
+            let results = (offset..<min(offset + limit, 250)).map { index in
+                SearchResult(verse: Verse(translation: translation, book: 1, chapter: 1, verse: index + 1, text: "many"),
+                             segments: [.init(text: "many", isMatch: true)])
+            }
+            return SearchPage(results: results, total: 250)
+        }
         let verse = Verse(translation: translation, book: 43, chapter: 3, verse: 16, text: "found")
-        return [SearchResult(verse: verse, segments: [.init(text: "found", isMatch: true)])]
+        return SearchPage(results: [SearchResult(verse: verse, segments: [.init(text: "found", isMatch: true)])], total: 1)
     }
 }
 
@@ -103,6 +123,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         model.query = ""
         model.submitSearch()
         #expect(model.results == nil)
+        #expect(!model.canLoadMore)
     }
 
     // @trace FR-14
@@ -167,12 +188,74 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.location == Location(book: 1, chapter: 1))
     }
 
-    // @trace FR-11
-    @Test func testSearchLimitIs200() {
+    // @trace FR-20
+    @Test func testResultsArePagedWithTotal() {
         let model = makeModel()
+        model.query = "many"
+        model.submitSearch()
+        #expect(model.results?.count == ReaderViewModel.pageSize)
+        #expect(model.resultTotal == 250)
+        #expect(model.canLoadMore)
+        model.loadMore()
+        model.loadMore()
+        #expect(repository.offsets == [0, 100, 200])
+        #expect(model.results?.count == 250)
+        #expect(model.results?.map(\.verse.verse) == Array(1...250))
+        #expect(!model.canLoadMore)
+        model.loadMore()
+        #expect(repository.offsets == [0, 100, 200])
+    }
+
+    // @trace FR-19
+    @Test func testScopeChangeRerunsSearch() {
+        let model = makeModel()
+        #expect(model.searchScope == .bible)
+        model.searchScope = .newTestament
+        #expect(repository.searches.isEmpty)
         model.query = "love"
         model.submitSearch()
-        #expect(repository.limits == [200])
+        #expect(repository.scopes == [.newTestament])
+        model.searchScope = .book(43)
+        #expect(repository.scopes == [.newTestament, .book(43)])
+        #expect(repository.offsets == [0, 0])
+        model.searchScope = .book(43)
+        #expect(repository.scopes.count == 2)
+    }
+
+    // @trace FR-19
+    @Test func testCurrentBookScopeFollowsLocation() {
+        let model = makeModel()
+        #expect(model.currentBookScope == .book(1))
+        model.open(Location(book: 43, chapter: 1))
+        #expect(model.currentBookScope == .book(43))
+        // Обрана книга лишається в панелі, навіть коли відкрили іншу.
+        model.searchScope = .book(43)
+        model.open(Location(book: 1, chapter: 1))
+        #expect(model.currentBookScope == .book(43))
+    }
+
+    // @trace FR-20
+    @Test func testLoadMoreStopsOnEmptyPageAndReportsErrors() {
+        let model = makeModel()
+        model.query = "shrinking"
+        model.submitSearch()
+        model.loadMore()
+        #expect(model.resultTotal == 100)
+        #expect(!model.canLoadMore)
+        model.query = "boom later"
+        model.submitSearch()
+        model.loadMore()
+        #expect(model.searchError != nil)
+    }
+
+    // @trace FR-19
+    @Test func testNoRepositoryIgnoresPaging() {
+        let model = ReaderViewModel { throw FakeRepository.Boom() }
+        model.loadMore()
+        model.searchScope = .newTestament
+        model.query = "love"
+        model.submitSearch()
+        #expect(model.results == nil)
     }
 
     // @trace FR-12

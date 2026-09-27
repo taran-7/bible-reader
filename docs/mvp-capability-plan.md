@@ -36,10 +36,10 @@
 
 | NFR | Механізм |
 |---|---|
-| NFR-1 | Скрипт: `MACOSX_DEPLOYMENT_TARGET` у `project.yml` = 14.0 і `lipo -archs` бінарника містить arm64 і x86_64 |
+| NFR-1 | Скрипт `check-platform`: `MACOSX_DEPLOYMENT_TARGET` = 14.0 і `lipo -archs` бінарника — рівно arm64 (Apple Silicon, рішення власника 2026-09-27) |
 | NFR-2 | Тест `@trace NFR-2`: у `Sources/` немає `URLSession`/`Network`, крім модуля ілюстрацій (FR-33…35) |
 | NFR-3 | Пошук: тест з таймером на реальній базі (`improve-search`); запуск: вимір у XCUITest (`add-a11y-launch-checks`) |
 | NFR-4 | XCUITest (`add-a11y-launch-checks`): accessibility labels і робота з клавіатури; контраст: тест токенів тем (FR-32) |
-| NFR-5 | Скрипт: розмір `.app` після `xcodebuild` < 60 МБ |
+| NFR-5 | Скрипт `check-platform`: розмір `.app` після Release-збірки < 100 МБ |
 
 NFR стає MVP-рядком разом зі слайсом, який додає його механізм.

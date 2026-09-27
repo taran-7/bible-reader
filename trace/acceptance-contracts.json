@@ -143,32 +143,32 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/SearchTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-19": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-20": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-21": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-22": [
@@ -311,8 +311,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/SearchTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-4": [

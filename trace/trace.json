@@ -18,10 +18,10 @@
     "FR-15": "MVP",
     "FR-16": "MVP",
     "FR-17": "MVP",
-    "FR-18": "Future",
-    "FR-19": "Future",
-    "FR-20": "Future",
-    "FR-21": "Future",
+    "FR-18": "MVP",
+    "FR-19": "MVP",
+    "FR-20": "MVP",
+    "FR-21": "MVP",
     "FR-22": "Future",
     "FR-23": "Future",
     "FR-24": "Future",
@@ -255,7 +255,6 @@
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
-        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
@@ -263,7 +262,6 @@
         "Tests/BibleCoreTests/SearchTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
         "tests/BibleCoreTests/QuoteTests.swift",
-        "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
@@ -288,9 +286,11 @@
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/SearchQueryTests.swift",
         "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "Tests/BibleCoreTests/SearchQueryTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
         "Tests/BibleCoreTests/SearchTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/SearchQueryTests.swift",
         "tests/BibleCoreTests/SearchQueryTests.swift",
         "tests/BibleCoreTests/SearchQueryTests.swift",
         "tests/BibleCoreTests/SearchTests.swift",
@@ -394,6 +394,92 @@
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-18",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleCoreTests/StemmerTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleCoreTests/StemmerTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-19",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/SearchQueryTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-20",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-21",
+      "specs": [
+        "openspec/specs/bible-search/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "Tests/BibleCoreTests/SearchTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/SearchQueryTests.swift",
+        "tests/BibleCoreTests/SearchTests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
@@ -565,6 +651,22 @@
     },
     {
       "check": "recording-evidence",
+      "msg": "FR-18 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-19 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-20 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-21 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
       "msg": "FR-28 is not referenced by any recording manifest under docs/qa/"
     },
     {
@@ -578,6 +680,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"improve-search\" is not archived"
     }
   ]
 }

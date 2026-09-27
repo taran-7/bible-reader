@@ -24,7 +24,18 @@ public final class ReaderViewModel {
     private var takenFocusRequest = 0
     public var query = ""
     /// `nil`, коли пошук не активний; порожній масив означає «Нічого не знайдено».
+    /// Містить завантажені сторінки; решту довантажує `loadMore()` (FR-20).
     public private(set) var results: [SearchResult]?
+    /// Загальна кількість збігів в області, для напису «Знайдено: N».
+    public private(set) var resultTotal = 0
+    /// Область пошуку (FR-19); зміна перезапускає активний пошук.
+    public var searchScope: SearchScope = .bible {
+        didSet {
+            guard searchScope != oldValue else { return }
+            if results != nil || searchError != nil { runSearch(submittedQuery) }
+        }
+    }
+    public static let pageSize = 100
     /// Запит, за яким отримано `results` (поле пошуку могли вже змінити).
     public private(set) var submittedQuery = ""
     public private(set) var loadError: String?
@@ -84,14 +95,41 @@ public final class ReaderViewModel {
         }
     }
 
+    /// Область «поточна книга» для панелі над результатами; якщо вже шукаємо в книзі — саме вона.
+    public var currentBookScope: SearchScope {
+        if case .book = searchScope { return searchScope }
+        return .book(location.book)
+    }
+
+    public var canLoadMore: Bool {
+        guard let results else { return false }
+        return results.count < resultTotal
+    }
+
+    /// Наступна сторінка результатів (прокручування до кінця списку).
+    public func loadMore() {
+        guard let repository, let loaded = results, canLoadMore else { return }
+        do {
+            let page = try repository.searchPage(submittedQuery, translation: translation, scope: searchScope,
+                                                 offset: loaded.count, limit: Self.pageSize)
+            results = loaded + page.results
+            resultTotal = page.results.isEmpty ? loaded.count : page.total
+        } catch {
+            searchError = "\(error)"
+        }
+    }
+
     private func runSearch(_ text: String) {
         guard let repository else { return }
         submittedQuery = text
         do {
-            results = try repository.search(text, translation: translation, limit: 200)
+            let page = try repository.searchPage(text, translation: translation, scope: searchScope, offset: 0, limit: Self.pageSize)
+            results = page.results
+            resultTotal = page.total
             searchError = nil
         } catch {
             results = nil
+            resultTotal = 0
             searchError = "\(error)"
         }
     }
