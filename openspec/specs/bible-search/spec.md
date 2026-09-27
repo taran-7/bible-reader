@@ -4,7 +4,7 @@
 
 Дозволяє знайти вірші за словом чи фразою в активному перекладі або перейти за введеним посиланням.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-11, FR-12, FR-13, FR-14.
+Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-11, FR-12, FR-13, FR-14, FR-18, FR-19, FR-20, FR-21.
 
 ## Requirements
 
