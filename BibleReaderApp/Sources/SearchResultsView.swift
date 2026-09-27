@@ -24,6 +24,7 @@ struct SearchResultsView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("search-result")
             }
             .navigationTitle("Знайдено: \(results.count)")
         }

@@ -160,12 +160,20 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/DatabaseLocationTests.swift",
+        "Tests/BibleCoreTests/DatabaseLocationTests.swift",
+        "Tests/BibleCoreTests/DatabaseLocationTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/RepositoryTests.swift",
         "Tests/BibleCoreTests/RepositoryTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/DatabaseLocationTests.swift",
+        "tests/BibleCoreTests/DatabaseLocationTests.swift",
+        "tests/BibleCoreTests/DatabaseLocationTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/RepositoryTests.swift",
-        "tests/BibleCoreTests/RepositoryTests.swift"
+        "tests/BibleCoreTests/RepositoryTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
     },
@@ -221,7 +229,11 @@
       "planned": true,
       "tests": [
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
-        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
     },
@@ -291,9 +303,13 @@
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
-        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
     },
@@ -305,7 +321,9 @@
       "planned": true,
       "tests": [
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
-        "tests/BibleCoreTests/ReaderViewModelTests.swift"
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
     }
@@ -367,6 +385,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-14 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"add-ui-tests\" is not archived"
     }
   ]
 }

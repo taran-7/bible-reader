@@ -21,6 +21,7 @@ public final class ReaderViewModel {
     /// Змінюється на кожен запит фокусу, навіть якщо номер вірша той самий
     /// (Ин 3:16 → Рим 3:16), щоб SwiftUI `onChange` спрацював.
     public private(set) var focusRequest = 0
+    private var takenFocusRequest = 0
     public var query = ""
     /// `nil`, коли пошук не активний; порожній масив означає «Нічого не знайдено».
     public private(set) var results: [SearchResult]?
@@ -93,6 +94,14 @@ public final class ReaderViewModel {
             results = nil
             searchError = "\(error)"
         }
+    }
+
+    /// Вірш для фокусу, один раз на кожен запит: повторне відображення розділу
+    /// (після очищення пошуку) не забирає фокус у поля пошуку.
+    public func takeFocus() -> Int? {
+        guard focusRequest != takenFocusRequest, let focusedVerse else { return nil }
+        takenFocusRequest = focusRequest
+        return focusedVerse
     }
 
     public func quote(for selectedVerses: Set<Int>) -> String? {
