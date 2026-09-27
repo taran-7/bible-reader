@@ -18,4 +18,4 @@
 ## 4. Батарея і документи
 
 - [x] 4.1 `qa-verify` і CI: `xcodebuild test` замість `build` (`Refs: PD-11`)
-- [ ] 4.2 `docs/requirements.md` §4, tech debt #2 і #7, план слайсів; рев'ю; архів
+- [x] 4.2 `docs/requirements.md` §4, tech debt #2 і #7, план слайсів; рев'ю; архів

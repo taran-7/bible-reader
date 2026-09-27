@@ -55,7 +55,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/DatabaseLocationTests.swift",
         "status": "artifact-ok"
       }
     ],
