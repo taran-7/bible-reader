@@ -43,6 +43,16 @@ enum TestSupport {
         }
     }
 
+    /// Усі вірші перекладу в порядку книг.
+    static func keys(_ translation: Translation, in db: URL) throws -> [VerseKey] {
+        let queue = try DatabaseQueue(path: db.path)
+        return try queue.read { db in
+            try Row.fetchAll(db, sql: "SELECT book, chapter, verse FROM verses WHERE translation = ? ORDER BY book, chapter, verse",
+                             arguments: [translation.rawValue])
+                .map { VerseKey(book: $0["book"], chapter: $0["chapter"], verse: $0["verse"]) }
+        }
+    }
+
     static func count(_ sql: String, in db: URL) throws -> Int {
         try DatabaseQueue(path: db.path).read { try Int.fetchOne($0, sql: sql) ?? 0 }
     }

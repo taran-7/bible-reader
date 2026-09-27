@@ -27,7 +27,7 @@
 | 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | зроблено 2026-09-28 (архів `2026-09-28-improve-search`) |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | зроблено 2026-09-28 (архів `2026-09-28-add-user-notes`) |
 | 3a | `add-verse-compare` (v1.5) | FR-36 | 1a (кнопка поруч із копіюванням) | зроблено 2026-09-28 (архів `2026-09-28-add-verse-compare`) |
-| 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |
+| 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | зроблено 2026-09-28 (архів `2026-09-28-add-parallel-view`) |
 | 6 | `add-translations` (v2.1) | FR-28, FR-29 | — (нумерація Огієнка = Синодальний; таблиця потрібна лише паралельному перегляду) | зроблено 2026-09-27 (архів `2026-09-27-add-translations`) |
 | 6a | `add-translation-modules` (v2.1) | FR-30 | 6 | serialize |
 | 4 | `add-illustrations` (v2.2) | FR-33, FR-34, FR-35 | 1a (кнопка поруч із 6.3) | serialize; останнім |

@@ -152,7 +152,7 @@ struct BookmarkCommands: Commands {
 
     var body: some Commands {
         CommandMenu("Закладки") {
-            let chapter = Bookmark.Target(book: model.location.book, chapter: model.location.chapter, verse: nil)
+            let chapter = model.canonicalChapter
             Button(userData.isBookmarked(chapter) ? "Прибрати закладку розділу" : "Закладка на розділ") {
                 userData.toggleBookmark(chapter)
             }

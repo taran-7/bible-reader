@@ -22,12 +22,22 @@ struct ChapterView: View {
     }
 
     var body: some View {
-        let marks = userData.marks(book: model.location.book, chapter: model.location.chapter)
+        // Дані користувача в нумерації KJV: у Синодальному позначки стають на той самий зміст.
+        let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
+        let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
-                    VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize,
-                             marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) })
+                    HStack(alignment: .firstTextBaseline, spacing: 16) {
+                        VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize,
+                                 marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) })
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        if let secondary = parallel[verse.verse], let other = model.parallelTranslation {
+                            ParallelColumn(verses: secondary, translation: other, primaryChapter: model.location.chapter,
+                                           fontSize: fontSize)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
                                   ? CopyButton.width(for: scale) + CompareButton.width(for: scale) + 12 : 36)
@@ -55,7 +65,8 @@ struct ChapterView: View {
                 Button("Порівняти в перекладах") { compare(verses) }.disabled(verses.isEmpty)
                 if let first = verses.min() {
                     Divider()
-                    let target = Bookmark.Target(book: model.location.book, chapter: model.location.chapter, verse: first)
+                    let canonical = key(first)
+                    let target = Bookmark.Target(book: canonical.book, chapter: canonical.chapter, verse: canonical.verse)
                     // Закладка ставиться на перший виділений вірш — так і написано в пункті.
                     Button(userData.isBookmarked(target) ? "Прибрати закладку з вірша \(first)" : "Додати закладку на вірш \(first)") {
                         userData.toggleBookmark(target)
@@ -73,13 +84,18 @@ struct ChapterView: View {
                 }
             }
             .sheet(item: $editingNote) { key in
-                NoteEditor(key: key, translation: model.translation)
+                NoteEditor(key: key, title: model.localReference(book: key.book, chapter: key.chapter, verse: key.verse)
+                    .format(in: model.translation))
             }
             .onCopyCommand {
                 guard let quote = model.quote(for: selection) else { return [] }
                 return [NSItemProvider(object: quote as NSString)]
             }
             .onChange(of: model.location) { _, _ in selection = [] }
+            // Той самий номер в іншому перекладі може означати інший зміст; вірш перевиділить фокус.
+            .onChange(of: model.translation) { _, _ in selection = [] }
+            // Перший виділений вірш: при перемиканні перекладу відкриється саме він (FR-27).
+            .onChange(of: selection) { _, selection in model.anchorVerse = selection.min() }
             .onAppear {
                 // Після коміту першого кадру з віршами (NFR-3).
                 CATransaction.setCompletionBlock { model.markFirstChapterShown() }
@@ -93,9 +109,7 @@ struct ChapterView: View {
         }
     }
 
-    private func key(_ verse: Int) -> VerseKey {
-        VerseKey(book: model.location.book, chapter: model.location.chapter, verse: verse)
-    }
+    private func key(_ verse: Int) -> VerseKey { model.canonicalKey(verse) }
 
     /// Виділення важливіше за підсвітку, щоб було видно, що саме виділено.
     private func rowBackground(_ verse: Int, _ highlight: HighlightColor?) -> Color {
@@ -190,14 +204,15 @@ extension VerseKey: @retroactive Identifiable {
 /// Нотатка до вірша: порожній текст при збереженні видаляє її.
 struct NoteEditor: View {
     let key: VerseKey
-    let translation: BibleCore.Translation
+    /// Посилання мовою й нумерацією перекладу на екрані.
+    let title: String
     @Environment(UserData.self) private var userData
     @Environment(\.dismiss) private var dismiss
     @State private var text = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Нотатка: \(key.reference.format(in: translation))").font(.headline)
+            Text("Нотатка: \(title)").font(.headline)
             TextEditor(text: $text)
                 .font(.body)
                 .frame(minWidth: 380, minHeight: 160)
@@ -221,5 +236,33 @@ struct NoteEditor: View {
         }
         .padding(20)
         .onAppear { text = userData.note(for: key)?.text ?? "" }
+    }
+}
+
+/// Друга колонка паралельного перегляду (FR-26): відповідні вірші іншого перекладу; якщо розділ інший —
+/// номер із розділом. Порожньо — вірш злито з попереднім або відповідника немає.
+struct ParallelColumn: View {
+    let verses: [Verse]
+    let translation: BibleCore.Translation
+    let primaryChapter: Int
+    let fontSize: Double
+    @Environment(\.theme) private var theme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ForEach(verses) { verse in
+                (Text(label(verse) + " ").foregroundStyle(Color(theme.verseNumber)) + Text(verse.text))
+                    .font(theme.verseFont(size: fontSize))
+                    .foregroundStyle(Color(theme.text))
+                    .lineSpacing(fontSize * theme.lineSpacing)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(translation.title): " + verses.map { "\(label($0)) \($0.text)" }.joined(separator: " "))
+        .accessibilityIdentifier("parallel-\(verses.first.map { "\($0.chapter)-\($0.verse)" } ?? "empty")")
+    }
+
+    private func label(_ verse: Verse) -> String {
+        verse.chapter == primaryChapter ? "\(verse.verse)" : "\(verse.chapter):\(verse.verse)"
     }
 }

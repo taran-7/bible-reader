@@ -40,10 +40,15 @@ struct ContentView: View {
                     }
                 }
                 .font(.system(size: scale.systemFontSize))
-                .toolbar { ReaderToolbar(model: model, userData: userData, scale: scale) }
+                .toolbar { ReaderToolbar(model: model, userData: userData, preferences: preferences, scale: scale) }
                 .modifier(ToolbarTheme())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
+            // Паралельний переклад з налаштувань; той самий, що основний, — вимкнено.
+            .onChange(of: [preferences.preferences.parallelTranslation, model.translation], initial: true) {
+                let other = preferences.preferences.parallelTranslation
+                model.parallelTranslation = other == model.translation ? nil : other
+            }
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in

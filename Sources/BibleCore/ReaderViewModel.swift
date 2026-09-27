@@ -7,6 +7,7 @@ public final class ReaderViewModel {
     public var translation: Translation = .kjv {
         didSet {
             guard translation != oldValue else { return }
+            if !keepLocationOnSwitch { remap(from: oldValue) }
             reload()
             savePosition()
             // Той самий запит, що дав результати, а не недописаний текст у полі.
@@ -16,7 +17,21 @@ public final class ReaderViewModel {
     public private(set) var location = Location(book: 1, chapter: 1)
     public private(set) var books: [Book] = []
     public private(set) var chapterCount = 0
-    public private(set) var verses: [Verse] = []
+    public private(set) var verses: [Verse] = [] {
+        didSet { rebuildParallel() }
+    }
+    /// Перший виділений вірш (з `ChapterView`): при перемиканні перекладу відкривається саме він (FR-27).
+    public var anchorVerse: Int?
+    /// Другий переклад поруч (FR-26); `nil` — паралельний перегляд вимкнено.
+    public var parallelTranslation: Translation? {
+        didSet { if parallelTranslation != oldValue { rebuildParallel() } }
+    }
+    /// Рядки паралельного перегляду: вірш основного перекладу і відповідні вірші другого.
+    public private(set) var parallelRows: [ParallelRow] = []
+    /// Таблиця відповідностей KJV ↔ Синодальний; будується при першій потребі з реальної бази.
+    @ObservationIgnored private lazy var versification: Versification? =
+        (repository as? SQLiteBibleRepository).flatMap { try? Versification.load(from: $0) }
+    @ObservationIgnored private var keepLocationOnSwitch = false
     /// Вірш, до якого треба прокрутити і який підсвітити.
     public var focusedVerse: Int?
     /// Змінюється на кожен запит фокусу, навіть якщо номер вірша той самий
@@ -69,6 +84,9 @@ public final class ReaderViewModel {
     public func open(_ target: Location, in translation: Translation, focus verse: Int?) {
         if translation != self.translation {
             location = target
+            // Місце вже в нумерації цього перекладу — не перераховуємо.
+            keepLocationOnSwitch = true
+            defer { keepLocationOnSwitch = false }
             self.translation = translation  // didSet: reload, savePosition, повтор пошуку
             focusedVerse = verse
             if verse != nil { focusRequest += 1 }
@@ -138,7 +156,46 @@ public final class ReaderViewModel {
     /// Відкриває вірш, до якого знайдено нотатку, і закриває результати.
     public func openNote(_ key: VerseKey) {
         results = nil
-        open(Location(book: key.book, chapter: key.chapter), focus: key.verse)
+        openCanonical(book: key.book, chapter: key.chapter, verse: key.verse)
+    }
+
+    // MARK: Нумерація KJV для даних користувача (tech debt #24)
+
+    /// Ключ вірша поточного розділу в нумерації KJV: так зберігаються нотатки, підсвітки й закладки,
+    /// тож у Синодальному вони стоять на тому самому змісті. Вірш без відповідника — власний номер.
+    public func canonicalKey(_ verse: Int) -> VerseKey {
+        let key = VerseKey(book: location.book, chapter: location.chapter, verse: verse)
+        return mapped(key, from: translation, to: .kjv) ?? key
+    }
+
+    /// Усі ключі KJV вірша поточного розділу: злитий вірш Синодального показує позначки всіх своїх частин.
+    public func canonicalKeys(_ verse: Int) -> [VerseKey] {
+        let key = VerseKey(book: location.book, chapter: location.chapter, verse: verse)
+        guard !translation.sharesKJVNumbering, let all = versification?.allKJV(fromSynodal: key), !all.isEmpty
+        else { return [canonicalKey(verse)] }
+        return all
+    }
+
+    /// Закладка на поточний розділ у нумерації KJV: розділ KJV, куди потрапляє більшість віршів
+    /// (Чис 13 Синодального починається з KJV 12:16, але це Чис 13).
+    public var canonicalChapter: Bookmark.Target {
+        let chapters = verses.map { canonicalKey($0.verse) }
+        let counts = Dictionary(chapters.map { ($0.chapter, 1) }, uniquingKeysWith: +)
+        let chapter = counts.max { ($0.value, -$0.key) < ($1.value, -$1.key) }?.key ?? location.chapter
+        return Bookmark.Target(book: location.book, chapter: chapter, verse: nil)
+    }
+
+    /// Місце, збережене в нумерації KJV, у нумерації поточного перекладу.
+    public func localReference(book: Int, chapter: Int, verse: Int?) -> Reference {
+        let key = VerseKey(book: book, chapter: chapter, verse: verse ?? 1)
+        let target = mapped(key, from: .kjv, to: translation) ?? key
+        return Reference(book: target.book, chapter: target.chapter, verseStart: verse == nil ? nil : target.verse)
+    }
+
+    /// Відкриває місце, збережене в нумерації KJV.
+    public func openCanonical(book: Int, chapter: Int, verse: Int?) {
+        let reference = localReference(book: book, chapter: chapter, verse: verse)
+        open(Location(book: reference.book, chapter: reference.chapter), focus: reference.verseStart)
     }
 
     /// Відкриває вірш і закриває список результатів.
@@ -223,6 +280,59 @@ public final class ReaderViewModel {
         }
     }
 
+    /// Вірш під тим самим змістом в іншій нумерації; без виділення — розділ за першим віршем.
+    private func remap(from old: Translation) {
+        let verse = anchorVerse ?? 1
+        // Вірш без відповідника (доповнення Септуагінти) — найближчий попередній, що його має.
+        var found: VerseKey?
+        for candidate in stride(from: verse, through: 1, by: -1) {
+            found = mapped(VerseKey(book: location.book, chapter: location.chapter, verse: candidate), from: old, to: translation)
+            if found != nil { break }
+        }
+        guard let target = found else { return }
+        location = Location(book: target.book, chapter: target.chapter)
+        if anchorVerse != nil {
+            focusedVerse = target.verse
+            focusRequest += 1
+        }
+        anchorVerse = nil
+    }
+
+    private func mapped(_ key: VerseKey, from source: Translation, to target: Translation) -> VerseKey? {
+        if source.sharesKJVNumbering == target.sharesKJVNumbering { return key }
+        return versification?.map(key, from: source, to: target)
+    }
+
+    /// Вірші другого перекладу розкладаються по рядках основного: кожен стає біля вірша, у який
+    /// відображається назад; вірш без відповідника (доповнення Септуагінти) — біля попереднього.
+    private func rebuildParallel() {
+        guard let other = parallelTranslation, other != translation, let repository, !verses.isEmpty else {
+            parallelRows = []
+            return
+        }
+        let book = location.book
+        let chapter = location.chapter
+        let targets = verses.compactMap { mapped(VerseKey(book: book, chapter: chapter, verse: $0.verse), from: translation, to: other) }
+        let chapters = Set(targets.map(\.chapter)).sorted()
+        var secondary: [[Verse]] = Array(repeating: [], count: verses.count)
+        let rowOf = Dictionary(uniqueKeysWithValues: verses.enumerated().map { ($1.verse, $0) })
+        var lastRow: Int?
+        for secondChapter in chapters {
+            let others = (try? repository.verses(book: book, chapter: secondChapter, translation: other)) ?? []
+            for verse in others {
+                let back = mapped(VerseKey(book: book, chapter: secondChapter, verse: verse.verse), from: other, to: translation)
+                if let back {
+                    guard back.chapter == chapter, let row = rowOf[back.verse] else { continue }
+                    secondary[row].append(verse)
+                    lastRow = row
+                } else if let lastRow {
+                    secondary[lastRow].append(verse)
+                }
+            }
+        }
+        parallelRows = zip(verses, secondary).map { ParallelRow(primary: $0, secondary: $1) }
+    }
+
     private func reload() {
         guard let repository else { return }
         do {
@@ -236,4 +346,11 @@ public final class ReaderViewModel {
             loadError = "\(error)"
         }
     }
+}
+
+/// Рядок паралельного перегляду (FR-26).
+public struct ParallelRow: Identifiable, Sendable {
+    public let primary: Verse
+    public let secondary: [Verse]
+    public var id: Int { primary.verse }
 }
