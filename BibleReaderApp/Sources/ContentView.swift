@@ -10,6 +10,17 @@ struct ContentView: View {
 
     var body: some View {
         content.modifier(ThemedScene(preferences: preferences))
+        #if DEBUG
+            .overlay(alignment: .bottomLeading) {
+                // Лише Debug; VoiceOver у Debug прочитає це число — свідомо, Release його не має.
+                if let launchMilliseconds = model.launchMilliseconds {
+                    Text("\(launchMilliseconds)")
+                        .font(.system(size: 1))
+                        .opacity(0.01)
+                        .accessibilityIdentifier("launch-time")
+                }
+            }
+        #endif
     }
 
     @ViewBuilder private var content: some View {

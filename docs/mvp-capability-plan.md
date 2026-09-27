@@ -20,7 +20,7 @@
 |---|---|---|---|---|
 | 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | зроблено 2026-09-27 (архів `2026-09-27-add-platform-checks`) |
 | 0a | `add-ui-tests` (XCUITest) | FR-7, FR-10, FR-13, FR-14 (UI-докази) | — | зроблено 2026-09-27 (архів `2026-09-27-add-ui-tests`) |
-| 0b | `add-a11y-launch-checks` | NFR-3 (запуск < 1 с), NFR-4 (VoiceOver, клавіатура) | 0a | parallel-safe з 0 |
+| 0b | `add-a11y-launch-checks` | NFR-3 (запуск < 1 с), NFR-4 (VoiceOver, клавіатура) | 0a | зроблено 2026-09-28 (архів `2026-09-28-add-a11y-launch-checks`) |
 | 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16 | — | зроблено 2026-09-27 (архів `2026-09-27-add-reading-comfort`) |
 | 1a | `add-copy-button` (v1.1) | FR-17 | 1 | зроблено 2026-09-27 (архів `2026-09-27-add-copy-button`) |
 | 1b | `add-themes` (v1.1) | FR-31, FR-32, NFR-4 (контраст, зокрема кнопки копіювання 0,6) | 1 (масштаб шрифтів у всіх темах) | зроблено 2026-09-27 (архів `2026-09-27-add-themes`; a11y-частина NFR-4 — у 0b) |

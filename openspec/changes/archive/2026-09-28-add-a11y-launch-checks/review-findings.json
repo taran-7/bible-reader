@@ -1,0 +1,25 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-a11y-launch-checks",
+  "change": "add-a11y-launch-checks",
+  "baseRef": "0fd84a2",
+  "headRef": "feature/add-a11y-launch-checks",
+  "dimensions": {
+    "correctness": { "confirmed": 11, "contested": 0, "rejected": 0, "fixed": 9, "deferred": 2 }
+  },
+  "fixed": [
+    "1: launch time recorded even on the database error screen — marked by ChapterView only with verses; UI test also checks verse-1 (NFR-3)",
+    "2: sample taken before the frame commit — CATransaction completion block (NFR-3)",
+    "4: cold launch hidden — first launch recorded as an attachment, second checked (design.md)",
+    "5: 300 ms unit limit flaky in debug — 500 ms",
+    "6: two ⌘F items — replaces the system text-editing Find group; UI test asserts the search field has focus (NFR-4)",
+    "7: list focus assumed — test waits for the search field to lose focus before ↓ and ⌘C",
+    "8: test wiped the developer clipboard — restores it, waits on changeCount",
+    "9: inconsistent key handling — digits documented as layout-independent (tech debt #23 for Czech)",
+    "11: contrast part of NFR-4 without a mechanism — theme contrast test now traces NFR-4"
+  ],
+  "deferred": "3 (measurement is Debug-only and under XCUITest — documented in requirements.md); 10 (VoiceOver can read the Debug-only launch number — Release has no element)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T03:00:00Z"
+}

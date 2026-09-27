@@ -63,6 +63,7 @@ import Testing
     }
 
     // @trace FR-32
+    // @trace NFR-4
     @Test(arguments: ThemeID.allCases)
     func testEveryPairPassesContrast(_ id: ThemeID) {
         for flag in Self.flags {

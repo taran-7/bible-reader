@@ -42,6 +42,14 @@ public final class ReaderViewModel {
     /// Запит, за яким отримано `results` (поле пошуку могли вже змінити).
     public private(set) var submittedQuery = ""
     public private(set) var loadError: String?
+    /// NFR-3: мілісекунди від старту процесу до першого показаного розділу з віршами (записує `ChapterView`).
+    public private(set) var launchMilliseconds: Int?
+
+    /// Перший виклик із непорожнім розділом фіксує час запуску; наступні ігноруються.
+    public func markFirstChapterShown(now: Date = Date()) {
+        guard launchMilliseconds == nil, !verses.isEmpty else { return }
+        launchMilliseconds = LaunchClock.millisecondsSinceStart(now: now)
+    }
     /// Помилка пошуку (не плутати з «Нічого не знайдено»).
     public private(set) var searchError: String?
 

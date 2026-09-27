@@ -38,6 +38,7 @@ struct BibleReaderApp: App {
         .commands {
             ExportCommands(userData: userData, model: model)
             BookmarkCommands(userData: userData, model: model)
+            FindCommands()
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
             TranslationCommands(model: model)
@@ -149,6 +150,20 @@ struct BookmarkCommands: Commands {
                 userData.toggleBookmark(chapter)
             }
             .keyboardShortcut("d", modifiers: .command)
+        }
+    }
+}
+
+/// ⌘F переводить фокус у поле пошуку (NFR-4: робота з клавіатури).
+struct FindCommands: Commands {
+    var body: some Commands {
+        // Замість системного «Знайти…» (панель пошуку в тексті), щоб не було двох ⌘F.
+        CommandGroup(replacing: .textEditing) {
+            Button("Знайти") {
+                let item = NSApp.keyWindow?.toolbar?.items.lazy.compactMap { $0 as? NSSearchToolbarItem }.first
+                item?.beginSearchInteraction()
+            }
+            .keyboardShortcut("f", modifiers: .command)
         }
     }
 }

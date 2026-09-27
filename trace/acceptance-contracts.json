@@ -311,7 +311,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/SearchTests.swift",
+        "artifact": "Tests/BibleCoreTests/LaunchClockTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -319,8 +319,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ThemeTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-5": [
