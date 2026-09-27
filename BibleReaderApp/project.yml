@@ -23,6 +23,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.taraniuk.BibleReader
+        # NFR-1: лише Apple Silicon (Intel поза обсягом, рішення власника 2026-09-27).
+        ARCHS: arm64
         PRODUCT_NAME: Bible Reader
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Bible Reader
