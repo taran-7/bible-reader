@@ -3,6 +3,7 @@ import SwiftUI
 
 struct BookList: View {
     let model: ReaderViewModel
+    let fontSize: Double
 
     private var selection: Binding<Int?> {
         Binding(
@@ -24,7 +25,9 @@ struct BookList: View {
     private func section(_ title: String, _ testament: Testament) -> some View {
         Section(title) {
             ForEach(model.books.filter { $0.testament == testament }) { book in
-                Text(book.name(in: model.translation)).tag(book.number)
+                Text(book.name(in: model.translation))
+                    .font(.system(size: fontSize))
+                    .tag(book.number)
             }
         }
     }
