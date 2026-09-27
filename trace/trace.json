@@ -30,7 +30,7 @@
     "FR-27": "MVP",
     "FR-28": "MVP",
     "FR-29": "MVP",
-    "FR-30": "Future",
+    "FR-30": "MVP",
     "FR-31": "MVP",
     "FR-32": "MVP",
     "FR-33": "Future",
@@ -675,6 +675,34 @@
       "recordings": []
     },
     {
+      "id": "FR-30",
+      "specs": [
+        "openspec/specs/translation-modules/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift"
+      ],
+      "recordings": []
+    },
+    {
       "id": "FR-31",
       "specs": [
         "openspec/specs/bible-reading/spec.md"
@@ -866,6 +894,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-29 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-30 is not referenced by any recording manifest under docs/qa/"
     },
     {
       "check": "recording-evidence",

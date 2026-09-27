@@ -39,7 +39,7 @@ public struct Reference: Hashable, Sendable {
         // Кириличні скорочення з крапкою (`Ин. 3:16`, `Ів. 3:16`), латинські — без.
         switch translation.language {
         case .russian, .ukrainian: return abbreviation + "."
-        case .english, .czech: return abbreviation
+        case .english, .czech, .other: return abbreviation
         }
     }
 

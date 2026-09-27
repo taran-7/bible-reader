@@ -17,7 +17,7 @@ public final class Stemmer {
         switch language {
         case .english: env = english_UTF_8_create_env()
         case .russian: env = russian_UTF_8_create_env()
-        case .ukrainian, .czech: env = nil
+        case .ukrainian, .czech, .other: env = nil
         }
     }
 
@@ -25,7 +25,7 @@ public final class Stemmer {
         switch language {
         case .english: english_UTF_8_close_env(env)
         case .russian: russian_UTF_8_close_env(env)
-        case .ukrainian, .czech: break
+        case .ukrainian, .czech, .other: break
         }
     }
 
@@ -64,6 +64,8 @@ public final class Stemmer {
         case .english: return snowball(Self.kjvVerbForm(word), stem: english_UTF_8_stem)
         case .russian: return Self.russianFleetingVowel(snowball(word, stem: russian_UTF_8_stem))
         case .ukrainian: return Self.ukrainian(word)
+        // Мова без стемера: шукаємо точні словоформи (як до FR-18).
+        case .other: return word
         // Без діакритики: індекс її згортає, а запит `buh` має дати ту саму основу, що й `bůh`.
         case .czech: return Self.czech(word.folding(options: .diacriticInsensitive, locale: nil))
         }
