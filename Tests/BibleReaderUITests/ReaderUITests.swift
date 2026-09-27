@@ -175,10 +175,10 @@ final class ReaderUITests: XCTestCase {
     // @trace FR-29
     func testUkrainianAndCzechTranslations() {
         launch()
-        let toolbarMenu = app.menuButtons["translation"]
-        XCTAssertTrue(toolbarMenu.waitForExistence(timeout: 5))
-        toolbarMenu.click()
-        app.menuItems["Огієнко — українська"].firstMatch.click()
+        // Тип елемента меню в тулбарі різниться між версіями macOS, тож шукаємо за ідентифікатором.
+        XCTAssertTrue(app.descendants(matching: .any)["translation"].firstMatch.waitForExistence(timeout: 5))
+        app.menuBars.menuBarItems["Переклад"].click()
+        app.menuBars.menuItems["Огієнко — українська"].click()
         expectTitle("Буття 1")
         let firstVerse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(firstVerse.waitForExistence(timeout: 5))
