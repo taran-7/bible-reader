@@ -14,25 +14,39 @@ import Testing
     // @trace FR-15
     @Test func testIncreaseAndDecreaseStopAtBounds() {
         var prefs = ReadingPreferences()
-        prefs.increaseVerseFont()
+        prefs.increaseFonts()
         #expect(prefs.verseFontSize == 16)
-        for _ in 0..<100 { prefs.increaseVerseFont() }
+        for _ in 0..<100 { prefs.increaseFonts() }
         #expect(prefs.verseFontSize == ReadingPreferences.verseFontRange.upperBound)
-        #expect(!prefs.canIncreaseVerseFont)
-        for _ in 0..<100 { prefs.decreaseVerseFont() }
+        #expect(!prefs.canIncreaseFonts)
+        for _ in 0..<100 { prefs.decreaseFonts() }
         #expect(prefs.verseFontSize == ReadingPreferences.verseFontRange.lowerBound)
-        #expect(!prefs.canDecreaseVerseFont)
+        #expect(!prefs.canDecreaseFonts)
     }
 
     // @trace FR-15
-    @Test func testResetOnlyTouchesVerses() {
+    @Test func testShortcutsChangeBothSizes() {
         var prefs = ReadingPreferences()
+        prefs.increaseFonts()
+        #expect(prefs.verseFontSize == 16 && prefs.bookListFontSize == 14)
+        prefs.decreaseFonts()
+        prefs.decreaseFonts()
+        #expect(prefs.verseFontSize == 14 && prefs.bookListFontSize == 12)
         prefs.verseFontSize = 20
         prefs.bookListFontSize = 18
-        prefs.resetVerseFont()
-        #expect(prefs.verseFontSize == 15)
-        #expect(prefs.bookListFontSize == 18)
-        #expect(prefs.isVerseFontDefault)
+        prefs.resetFonts()
+        #expect(prefs.verseFontSize == 15 && prefs.bookListFontSize == 13)
+        #expect(prefs.areFontsDefault)
+        // Змішаний стан: вірші вже на межі, список книг ще ні — ⌘+ доступна і збільшує лише список.
+        prefs.verseFontSize = 32
+        prefs.bookListFontSize = 20
+        #expect(prefs.canIncreaseFonts)
+        prefs.increaseFonts()
+        #expect(prefs.verseFontSize == 32 && prefs.bookListFontSize == 21)
+        prefs.resetFonts()
+        // Межі однакові: після багатьох ⌘+ обидва на 32.
+        for _ in 0..<100 { prefs.increaseFonts() }
+        #expect(prefs.verseFontSize == 32 && prefs.bookListFontSize == 32)
     }
 
     // @trace FR-15
@@ -43,10 +57,9 @@ import Testing
         #expect(prefs.verseFontSize == 32)
         #expect(prefs.bookListFontSize == 11)
         prefs.bookListFontSize = 99
-        #expect(prefs.bookListFontSize == 24)
+        #expect(prefs.bookListFontSize == 32)
         prefs.verseFontSize = 15.4
         #expect(prefs.verseFontSize == 15)
-        #expect(prefs.isVerseFontDefault)
     }
 
     // @trace FR-16
@@ -72,7 +85,7 @@ final class DictionaryStore: KeyValueStore, @unchecked Sendable {
     @Test func testChangesPersistAcrossStores() {
         let storage = DictionaryStore()
         let store = PreferencesStore(storage: storage)
-        store.preferences.increaseVerseFont()
+        store.preferences.increaseFonts()
         store.preferences.bookListFontSize = 17
         store.preferences.interfaceScale = .large
 
