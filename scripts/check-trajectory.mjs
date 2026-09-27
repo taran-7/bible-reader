@@ -5,7 +5,7 @@
 // part of "trajectory evaluation" that git/artifacts can prove, with exit
 // codes (no LLM judgment):
 //   - review evidence exists and is clean (review ran before archive);
-//   - the slice's commits carry the `Slice:` trailer;
+//   - the slice's commits (reachable from HEAD) carry the `Slice:` trailer;
 //   - module scope: which lib/<domain>/ each slice touched (cross-slice
 //     overlaps flagged for drift review);
 //   - the archived change folder has design.md + tasks.md.
@@ -94,7 +94,7 @@ for (const slice of slices) {
   let trailerCommits = 0;
   let libDomains = [];
   if (isRepo) {
-    const { ok, out } = git(["log", "--all", `--grep=Slice: ${trailerName}`, "--name-only", "--pretty=format:commit %H"]);
+    const { ok, out } = git(["log", "HEAD", `--grep=Slice: ${trailerName}`, "--name-only", "--pretty=format:commit %H"]);
     if (ok) {
       const files = new Set();
       for (const line of out.split("\n")) {

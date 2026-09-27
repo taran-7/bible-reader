@@ -19,8 +19,11 @@ final class ReaderUITests: XCTestCase {
         app.terminate()
     }
 
+    /// Свій профіль користувача на кожен тест: закладки й останнє місце не перетікають між тестами.
+    private lazy var profile = UUID().uuidString
+
     private func launch(environment: [String: String] = [:]) {
-        app.launchEnvironment = environment
+        app.launchEnvironment = environment.merging(["BIBLE_READER_PROFILE": profile]) { $1 }
         app.launch()
         XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
     }
@@ -186,7 +189,7 @@ final class ReaderUITests: XCTestCase {
         expectTitle("Буття 1")
         let firstVerse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(firstVerse.waitForExistence(timeout: 5))
-        wait(for: [expectation(for: NSPredicate(format: "value CONTAINS 'На початку Бог створив'"), evaluatedWith: firstVerse)], timeout: 5)
+        wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'На початку Бог створив'"), evaluatedWith: firstVerse)], timeout: 5)
 
         // ⌘⌥2 — Kralická (порядок: KJV, Kralická, Огієнко, Синодальний); посилання чеською.
         app.typeKey("2", modifierFlags: [.command, .option])
@@ -237,5 +240,77 @@ final class ReaderUITests: XCTestCase {
         scope.radioButtons["Уся Біблія"].click()
         search("\"only begotten Son\"")
         _ = waitForCount({ $0 > 0 && $0 < 10 })
+    }
+
+    private func paste(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        app.menuItems["paste:"].click()
+    }
+
+    /// Позначки вірша (підсвітка, закладка, нотатка) VoiceOver читає в кінці мітки рядка.
+    private func expectMarks(_ verse: Int, contain text: String, file: StaticString = #filePath, line: UInt = #line) {
+        let element = app.descendants(matching: .any)["verse-\(verse)"].firstMatch
+        XCTAssertTrue(element.waitForExistence(timeout: 5), file: file, line: line)
+        let predicate = NSPredicate(format: "label CONTAINS %@", text)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: predicate, evaluatedWith: element)], timeout: 5), .completed,
+                       "вірш \(verse): «\(text)» у «\(element.label)»", file: file, line: line)
+    }
+
+    // @trace FR-22
+    // @trace FR-23
+    // @trace FR-24
+    // @trace FR-25
+    func testBookmarksHighlightsNotesSurviveRelaunch() {
+        launch()
+        search("John 3:16")
+        expectTitle("John 3")
+        let row = verseRow(16)
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+
+        // Координата, а не елемент: рядок під кнопкою копіювання XCUI вважає «not hittable».
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
+        XCTAssertTrue(app.menuItems["Підсвітити"].waitForExistence(timeout: 5))
+        app.menuItems["Підсвітити"].hover()
+        app.menuItems["Жовтий"].click()
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
+        app.menuItems["Додати закладку на вірш 16"].click()
+        expectMarks(16, contain: "закладка")
+
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
+        app.menuItems["Додати нотатку…"].click()
+        let editor = app.textViews["note-text"]
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.click()
+        paste("Центральний вірш")
+        app.buttons["note-save"].click()
+        expectMarks(16, contain: "є нотатка")
+
+        // ⌘D — закладка на розділ; обидві закладки в бічній панелі.
+        app.buttons.matching(identifier: "bookmark-chapter").firstMatch.click()
+        let rows = app.buttons.matching(identifier: "bookmark-row")
+        XCTAssertTrue(rows.element(boundBy: 1).waitForExistence(timeout: 5), "дві закладки в бічній панелі")
+
+        let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
+        attachment.name = "notes-bookmarks"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+
+        // Перезапуск з тим самим профілем: те саме місце, позначки й нотатка на місці.
+        app.terminate()
+        launch()
+        expectTitle("John 3")
+        expectMarks(16, contain: "є нотатка")
+        expectMarks(16, contain: "жовтий")
+
+        // Пошук знаходить нотатку; клік відкриває вірш.
+        search("Genesis 1")
+        expectTitle("Genesis 1")
+        search("центральний")
+        let note = app.buttons.matching(identifier: "note-result").firstMatch
+        XCTAssertTrue(note.waitForExistence(timeout: 5))
+        note.click()
+        expectTitle("John 3")
+        expectSelected(16)
     }
 }
