@@ -118,6 +118,8 @@ struct ChromeBackground: ViewModifier {
         if theme.usesGlass {
             // Колір панелі з непрозорістю хрому поверх розмиття: контраст перевірено на чорному і білому тлі.
             let tint = Color(color).opacity(theme.chromeOpacity)
+            // `glassEffect` є лише в SDK macOS 26 (Swift 6.2+); CI на macos-15 збирає старішим Xcode.
+            #if compiler(>=6.2)
             if #available(macOS 26, *) {
                 content.scrollContentBackground(.hidden)
                     .background(tint.ignoresSafeArea())
@@ -127,6 +129,11 @@ struct ChromeBackground: ViewModifier {
                     .background(tint.ignoresSafeArea())
                     .background(.ultraThinMaterial)
             }
+            #else
+            content.scrollContentBackground(.hidden)
+                .background(tint.ignoresSafeArea())
+                .background(.ultraThinMaterial)
+            #endif
         } else {
             content.scrollContentBackground(.hidden)
                 .background(Color(color).ignoresSafeArea())
