@@ -8,9 +8,10 @@
 наступних зберігаються). Прибирає знаки наголосу U+0301, теги <…> і одиночні
 фігурні дужки; у BKR альтернативні слова {слово} стають (слово).
 ASCII-лапки стають українськими „…“, курсив <i>…</i> — звичайним текстом.
+З --align-to <файл data/raw> нумерація вирівнюється вірш у вірш за іншим перекладом (KJV), див. align_to.
 Використання:
-    python3 scripts/convert_getbible.py UBIO.json data/raw/uk_ohienko.json   # bolls.life
-    python3 scripts/convert_getbible.py bkr.json data/raw/cs_bkr.json        # getBible
+    python3 scripts/convert_getbible.py UBIO.json data/raw/uk_ohienko.json --align-to data/raw/en_kjv.json
+    python3 scripts/convert_getbible.py bkr.json data/raw/cs_bkr.json
 """
 import json
 import re
@@ -19,7 +20,7 @@ import sys
 # Контрольні вірші: (книга, розділ, вірш) → початок тексту після очищення.
 CHECKS = {
     "UBIO": {(1, 1, 1): "На початку Бог створив", (43, 3, 16): "Так бо Бог полюбив світ",
-             (19, 3, 1): "Псалом Давидів"},
+             (19, 3, 1): "Псалом Давидів", (19, 23, 1): "Псалом Давидів. Господь то мій Пастир"},
     "bkr": {(1, 1, 1): "Na počátku stvořil Bůh", (43, 3, 16): "Nebo tak Bůh miloval svět"},
 }
 
@@ -87,11 +88,42 @@ def convert(source):
     return out
 
 
-def main(src, dst):
+def align_to(books, reference):
+    """Вирівнює нумерацію віршів за `reference` (формат data/raw) вірш у вірш.
+
+    Відомі розбіжності єврейської нумерації з KJV, решта — помилка:
+    - Псалми: надпис окремим віршем (1–2 вірші) → зливається з першим віршем тексту, як у KJV;
+    - 1 Сам 21:1 → кінець 1 Сам 20:42;
+    - 3 Ів 1:14–15 → один вірш 14.
+    """
+    for bi, (book, ref) in enumerate(zip(books, reference)):
+        if len(book["chapters"]) != len(ref["chapters"]):
+            sys.exit(f"книга {bi + 1}: {len(book['chapters'])} розділів, у зразку {len(ref['chapters'])}")
+        for ci, (verses, ref_verses) in enumerate(zip(book["chapters"], ref["chapters"])):
+            extra = len(verses) - len(ref_verses)
+            if extra == 0:
+                continue
+            if bi + 1 == 19 and extra in (1, 2):
+                verses = [" ".join(verses[:extra + 1])] + verses[extra + 1:]
+            elif (bi + 1, ci + 1) == (9, 21) and extra == 1:
+                previous = book["chapters"][ci - 1]
+                previous[-1] = f"{previous[-1]} {verses[0]}"
+                verses = verses[1:]
+            elif (bi + 1, ci + 1) == (64, 1) and extra == 1:
+                verses = verses[:-2] + [f"{verses[-2]} {verses[-1]}"]
+            else:
+                sys.exit(f"{bi + 1}:{ci + 1}: {len(verses)} віршів, у зразку {len(ref_verses)} — невідома розбіжність")
+            book["chapters"][ci] = verses
+    return books
+
+
+def main(src, dst, align=None):
     source = json.load(open(src, encoding="utf-8"))
     if isinstance(source, list):
         source = from_bolls(source)
     books = convert(source)
+    if align:
+        books = align_to(books, json.load(open(align, encoding="utf-8-sig")))
     code = source.get("abbreviation", "")
     for (b, c, v), prefix in CHECKS.get(code, {}).items():
         text = books[b - 1]["chapters"][c - 1][v - 1]
@@ -108,6 +140,12 @@ def main(src, dst):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    args = sys.argv[1:]
+    align = None
+    if "--align-to" in args:
+        i = args.index("--align-to")
+        align = args[i + 1]
+        del args[i:i + 2]
+    if len(args) != 2:
         sys.exit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(args[0], args[1], align)
