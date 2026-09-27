@@ -248,6 +248,15 @@ final class ReaderUITests: XCTestCase {
         app.menuItems["paste:"].click()
     }
 
+    /// Позначки вірша (підсвітка, закладка, нотатка) VoiceOver читає з value рядка.
+    private func expectMarks(_ verse: Int, contain text: String, file: StaticString = #filePath, line: UInt = #line) {
+        let element = app.descendants(matching: .any)["verse-\(verse)"].firstMatch
+        XCTAssertTrue(element.waitForExistence(timeout: 5), file: file, line: line)
+        let predicate = NSPredicate(format: "value CONTAINS %@", text)
+        XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: predicate, evaluatedWith: element)], timeout: 5), .completed,
+                       "вірш \(verse): «\(text)» у \(element.value ?? "")", file: file, line: line)
+    }
+
     // @trace FR-22
     // @trace FR-23
     // @trace FR-24
@@ -266,7 +275,7 @@ final class ReaderUITests: XCTestCase {
         app.menuItems["Жовтий"].click()
         row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
         app.menuItems["Додати закладку на вірш 16"].click()
-        XCTAssertTrue(app.descendants(matching: .any)["bookmark-mark-16"].waitForExistence(timeout: 5))
+        expectMarks(16, contain: "закладка")
 
         row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
         app.menuItems["Додати нотатку…"].click()
@@ -275,7 +284,7 @@ final class ReaderUITests: XCTestCase {
         editor.click()
         paste("Центральний вірш")
         app.buttons["note-save"].click()
-        XCTAssertTrue(app.descendants(matching: .any)["note-mark-16"].waitForExistence(timeout: 5))
+        expectMarks(16, contain: "є нотатка")
 
         // ⌘D — закладка на розділ; обидві закладки в бічній панелі.
         app.buttons["bookmark-chapter"].click()
@@ -290,8 +299,8 @@ final class ReaderUITests: XCTestCase {
         app.terminate()
         launch()
         expectTitle("John 3")
-        XCTAssertTrue(app.descendants(matching: .any)["note-mark-16"].waitForExistence(timeout: 5))
-        wait(for: [expectation(for: NSPredicate(format: "value CONTAINS 'жовтий'"), evaluatedWith: app.descendants(matching: .any)["verse-16"].firstMatch)], timeout: 5)
+        expectMarks(16, contain: "є нотатка")
+        expectMarks(16, contain: "жовтий")
 
         // Пошук знаходить нотатку; клік відкриває вірш.
         search("Genesis 1")
