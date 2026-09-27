@@ -21,11 +21,19 @@ struct BibleReaderApp: App {
             ContentView(model: model, preferences: preferences)
                 .frame(minWidth: 800, minHeight: 500)
         }
-        .commands { FontCommands(preferences: preferences) }
+        .commands {
+            FontCommands(preferences: preferences)
+            CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
+        }
 
         Settings {
             SettingsView(preferences: preferences)
+                .modifier(ThemedScene(preferences: preferences))
         }
+    }
+
+    init() {
+        ThemeFonts.register()
     }
 
     private static func makePreferences() -> PreferencesStore {
@@ -53,6 +61,7 @@ struct FontCommands: Commands {
             Button("Стандартний розмір") { preferences.preferences.resetVerseFont() }
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.isVerseFontDefault)
+            Divider()
         }
     }
 }

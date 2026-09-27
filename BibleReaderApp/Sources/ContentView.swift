@@ -8,9 +8,13 @@ struct ContentView: View {
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
 
     var body: some View {
+        content.modifier(ThemedScene(preferences: preferences))
+    }
+
+    @ViewBuilder private var content: some View {
         if let error = model.loadError {
             DatabaseErrorView(message: error)
-                .environment(\.interfaceScale, scale)
+                .background(ThemeBackground())
         } else {
             NavigationSplitView {
                 BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
@@ -22,6 +26,8 @@ struct ContentView: View {
                             title: "Пошук не вдався",
                             systemImage: "exclamationmark.triangle",
                             lines: ["Запит «\(model.submittedQuery)»: \(error)"])
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(ThemeBackground())
                     } else if let results = model.results {
                         SearchResultsView(model: model, results: results)
                     } else {
@@ -30,8 +36,8 @@ struct ContentView: View {
                 }
                 .font(.system(size: scale.systemFontSize))
                 .toolbar { ReaderToolbar(model: model, scale: scale) }
+                .modifier(ToolbarTheme())
             }
-            .environment(\.interfaceScale, scale)
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in

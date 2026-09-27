@@ -16,6 +16,8 @@ struct SettingsView: View {
                 ForEach(InterfaceScale.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .accessibilityIdentifier("interface-scale")
+            ThemePicker(preferences: preferences)
+                .accessibilityIdentifier("theme")
             Button("Скинути до стандартних") { preferences.reset() }
         }
         .formStyle(.grouped)

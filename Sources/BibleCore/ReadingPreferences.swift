@@ -41,15 +41,18 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
         didSet { bookListFontSize = bookListFontSize.clamped(to: Self.bookListFontRange) }
     }
     public var interfaceScale: InterfaceScale
+    public var theme: ThemeChoice
 
     public init(
         verseFontSize: Double = defaultVerseFontSize,
         bookListFontSize: Double = defaultBookListFontSize,
-        interfaceScale: InterfaceScale = .standard
+        interfaceScale: InterfaceScale = .standard,
+        theme: ThemeChoice = .system
     ) {
         self.verseFontSize = verseFontSize.clamped(to: Self.verseFontRange)
         self.bookListFontSize = bookListFontSize.clamped(to: Self.bookListFontRange)
         self.interfaceScale = interfaceScale
+        self.theme = theme
     }
 
     /// Відсутнє чи невідоме поле бере стандартне значення, решта збережених лишається.
@@ -58,7 +61,8 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
         self.init(
             verseFontSize: (try? c.decodeIfPresent(Double.self, forKey: .verseFontSize)) ?? Self.defaultVerseFontSize,
             bookListFontSize: (try? c.decodeIfPresent(Double.self, forKey: .bookListFontSize)) ?? Self.defaultBookListFontSize,
-            interfaceScale: (try? c.decodeIfPresent(InterfaceScale.self, forKey: .interfaceScale)) ?? .standard)
+            interfaceScale: (try? c.decodeIfPresent(InterfaceScale.self, forKey: .interfaceScale)) ?? .standard,
+            theme: (try? c.decodeIfPresent(ThemeChoice.self, forKey: .theme)) ?? .system)
     }
 
     public var canIncreaseVerseFont: Bool { verseFontSize < Self.verseFontRange.upperBound }
