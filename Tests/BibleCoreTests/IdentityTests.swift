@@ -5,7 +5,7 @@ import Testing
 @Suite struct IdentityTests {
     // @trace FR-4
     @Test func testTranslationTitles() {
-        #expect(Translation.allCases.map(\.title) == ["KJV", "Синодальний", "Огієнко", "Kralická"])
+        #expect(Translation.allCases.map(\.title) == ["KJV", "Kralická", "Огієнко", "Синодальний"])
     }
 
     // @trace FR-4

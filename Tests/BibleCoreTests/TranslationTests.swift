@@ -4,11 +4,11 @@ import Testing
 @Suite struct TranslationTests {
     // @trace FR-28
     @Test func testFourTranslationsWithLanguages() {
-        #expect(Translation.allCases == [.kjv, .synodal, .ohienko, .bkr])
-        #expect(Translation.allCases.map(\.language) == [.english, .russian, .ukrainian, .czech])
-        #expect(Translation.allCases.map(\.title) == ["KJV", "Синодальний", "Огієнко", "Kralická"])
-        #expect(Translation.allCases.map(\.sourceFileName) == ["en_kjv.json", "ru_synodal.json", "uk_ohienko.json", "cs_bkr.json"])
-        #expect(Translation.allCases.map(\.menuTitle) == ["KJV — English", "Синодальний — русский", "Огієнко — українська", "Kralická — čeština"])
+        #expect(Translation.allCases == [.kjv, .bkr, .ohienko, .synodal])
+        #expect(Translation.allCases.map(\.language) == [.english, .czech, .ukrainian, .russian])
+        #expect(Translation.allCases.map(\.title) == ["KJV", "Kralická", "Огієнко", "Синодальний"])
+        #expect(Translation.allCases.map(\.sourceFileName) == ["en_kjv.json", "cs_bkr.json", "uk_ohienko.json", "ru_synodal.json"])
+        #expect(Translation.allCases.map(\.menuTitle) == ["KJV — English", "Kralická — čeština", "Огієнко — українська", "Синодальний — русский"])
         #expect(Translation.bkr.menuTitle == "Kralická — čeština")
     }
 

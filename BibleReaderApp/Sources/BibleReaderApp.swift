@@ -53,15 +53,15 @@ struct FontCommands: Commands {
     var body: some Commands {
         CommandGroup(after: .toolbar) {
             Divider()
-            Button("Збільшити шрифт") { preferences.preferences.increaseVerseFont() }
+            Button("Збільшити шрифт") { preferences.preferences.increaseFonts() }
                 .keyboardShortcut("=", modifiers: .command)
-                .disabled(!preferences.preferences.canIncreaseVerseFont)
-            Button("Зменшити шрифт") { preferences.preferences.decreaseVerseFont() }
+                .disabled(!preferences.preferences.canIncreaseFonts)
+            Button("Зменшити шрифт") { preferences.preferences.decreaseFonts() }
                 .keyboardShortcut("-", modifiers: .command)
-                .disabled(!preferences.preferences.canDecreaseVerseFont)
-            Button("Стандартний розмір") { preferences.preferences.resetVerseFont() }
+                .disabled(!preferences.preferences.canDecreaseFonts)
+            Button("Стандартний розмір") { preferences.preferences.resetFonts() }
                 .keyboardShortcut("0", modifiers: .command)
-                .disabled(preferences.preferences.isVerseFontDefault)
+                .disabled(preferences.preferences.areFontsDefault)
             Divider()
         }
     }
