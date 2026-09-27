@@ -10,7 +10,7 @@ struct ContentView: View {
     var body: some View {
         if let error = model.loadError {
             DatabaseErrorView(message: error)
-                .font(.system(size: scale.systemFontSize))
+                .environment(\.interfaceScale, scale)
         } else {
             NavigationSplitView {
                 BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
@@ -18,10 +18,10 @@ struct ContentView: View {
             } detail: {
                 Group {
                     if let error = model.searchError {
-                        ContentUnavailableView(
-                            "Пошук не вдався",
+                        MessageView(
+                            title: "Пошук не вдався",
                             systemImage: "exclamationmark.triangle",
-                            description: Text("Запит «\(model.submittedQuery)»: \(error)"))
+                            lines: ["Запит «\(model.submittedQuery)»: \(error)"])
                     } else if let results = model.results {
                         SearchResultsView(model: model, results: results)
                     } else {
@@ -29,9 +29,9 @@ struct ContentView: View {
                     }
                 }
                 .font(.system(size: scale.systemFontSize))
-                .toolbar { ReaderToolbar(model: model) }
-                .controlSize(scale.controlSize)
+                .toolbar { ReaderToolbar(model: model, scale: scale) }
             }
+            .environment(\.interfaceScale, scale)
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
@@ -45,12 +45,10 @@ struct DatabaseErrorView: View {
     let message: String
 
     var body: some View {
-        ContentUnavailableView {
-            Label("Не вдалося відкрити базу", systemImage: "exclamationmark.triangle")
-        } description: {
-            Text(message)
-            Text("Перезберіть додаток після `make db`.")
-        }
+        MessageView(
+            title: "Не вдалося відкрити базу",
+            systemImage: "exclamationmark.triangle",
+            lines: [message, "Перезберіть додаток після «make db»."])
         .textSelection(.enabled)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("database-error")

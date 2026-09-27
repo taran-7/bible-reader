@@ -11,6 +11,15 @@
       "processComplete": true
     },
     {
+      "slice": "2026-09-27-add-reading-comfort",
+      "reviewEvidence": "clean",
+      "trailerCommits": 2,
+      "libDomains": [
+        "BibleCore"
+      ],
+      "processComplete": true
+    },
+    {
       "slice": "2026-09-27-add-ui-tests",
       "reviewEvidence": "clean",
       "trailerCommits": 3,
@@ -25,6 +34,7 @@
       "domain": "BibleCore",
       "slices": [
         "2026-09-25-bible-reader-mvp",
+        "2026-09-27-add-reading-comfort",
         "2026-09-27-add-ui-tests"
       ]
     }
@@ -33,7 +43,7 @@
   "warnings": [
     {
       "check": "in-scope",
-      "msg": "lib/BibleCore/ modified by 2 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-ui-tests) — review for scope drift"
+      "msg": "lib/BibleCore/ modified by 3 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-reading-comfort, 2026-09-27-add-ui-tests) — review for scope drift"
     }
   ]
 }

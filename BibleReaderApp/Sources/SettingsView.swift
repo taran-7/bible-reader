@@ -15,6 +15,7 @@ struct SettingsView: View {
             Picker("Масштаб інтерфейсу", selection: $preferences.preferences.interfaceScale) {
                 ForEach(InterfaceScale.allCases, id: \.self) { Text($0.title).tag($0) }
             }
+            .accessibilityIdentifier("interface-scale")
             Button("Скинути до стандартних") { preferences.reset() }
         }
         .formStyle(.grouped)
