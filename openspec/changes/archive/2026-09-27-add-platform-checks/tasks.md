@@ -11,4 +11,4 @@
 ## 3. Документи і рев'ю
 
 - [x] 3.1 PRD §7, `docs/requirements.md`: NFR-1 (лише Apple Silicon), NFR-5 (< 100 МБ); tech debt #22 закрито
-- [ ] 3.2 Рев'ю; NFR-1, NFR-2, NFR-5 → MVP; архів
+- [x] 3.2 Рев'ю (3 medium, 4 low: виправлено 6, додаткова Release-збірка в CI прийнята); NFR-1, NFR-2, NFR-5 → MVP; архів

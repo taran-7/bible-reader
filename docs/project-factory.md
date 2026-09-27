@@ -63,7 +63,7 @@ Swift описано в [ADR-0001](adr/0001-adopt-swift-stack.md).
 - **PD-10 (2026-09-27).** `check-coverage-ratchet` і `swift-coverage-summary`: метрика з порожнім скоупом (0 з 0) має `pct: null`, друкується як SKIP-pending і не входить у baseline. Причина: Swift не збирає покриття гілок, а 0/0 рахувалося як 100 % і ставало планкою над нічим. Якщо метрика є в baseline, а скоупу вже немає, це FAIL.
 
 - **PD-11 (2026-09-27).** `qa-verify`: UI-тести (XCUITest) керують реальними мишею, клавіатурою і буфером обміну, тож локально запускаються лише з `QA_UI_TESTS=1`, а в CI — завжди; без них член `app-ui-tests` у списку DEFERRED. Причина: слайс `add-ui-tests`.
-- **PD-12 (2026-09-27).** `qa-verify` і CI: член `platform` (`scripts/check-platform.mjs`) перевіряє Release-збірку — мінімальна macOS 14.0, архітектура `arm64`, `.app` < 100 МБ (WARN від 80). Причина: NFR-1 і NFR-5 не мали механізму перевірки (слайс `add-platform-checks`); власник звузив NFR-1 до Apple Silicon і підняв межу NFR-5 до 100 МБ.
+- **PD-12 (2026-09-27).** `qa-verify` і CI: член `app-build` тепер `scripts/check-platform.mjs` — Release-збірка замість Debug, і на ній перевіряється — мінімальна macOS 14.0, архітектура `arm64`, `.app` < 100 МБ (WARN від 80). Причина: NFR-1 і NFR-5 не мали механізму перевірки (слайс `add-platform-checks`); власник звузив NFR-1 до Apple Silicon і підняв межу NFR-5 до 100 МБ.
 
 ## Correction events
 

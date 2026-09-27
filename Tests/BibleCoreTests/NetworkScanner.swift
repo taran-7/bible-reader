@@ -1,8 +1,15 @@
 import Foundation
 
 /// Шукає мережеві API й адреси в `.swift`-файлах (NFR-2). Живе в тестах: це перевірка, а не код додатка.
+/// Правило суворе: адреса в коментарі теж знахідка. `URL(fileURLWithPath:)` дозволено.
 enum NetworkScanner {
-    static let patterns = ["URLSession", "URLRequest", "NSURLConnection", "import Network", "WKWebView", "http://", "https://"]
+    static let tokens = [
+        "URLSession", "URLRequest", "URLComponents", "URL(string:", "NSURL(", "NSURLConnection",
+        "NWConnection", "NWListener", "NWPathMonitor", "CFStream", "CFSocket", "SCNetworkReachability",
+        "getaddrinfo", "WKWebView", "http://", "https://", "ws://", "wss://",
+    ]
+    /// `import Network`, `@testable import WebKit` тощо.
+    static var imports: Regex<Substring> { /^\s*(?:@\w+\s+)*import\s+(?:Network|WebKit|CFNetwork)\b/ }
 
     struct Report {
         /// «шлях:рядок: шаблон», відсортовані; шлях — відносно кореня.
@@ -21,8 +28,11 @@ enum NetworkScanner {
                 guard !allowed.contains(path), let text = try? String(contentsOf: url, encoding: .utf8) else { continue }
                 report.scannedFiles += 1
                 for (index, line) in text.components(separatedBy: .newlines).enumerated() {
-                    for pattern in patterns where line.contains(pattern) {
-                        report.findings.append("\(path):\(index + 1): \(pattern)")
+                    for token in tokens where line.contains(token) {
+                        report.findings.append("\(path):\(index + 1): \(token)")
+                    }
+                    if line.contains(imports) {
+                        report.findings.append("\(path):\(index + 1): import")
                     }
                 }
             }
