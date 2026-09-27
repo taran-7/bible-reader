@@ -28,6 +28,20 @@ final class ParallelUITests: XCTestCase {
         field.typeKey(.return, modifierFlags: [])
     }
 
+    /// Однакові пункти є і в головному меню, і в меню тулбара — клікаємо той, що відкритий.
+    private func clickMenuItem(_ title: String, file: StaticString = #filePath, line: UInt = #line) {
+        let items = app.menuItems.matching(NSPredicate(format: "title == %@", title))
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline {
+            if let item = items.allElementsBoundByIndex.first(where: \.isHittable) {
+                item.click()
+                return
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        }
+        XCTFail("пункт меню «\(title)»", file: file, line: line)
+    }
+
     private func expectTitle(_ title: String, file: StaticString = #filePath, line: UInt = #line) {
         let window = app.windows.matching(NSPredicate(format: "title == %@", title)).firstMatch
         XCTAssertTrue(window.waitForExistence(timeout: 5), "вікно «\(title)»", file: file, line: line)
@@ -45,10 +59,12 @@ final class ParallelUITests: XCTestCase {
         let menu = app.descendants(matching: .any)["parallel"].firstMatch
         XCTAssertTrue(menu.waitForExistence(timeout: 5))
         menu.click()
-        app.menuItems["Синодальний — русский"].click()
-        let column = app.descendants(matching: .any)["parallel-21-1"].firstMatch
-        XCTAssertTrue(column.waitForExistence(timeout: 5))
-        XCTAssertTrue(column.label.contains("Боже мой! Боже мой!"), column.label)
+        clickMenuItem("Синодальний — русский")
+        // Рядок Пс 22:1 читається разом із паралельною колонкою: надпис і Пс 21:2.
+        let verse = app.descendants(matching: .any)["verse-1"].firstMatch
+        XCTAssertTrue(verse.waitForExistence(timeout: 5))
+        wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'Синодальний: 1 '"), evaluatedWith: verse)], timeout: 5)
+        XCTAssertTrue(verse.label.contains("2 Боже мой! Боже мой!"), verse.label)
         let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
         attachment.name = "parallel-psalm-22"
         attachment.lifetime = .keepAlways

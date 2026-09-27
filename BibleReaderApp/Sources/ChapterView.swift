@@ -30,7 +30,8 @@ struct ChapterView: View {
                 ForEach(model.verses) { verse in
                     HStack(alignment: .firstTextBaseline, spacing: 16) {
                         VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize,
-                                 marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) })
+                                 marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) },
+                                 parallelText: spokenParallel(parallel[verse.verse]))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         if let secondary = parallel[verse.verse], let other = model.parallelTranslation {
                             ParallelColumn(verses: secondary, translation: other, primaryChapter: model.location.chapter,
@@ -111,6 +112,11 @@ struct ChapterView: View {
 
     private func key(_ verse: Int) -> VerseKey { model.canonicalKey(verse) }
 
+    private func spokenParallel(_ secondary: [Verse]?) -> String? {
+        guard let secondary, let other = model.parallelTranslation else { return nil }
+        return ParallelColumn.spoken(secondary, translation: other, primaryChapter: model.location.chapter)
+    }
+
     /// Виділення важливіше за підсвітку, щоб було видно, що саме виділено.
     private func rowBackground(_ verse: Int, _ highlight: HighlightColor?) -> Color {
         if selection.contains(verse) { return Color(theme.selection) }
@@ -144,6 +150,8 @@ struct VerseRow: View {
     let fontSize: Double
     var marks = VerseMarks()
     var openNote: () -> Void = {}
+    /// Другий переклад для VoiceOver: рядок читається разом із паралельною колонкою.
+    var parallelText: String?
     @Environment(\.theme) private var theme
 
     var body: some View {
@@ -179,7 +187,8 @@ struct VerseRow: View {
         .padding(.vertical, 2)
         .accessibilityElement(children: .ignore)
         // Позначки — у кінці мітки: value рядка списку macOS не віддає ні VoiceOver, ні XCUI.
-        .accessibilityLabel(accessibilityMarks.isEmpty ? "\(verse.verse) \(verse.text)" : "\(verse.verse) \(verse.text); \(accessibilityMarks)")
+        .accessibilityLabel(["\(verse.verse) \(verse.text)", accessibilityMarks, parallelText ?? ""]
+            .filter { !$0.isEmpty }.joined(separator: "; "))
         .accessibilityIdentifier("verse-\(verse.verse)")
         .accessibilityAction(named: "Нотатка") { openNote() }
     }
@@ -257,12 +266,18 @@ struct ParallelColumn: View {
                     .lineSpacing(fontSize * theme.lineSpacing)
             }
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(translation.title): " + verses.map { "\(label($0)) \($0.text)" }.joined(separator: " "))
-        .accessibilityIdentifier("parallel-\(verses.first.map { "\($0.chapter)-\($0.verse)" } ?? "empty")")
+        // VoiceOver читає колонку в мітці рядка основного вірша (`VerseRow.parallelText`).
+        .accessibilityHidden(true)
     }
 
-    private func label(_ verse: Verse) -> String {
+    private func label(_ verse: Verse) -> String { Self.label(verse, primaryChapter: primaryChapter) }
+
+    static func label(_ verse: Verse, primaryChapter: Int) -> String {
         verse.chapter == primaryChapter ? "\(verse.verse)" : "\(verse.chapter):\(verse.verse)"
+    }
+
+    static func spoken(_ verses: [Verse], translation: BibleCore.Translation, primaryChapter: Int) -> String? {
+        guard !verses.isEmpty else { return nil }
+        return "\(translation.title): " + verses.map { "\(label($0, primaryChapter: primaryChapter)) \($0.text)" }.joined(separator: " ")
     }
 }
