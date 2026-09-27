@@ -19,7 +19,8 @@
 | # | Слайс (OpenSpec change) | Вимоги | Залежність | Паралельність |
 |---|---|---|---|---|
 | 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | parallel-safe |
-| 0a | `add-ui-tests` (XCUITest, tech debt #7) | FR-10, FR-14 (UI-докази), NFR-3 (запуск), NFR-4 (VoiceOver, клавіатура) | — | parallel-safe з 0 |
+| 0a | `add-ui-tests` (XCUITest) | FR-7, FR-10, FR-13, FR-14 (UI-докази) | — | зроблено 2026-09-27 |
+| 0b | `add-a11y-launch-checks` | NFR-3 (запуск < 1 с), NFR-4 (VoiceOver, клавіатура) | 0a | parallel-safe з 0 |
 | 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16, FR-17, FR-31, FR-32, NFR-4 (контраст) | — | serialize |
 | 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | parallel-safe з 1 |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
@@ -33,8 +34,8 @@
 |---|---|
 | NFR-1 | Скрипт: `MACOSX_DEPLOYMENT_TARGET` у `project.yml` = 14.0 і `lipo -archs` бінарника містить arm64 і x86_64 |
 | NFR-2 | Тест `@trace NFR-2`: у `Sources/` немає `URLSession`/`Network`, крім модуля ілюстрацій (FR-33…35) |
-| NFR-3 | Пошук: тест з таймером на реальній базі (`improve-search`); запуск: вимір у XCUITest |
-| NFR-4 | XCUITest: accessibility labels і робота з клавіатури; контраст: тест токенів тем (FR-32) |
+| NFR-3 | Пошук: тест з таймером на реальній базі (`improve-search`); запуск: вимір у XCUITest (`add-a11y-launch-checks`) |
+| NFR-4 | XCUITest (`add-a11y-launch-checks`): accessibility labels і робота з клавіатури; контраст: тест токенів тем (FR-32) |
 | NFR-5 | Скрипт: розмір `.app` після `xcodebuild` < 60 МБ |
 
 NFR стає MVP-рядком разом зі слайсом, який додає його механізм.

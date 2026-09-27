@@ -40,11 +40,11 @@ jobs:
         run: node scripts/check-coverage-ratchet.mjs
 
       # --- збірка додатка ---
-      - name: Build app
+      - name: Build app + UI tests (XCUITest)
         run: |
           brew install xcodegen
           (cd BibleReaderApp && xcodegen generate)
-          xcodebuild -quiet -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build CODE_SIGNING_ALLOWED=NO
+          make ui-test
 
       # --- докази ---
       - name: Upload QA evidence

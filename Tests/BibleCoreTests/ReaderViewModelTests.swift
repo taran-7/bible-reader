@@ -187,3 +187,17 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.searchError == nil)
     }
 }
+
+extension ReaderViewModelTests {
+    // @trace FR-13
+    @Test func testFocusIsTakenOncePerRequest() {
+        let model = makeModel()
+        model.query = "Ин 3:16"
+        model.submitSearch()
+        #expect(model.takeFocus() == 16)
+        // Повторне відображення розділу (напр. після очищення пошуку) не забирає фокус знову.
+        #expect(model.takeFocus() == nil)
+        model.submitSearch()
+        #expect(model.takeFocus() == 16)
+    }
+}
