@@ -3,34 +3,47 @@ import SwiftUI
 
 struct SearchResultsView: View {
     @Bindable var model: ReaderViewModel
-    let results: [SearchResult]
     @Environment(\.interfaceScale) private var scale
     @Environment(\.theme) private var theme
 
     var body: some View {
+        // Панель області видно й на екрані помилки: інакше область, з якою пошук упав, не змінити.
         VStack(spacing: 0) {
             header
-            if results.isEmpty {
+            if let error = model.searchError {
+                MessageView(
+                    title: "Пошук не вдався",
+                    systemImage: "exclamationmark.triangle",
+                    lines: ["Запит «\(model.submittedQuery)»: \(error)"])
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let results = model.results, !results.isEmpty {
+                list(results)
+            } else {
                 MessageView(
                     title: "Нічого не знайдено",
                     systemImage: "magnifyingglass",
-                    lines: ["За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."])
+                    lines: ["За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) (\(scopeTitle(model.searchScope))) немає віршів."])
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
-                list
             }
         }
         .background(Color(theme.results))
-        .navigationTitle("Знайдено: \(model.resultTotal)")
+        .navigationTitle("Пошук: «\(model.submittedQuery)»")
+    }
+
+    private func scopeTitle(_ scope: SearchScope) -> String {
+        switch scope {
+        case .bible: "уся Біблія"
+        case .oldTestament: "Старий Завіт"
+        case .newTestament: "Новий Завіт"
+        case .book: bookTitle
+        }
     }
 
     /// Область пошуку (FR-19) і лічильник (FR-20).
     private var header: some View {
         HStack(spacing: 12) {
             Picker("Де шукати", selection: $model.searchScope) {
-                Text("Уся Біблія").tag(SearchScope.bible)
-                Text("Старий Завіт").tag(SearchScope.oldTestament)
-                Text("Новий Завіт").tag(SearchScope.newTestament)
+                ForEach([SearchScope.bible, .oldTestament, .newTestament], id: \.self) { Text(scopeTitle($0).capitalizedFirst).tag($0) }
                 Text(bookTitle).tag(model.currentBookScope)
             }
             .pickerStyle(.segmented)
@@ -52,7 +65,7 @@ struct SearchResultsView: View {
         return book.name(in: model.translation)
     }
 
-    private var list: some View {
+    private func list(_ results: [SearchResult]) -> some View {
         List {
             ForEach(results) { result in
                 Button { model.open(result) } label: {
@@ -71,7 +84,15 @@ struct SearchResultsView: View {
                 .listRowBackground(Color(theme.results))
                 .listRowSeparator(.hidden)
             }
-            if model.canLoadMore {
+            if let error = model.pageError {
+                HStack {
+                    Text("Не вдалося довантажити: \(error)").foregroundStyle(Color(theme.secondaryText))
+                    Button("Повторити") { model.loadMore() }
+                }
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color(theme.results))
+                .listRowSeparator(.hidden)
+            } else if model.canLoadMore {
                 // Довантаження, коли прокрутили до кінця (FR-20).
                 ProgressView()
                     .frame(maxWidth: .infinity)
@@ -94,4 +115,8 @@ struct SearchResultsView: View {
             text += part
         }
     }
+}
+
+private extension String {
+    var capitalizedFirst: String { prefix(1).uppercased() + dropFirst() }
 }

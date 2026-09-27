@@ -245,7 +245,12 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         model.query = "boom later"
         model.submitSearch()
         model.loadMore()
-        #expect(model.searchError != nil)
+        // Помилка сторінки не ховає вже знайдене.
+        #expect(model.pageError != nil)
+        #expect(model.searchError == nil)
+        #expect(model.results?.count == 1)
+        model.submitSearch()
+        #expect(model.pageError == nil)
     }
 
     // @trace FR-19
