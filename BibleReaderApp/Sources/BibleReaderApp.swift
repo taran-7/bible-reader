@@ -1,3 +1,4 @@
+import AppKit
 import BibleCore
 import SwiftUI
 
@@ -14,11 +15,51 @@ struct BibleReaderApp: App {
             bundled: Bundle.main.url(forResource: "bible", withExtension: "sqlite"))
         return try SQLiteBibleRepository(path: url)
     }
+    @State private var preferences = BibleReaderApp.makePreferences()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(model: model)
+            ContentView(model: model, preferences: preferences)
                 .frame(minWidth: 800, minHeight: 500)
+        }
+        .commands { FontCommands(preferences: preferences) }
+
+        Settings {
+            SettingsView(preferences: preferences)
+        }
+    }
+
+    private static func makePreferences() -> PreferencesStore {
+        let store = PreferencesStore(storage: UserDefaults.standard)
+        #if DEBUG
+        // UI-тести стартують зі стандартних налаштувань.
+        if UserDefaults.standard.bool(forKey: "ResetReadingPreferences") { store.reset() }
+        #endif
+        return store
+    }
+}
+
+/// Базовий розмір для масштабу інтерфейсу: системний розмір шрифту macOS.
+extension InterfaceScale {
+    var systemFontSize: CGFloat { fontSize(base: NSFont.systemFontSize) }
+    var controlSize: ControlSize { factor > 1 ? .large : factor < 1 ? .small : .regular }
+}
+
+struct FontCommands: Commands {
+    let preferences: PreferencesStore
+
+    var body: some Commands {
+        CommandGroup(after: .toolbar) {
+            Divider()
+            Button("Збільшити шрифт") { preferences.preferences.increaseVerseFont() }
+                .keyboardShortcut("=", modifiers: .command)
+                .disabled(!preferences.preferences.canIncreaseVerseFont)
+            Button("Зменшити шрифт") { preferences.preferences.decreaseVerseFont() }
+                .keyboardShortcut("-", modifiers: .command)
+                .disabled(!preferences.preferences.canDecreaseVerseFont)
+            Button("Стандартний розмір") { preferences.preferences.resetVerseFont() }
+                .keyboardShortcut("0", modifiers: .command)
+                .disabled(preferences.preferences.isVerseFontDefault)
         }
     }
 }

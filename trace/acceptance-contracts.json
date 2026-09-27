@@ -119,16 +119,16 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-16": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-17": [

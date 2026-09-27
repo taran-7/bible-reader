@@ -3,13 +3,17 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable var model: ReaderViewModel
+    let preferences: PreferencesStore
+
+    private var scale: InterfaceScale { preferences.preferences.interfaceScale }
 
     var body: some View {
         if let error = model.loadError {
             DatabaseErrorView(message: error)
+                .font(.system(size: scale.systemFontSize))
         } else {
             NavigationSplitView {
-                BookList(model: model)
+                BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
                 Group {
@@ -21,10 +25,12 @@ struct ContentView: View {
                     } else if let results = model.results {
                         SearchResultsView(model: model, results: results)
                     } else {
-                        ChapterView(model: model)
+                        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
                     }
                 }
+                .font(.system(size: scale.systemFontSize))
                 .toolbar { ReaderToolbar(model: model) }
+                .controlSize(scale.controlSize)
             }
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }

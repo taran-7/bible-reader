@@ -14,17 +14,19 @@
 
 ## Нова робота (кожен слайс проходить повний цикл G4)
 
-Порядок за [PRD](product-specs/prd.md) §6. Власник затвердив план 2026-09-27: v1.3 іде перед v2.0.
+Порядок за [PRD](product-specs/prd.md) §6. Власник затвердив план 2026-09-27: v1.3 іде перед v2.0; v1.1 розділено на три слайси (1, 1a, 1b).
 
 | # | Слайс (OpenSpec change) | Вимоги | Залежність | Паралельність |
 |---|---|---|---|---|
 | 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | parallel-safe |
-| 0a | `add-ui-tests` (XCUITest) | FR-7, FR-10, FR-13, FR-14 (UI-докази) | — | зроблено 2026-09-27 |
+| 0a | `add-ui-tests` (XCUITest) | FR-7, FR-10, FR-13, FR-14 (UI-докази) | — | зроблено 2026-09-27 (архів `2026-09-27-add-ui-tests`) |
 | 0b | `add-a11y-launch-checks` | NFR-3 (запуск < 1 с), NFR-4 (VoiceOver, клавіатура) | 0a | parallel-safe з 0 |
-| 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16, FR-17, FR-31, FR-32, NFR-4 (контраст) | — | serialize |
+| 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16 | — | serialize |
+| 1a | `add-copy-button` (v1.1) | FR-17 | 1 | serialize |
+| 1b | `add-themes` (v1.1) | FR-31, FR-32, NFR-4 (контраст) | 1 (масштаб шрифтів у всіх темах) | serialize |
 | 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | parallel-safe з 1 |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
-| 4 | `add-illustrations` (v1.4) | FR-33, FR-34, FR-35 | 1 (кнопка поруч із 6.3) | serialize |
+| 4 | `add-illustrations` (v1.4) | FR-33, FR-34, FR-35 | 1a (кнопка поруч із 6.3) | serialize |
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |
 | 6 | `add-translations` (v2.1) | FR-28, FR-29, FR-30 | 5 (для Огієнка) | serialize |
 
