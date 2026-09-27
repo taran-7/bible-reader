@@ -259,14 +259,16 @@ final class ReaderUITests: XCTestCase {
         let row = verseRow(16)
         XCTAssertTrue(row.waitForExistence(timeout: 5))
 
-        row.rightClick()
+        // Координата, а не елемент: рядок під кнопкою копіювання XCUI вважає «not hittable».
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
+        XCTAssertTrue(app.menuItems["Підсвітити"].waitForExistence(timeout: 5))
         app.menuItems["Підсвітити"].hover()
         app.menuItems["Жовтий"].click()
-        row.rightClick()
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
         app.menuItems["Додати закладку на вірш 16"].click()
         XCTAssertTrue(app.descendants(matching: .any)["bookmark-mark-16"].waitForExistence(timeout: 5))
 
-        row.rightClick()
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
         app.menuItems["Додати нотатку…"].click()
         let editor = app.textViews["note-text"]
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
