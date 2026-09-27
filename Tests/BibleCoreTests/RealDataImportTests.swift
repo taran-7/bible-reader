@@ -37,6 +37,9 @@ import Testing
         // Без знаків наголосу, тегів і фігурних дужок.
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%' || char(769) || '%' OR text LIKE '%<%' OR text LIKE '%{%')", in: db) == 0)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'bkr'", in: db) == 31_102)
+        // Огієнко з getBible: 88 віршів відсутні (data/raw/SOURCE.md); число фіксуємо, щоб перегенерація не змінила його тихо.
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'ohienko'", in: db) == 31_050)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%\\%' OR text LIKE '%\"%')", in: db) == 0)
         #expect(try TestSupport.count("SELECT MAX(chapter) FROM verses WHERE translation = 'bkr' AND book = 19", in: db) == 150)
     }
 }

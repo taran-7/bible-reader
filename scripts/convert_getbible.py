@@ -20,12 +20,22 @@ CHECKS = {
 }
 
 
+# Дозволені символи після очищення; будь-що інше зупиняє конвертацію, щоб нова розмітка не пройшла тихо.
+ALLOWED_PUNCTUATION = set(" ,.;:!?-—–'’„“”«»()[]…")
+
+
 def clean(text):
     text = text.replace("́", "")
     text = re.sub(r"<[^>]*>", "", text)
     text = re.sub(r"\{([^{}]*)\}", r"(\1)", text)
-    text = text.replace("{", "").replace("}", "")
-    return re.sub(r"\s+", " ", text).strip()
+    text = text.replace("{", "").replace("}", "").replace("\\", "")
+    # В Огієнка лапки „…“; зрідка закривна — ASCII ".
+    text = text.replace('"', "“")
+    text = re.sub(r"\s+", " ", text).strip()
+    odd = {c for c in text if not (c.isalpha() or c.isdigit() or c in ALLOWED_PUNCTUATION)}
+    if odd:
+        sys.exit(f"неочікувані символи {sorted(odd)} у «{text[:60]}»")
+    return text
 
 
 def convert(source):
@@ -67,9 +77,12 @@ def main(src, dst):
             sys.exit(f"контрольний вірш {b}:{c}:{v}: «{text[:40]}» не починається з «{prefix}»")
     with open(dst, "w", encoding="utf-8") as f:
         json.dump(books, f, ensure_ascii=False, separators=(",", ":"))
-    missing = sum(t == "" for b in books for c in b["chapters"] for t in c)
+    gaps = [f"{b['abbrev']}:{ci + 1}:{vi + 1}" for b in books
+            for ci, c in enumerate(b["chapters"]) for vi, t in enumerate(c) if t == ""]
     total = sum(len(c) for b in books for c in b["chapters"])
-    print(f"{dst}: 66 книг, {total - missing} віршів, пропущено {missing}")
+    print(f"{dst}: 66 книг, {total - len(gaps)} віршів, пропущено {len(gaps)}")
+    if gaps:
+        print("пропущені (книга:розділ:вірш):", " ".join(gaps))
 
 
 if __name__ == "__main__":

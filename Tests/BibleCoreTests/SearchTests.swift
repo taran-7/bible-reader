@@ -73,5 +73,14 @@ import Testing
         let cs = try repository.search("buh miloval", translation: .bkr)
         #expect(cs.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
     }
+
+    // @trace FR-28
+    @Test func testUkrainianApostropheVariants() throws {
+        // Дані мають ASCII-апостроф; розкладка macOS може дати ’ або ʼ.
+        for query in ["п'ять", "п’ять", "пʼять"] {
+            #expect(try !repository.search(query, translation: .ohienko).isEmpty, "\(query)")
+        }
+        #expect(SearchText.fold("пʼять і п’ять") == "п'ять і п'ять")
+    }
 }
 

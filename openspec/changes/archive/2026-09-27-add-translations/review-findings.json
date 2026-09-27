@@ -1,0 +1,23 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-translations",
+  "change": "add-translations",
+  "baseRef": "5eeeadc",
+  "headRef": "feature/add-translations",
+  "dimensions": {
+    "correctness": { "confirmed": 9, "contested": 0, "rejected": 0, "fixed": 7, "deferred": 2 }
+  },
+  "fixed": [
+    "M1: stray backslash and ASCII closing quotes left in Ohienko — converter strips them and fails on any unexpected character; test asserts none in the DB (FR-28)",
+    "M2: 88 missing Ohienko verses undocumented — converter prints the list, SOURCE.md records it, RealDataImportTests pins 31 050 (FR-28)",
+    "M3: typographic apostrophes (’ ʼ) broke Ukrainian search — SearchText.fold maps them to ' 1:1; test for three spellings (FR-28)",
+    "L4: short Czech forms colliding with English habits — parse tests pin Jon/Na behaviour (FR-29)",
+    "L5: Daniel abbreviated Da instead of ČEP Dn (FR-29)",
+    "L6: inconsistent Ukrainian case (1 царів, Малахії) (FR-28)",
+    "L9: converter had no tests — scripts/test_convert_getbible.py run by make test (FR-28, FR-29)"
+  ],
+  "deferred": "docs/exec-plans/tech-debt-tracker.md #21 (source gaps), #23 (⌘⌥ digits on Czech layout)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T18:45:28Z"
+}

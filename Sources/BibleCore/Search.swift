@@ -1,11 +1,19 @@
 import GRDB
 
 /// Згортання для пошуку: `unicode61 remove_diacritics` згортає лише латиницю,
-/// тож «ё → е» робимо самі. Заміна символ-на-символ, тому позиції у згорнутому
+/// тож «ё → е» робимо самі; типографські апострофи (’ ʼ ‘) → ' — інакше `пʼять`
+/// стає одним токеном. Заміна символ-на-символ, тому позиції у згорнутому
 /// і оригінальному тексті збігаються.
 public enum SearchText {
     public static func fold(_ text: String) -> String {
-        String(text.map { $0 == "ё" ? "е" : $0 == "Ё" ? "Е" : $0 })
+        String(text.map { character in
+            switch character {
+            case "ё": "е"
+            case "Ё": "Е"
+            case "’", "ʼ", "‘": "'"
+            default: character
+            }
+        })
     }
 }
 

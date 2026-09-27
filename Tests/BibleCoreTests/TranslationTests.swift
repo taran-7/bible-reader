@@ -50,6 +50,10 @@ import Testing
         #expect(Reference.parse("1. Korintským 13") == Reference(book: 46, chapter: 13))
         #expect(Reference.parse("Žalmy 23")?.book == 19)
         #expect(Reference.parse("Gn 1:1")?.book == 1)
+        #expect(Reference.parse("Dn 7")?.book == 27)
+        // Короткі чеські форми, що збігаються зі звичними англійськими: `Jon` — Йона, як і в англійській.
+        #expect(Reference.parse("Jon 3")?.book == 32)
+        #expect(Reference.parse("Na 1")?.book == 34)
     }
 
     // @trace FR-28
