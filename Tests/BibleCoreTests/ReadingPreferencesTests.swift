@@ -44,6 +44,9 @@ import Testing
         #expect(prefs.bookListFontSize == 11)
         prefs.bookListFontSize = 99
         #expect(prefs.bookListFontSize == 24)
+        prefs.verseFontSize = 15.4
+        #expect(prefs.verseFontSize == 15)
+        #expect(prefs.isVerseFontDefault)
     }
 
     // @trace FR-16
@@ -53,7 +56,7 @@ import Testing
         #expect(InterfaceScale.large.fontSize(base: 10) == 12)
         #expect(InterfaceScale.extraLarge.fontSize(base: 10) == 14)
         #expect(InterfaceScale.small.fontSize(base: 20) == 17)
-        #expect(InterfaceScale.large.title == "Великий")
+        #expect(InterfaceScale.allCases.map(\.title) == ["Малий", "Стандарт", "Великий", "Дуже великий"])
     }
 }
 
@@ -91,6 +94,19 @@ final class DictionaryStore: KeyValueStore, @unchecked Sendable {
         let storage = DictionaryStore()
         storage.values[PreferencesStore.key] = Data(#"{"verseFontSize":500,"bookListFontSize":13,"interfaceScale":"standard"}"#.utf8)
         #expect(PreferencesStore(storage: storage).preferences.verseFontSize == 32)
+    }
+
+    // @trace FR-15
+    @Test func testPartialDataKeepsKnownValues() {
+        let storage = DictionaryStore()
+        storage.values[PreferencesStore.key] = Data(#"{"verseFontSize":20,"interfaceScale":"gigantic"}"#.utf8)
+        let prefs = PreferencesStore(storage: storage).preferences
+        #expect(prefs.verseFontSize == 20)
+        #expect(prefs.bookListFontSize == 13)
+        #expect(prefs.interfaceScale == .standard)
+
+        storage.values[PreferencesStore.key] = Data(#"{"bookListFontSize":18}"#.utf8)
+        #expect(PreferencesStore(storage: storage).preferences == ReadingPreferences(bookListFontSize: 18))
     }
 
     // @trace FR-15

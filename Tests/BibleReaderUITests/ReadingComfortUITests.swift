@@ -71,4 +71,38 @@ final class ReadingComfortUITests: XCTestCase {
         app.typeKey(physicalKey(kVK_ANSI_0, fallback: "0"), modifierFlags: .command)
         waitForHeight({ abs($0 - standard) <= 1 }, "⌘0 повертає стандарт")
     }
+
+    private func search(_ text: String) {
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.click()
+        app.menuItems["selectAll:"].click()
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+        app.menuItems["paste:"].click()
+        field.typeKey(.return, modifierFlags: [])
+    }
+
+    // @trace FR-16
+    func testInterfaceScaleEnlargesSearchResults() {
+        launch(reset: true)
+        search("only begotten Son")
+        let result = app.buttons.matching(identifier: "search-result").firstMatch
+        XCTAssertTrue(result.waitForExistence(timeout: 5))
+        let standard = result.frame.height
+
+        app.typeKey(physicalKey(kVK_ANSI_Comma, fallback: ","), modifierFlags: .command)
+        let picker = app.popUpButtons["interface-scale"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        picker.click()
+        app.menuItems["Дуже великий"].click()
+        app.typeKey("w", modifierFlags: .command)
+
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline, result.frame.height < standard * 1.1 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.1))
+        }
+        // Рядок має фіксовані відступи, тож росте повільніше за шрифт (×1,4 дає ~×1,16).
+        XCTAssertGreaterThanOrEqual(result.frame.height, standard * 1.1, "стандарт \(standard)")
+    }
 }

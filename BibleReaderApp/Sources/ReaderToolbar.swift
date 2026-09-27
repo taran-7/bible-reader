@@ -3,6 +3,8 @@ import SwiftUI
 
 struct ReaderToolbar: ToolbarContent {
     @Bindable var model: ReaderViewModel
+    /// Елементи тулбара живуть у `NSToolbar`, тож масштаб задаємо кожному явно.
+    let scale: InterfaceScale
 
     private var chapter: Binding<Int> {
         Binding(
@@ -15,14 +17,17 @@ struct ReaderToolbar: ToolbarContent {
             Button("Попередній розділ", systemImage: "chevron.left") { model.goPrevious() }
                 .disabled(!model.canGoPrevious)
                 .keyboardShortcut("[", modifiers: .command)
+                .controlSize(scale.controlSize)
             Button("Наступний розділ", systemImage: "chevron.right") { model.goNext() }
                 .disabled(!model.canGoNext)
                 .keyboardShortcut("]", modifiers: .command)
+                .controlSize(scale.controlSize)
         }
         ToolbarItem(placement: .principal) {
             Picker("Розділ", selection: chapter) {
                 ForEach(Array(1...max(model.chapterCount, 1)), id: \.self) { Text("Розділ \($0)").tag($0) }
             }
+            .controlSize(scale.controlSize)
             .fixedSize()
         }
         ToolbarItem {
@@ -30,6 +35,7 @@ struct ReaderToolbar: ToolbarContent {
                 ForEach(Translation.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .pickerStyle(.segmented)
+            .controlSize(scale.controlSize)
         }
     }
 }

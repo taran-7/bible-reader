@@ -52,12 +52,13 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
         self.interfaceScale = interfaceScale
     }
 
+    /// Відсутнє чи невідоме поле бере стандартне значення, решта збережених лишається.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.init(
-            verseFontSize: try c.decode(Double.self, forKey: .verseFontSize),
-            bookListFontSize: try c.decode(Double.self, forKey: .bookListFontSize),
-            interfaceScale: try c.decode(InterfaceScale.self, forKey: .interfaceScale))
+            verseFontSize: (try? c.decodeIfPresent(Double.self, forKey: .verseFontSize)) ?? Self.defaultVerseFontSize,
+            bookListFontSize: (try? c.decodeIfPresent(Double.self, forKey: .bookListFontSize)) ?? Self.defaultBookListFontSize,
+            interfaceScale: (try? c.decodeIfPresent(InterfaceScale.self, forKey: .interfaceScale)) ?? .standard)
     }
 
     public var canIncreaseVerseFont: Bool { verseFontSize < Self.verseFontRange.upperBound }
@@ -70,7 +71,8 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
 }
 
 private extension Double {
-    func clamped(to range: ClosedRange<Double>) -> Double { Swift.min(Swift.max(self, range.lowerBound), range.upperBound) }
+    /// Цілі pt у межах: крок завжди 1, тож порівняння зі стандартом точне.
+    func clamped(to range: ClosedRange<Double>) -> Double { Swift.min(Swift.max(rounded(), range.lowerBound), range.upperBound) }
 }
 
 /// Сховище ключ–значення; у додатку це `UserDefaults`, у тестах — словник.
@@ -108,7 +110,7 @@ public final class PreferencesStore {
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(preferences) else { return }
-        storage.set(data, forKey: Self.key)
+        // Кодування трьох простих полів не може впасти.
+        storage.set(try! JSONEncoder().encode(preferences), forKey: Self.key)
     }
 }

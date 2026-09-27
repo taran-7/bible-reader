@@ -1,4 +1,3 @@
-import AppKit
 import BibleCore
 import SwiftUI
 
@@ -37,12 +36,6 @@ struct BibleReaderApp: App {
         #endif
         return store
     }
-}
-
-/// Базовий розмір для масштабу інтерфейсу: системний розмір шрифту macOS.
-extension InterfaceScale {
-    var systemFontSize: CGFloat { fontSize(base: NSFont.systemFontSize) }
-    var controlSize: ControlSize { factor > 1 ? .large : factor < 1 ? .small : .regular }
 }
 
 struct FontCommands: Commands {

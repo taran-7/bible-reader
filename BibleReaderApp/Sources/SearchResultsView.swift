@@ -4,20 +4,21 @@ import SwiftUI
 struct SearchResultsView: View {
     let model: ReaderViewModel
     let results: [SearchResult]
+    @Environment(\.interfaceScale) private var scale
 
     var body: some View {
         if results.isEmpty {
-            ContentUnavailableView(
-                "Нічого не знайдено",
+            MessageView(
+                title: "Нічого не знайдено",
                 systemImage: "magnifyingglass",
-                description: Text("За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."))
+                lines: ["За запитом «\(model.submittedQuery)» в перекладі \(model.translation.title) немає віршів."])
         } else {
             List(results) { result in
                 Button { model.open(result) } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(Reference(book: result.verse.book, chapter: result.verse.chapter, verseStart: result.verse.verse)
                             .format(in: result.verse.translation))
-                            .bold()
+                            .font(.system(size: scale.systemFontSize * 1.1, weight: .semibold))
                         Text(highlighted(result.segments))
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

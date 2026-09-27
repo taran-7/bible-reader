@@ -1,0 +1,22 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-reading-comfort",
+  "change": "add-reading-comfort",
+  "baseRef": "b26905d",
+  "headRef": "feature/add-reading-comfort",
+  "dimensions": {
+    "correctness": { "confirmed": 8, "contested": 0, "rejected": 0, "fixed": 6, "deferred": 2 }
+  },
+  "fixed": [
+    "M1: one missing/unknown stored key reset all preferences — lenient per-field decode, test testPartialDataKeepsKnownValues (FR-15)",
+    "M2: ContentUnavailableView ignored the scaled font — MessageView with explicit scaled fonts for error/empty screens (FR-16)",
+    "M3: toolbar controls live in NSToolbar and missed .controlSize; large == extraLarge — per-item controlSize, extraLarge maps to .extraLarge (FR-16)",
+    "L4: search result reference lost headline prominence — explicit semibold ×1.1 (FR-16)",
+    "L5: FR-16 had no UI evidence — testInterfaceScaleEnlargesSearchResults (FR-16)",
+    "L8: exact float compare for default — sizes rounded to whole pt on set (FR-15)"
+  ],
+  "deferred": "docs/exec-plans/tech-debt-tracker.md #15 (search field not scaled), #16 (menu enablement at bounds, manual 800 pt check), #17 (DEBUG-only reset flag)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T14:42:24Z"
+}
