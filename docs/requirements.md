@@ -64,7 +64,7 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 |---|---|---|---|---|
 | FR-15 | MVP | Reading | Масштаб шрифту віршів і списку книг, ⌘+ / ⌘− / ⌘0, зберігається між запусками (PRD 6.1). | local-verifiable |
 | FR-16 | MVP | Reading | Загальний масштаб інтерфейсу в Settings, поважає системний розмір тексту (PRD 6.2). | local-verifiable |
-| FR-17 | Future | Reference | Напівпрозора кнопка копіювання над виділенням, напис «Скопійовано» ~1,5 с (PRD 6.3). | local-verifiable |
+| FR-17 | MVP | Reference | Напівпрозора кнопка копіювання над виділенням, напис «Скопійовано» ~1,5 с (PRD 6.3). | local-verifiable |
 | FR-18 | Future | Search | Морфологічний пошук (стемер en/ru) (PRD 6.4). | local-verifiable |
 | FR-19 | Future | Search | Фільтр області пошуку: Біблія / СЗ / НЗ / поточна книга (PRD 6.5). | local-verifiable |
 | FR-20 | Future | Search | Усі результати з лічильником «Знайдено: N» і довантаженням (PRD 6.6). | local-verifiable |

@@ -31,7 +31,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/IdentityTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -111,7 +111,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/IdentityTests.swift",
         "status": "artifact-ok"
       }
     ],

@@ -2,26 +2,21 @@ import BibleCore
 import SwiftUI
 
 /// Напівпрозора кнопка копіювання над першим виділеним віршем (FR-17).
+/// У спокої це лише іконка в правому полі рядка; напис «Скопійовано» на 1,5 с може лягти на край тексту.
 struct CopyButton: View {
     let action: () -> Void
-    @State private var model = CopyButtonModel()
+    @State private var copies = 0
+    @State private var showCopied = false
     @State private var isHovered = false
-    /// Змінюється, коли минає час «Скопійовано», щоб view перечитав `model`.
-    @State private var tick = 0
 
     var body: some View {
-        let copied = model.isShowingCopied(at: .now)
         Button {
             action()
-            model.markCopied(at: .now)
-            tick += 1
-            Task {
-                try? await Task.sleep(for: .seconds(CopyButtonModel.feedbackDuration))
-                tick += 1
-            }
+            showCopied = true
+            copies += 1
         } label: {
             Group {
-                if copied {
+                if showCopied {
                     Label("Скопійовано", systemImage: "checkmark").labelStyle(.titleAndIcon)
                 } else {
                     Image(systemName: "doc.on.doc")
@@ -31,13 +26,18 @@ struct CopyButton: View {
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6))
-            .id(tick)
         }
         .buttonStyle(.borderless)
-        .opacity(isHovered || copied ? 1 : 0.6)
+        .opacity(isHovered || showCopied ? 1 : 0.6)
         .onHover { isHovered = $0 }
         .help("Копіювати цитату")
-        .accessibilityLabel(copied ? "Скопійовано" : "Копіювати цитату")
+        .accessibilityLabel(showCopied ? "Скопійовано" : "Копіювати цитату")
         .accessibilityIdentifier("copy-button")
+        // Повторний клік перезапускає відлік; зникнення view скасовує його.
+        .task(id: copies) {
+            guard copies > 0 else { return }
+            try? await Task.sleep(for: CopyButtonModel.feedbackDuration)
+            if !Task.isCancelled { showCopied = false }
+        }
     }
 }

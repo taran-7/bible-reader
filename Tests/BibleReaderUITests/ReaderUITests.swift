@@ -138,6 +138,7 @@ final class ReaderUITests: XCTestCase {
     // @trace FR-17
     func testCopyButtonCopiesQuote() {
         launch()
+        XCTAssertTrue(verseRow(1).waitForExistence(timeout: 5))
         let button = app.buttons.matching(identifier: "copy-button").firstMatch
         XCTAssertFalse(button.exists, "без виділення кнопки немає")
 
@@ -154,6 +155,16 @@ final class ReaderUITests: XCTestCase {
         wait(for: [expectation(for: copied, evaluatedWith: button)], timeout: 2)
         let restored = NSPredicate(format: "label == 'Копіювати цитату'")
         wait(for: [expectation(for: restored, evaluatedWith: button)], timeout: 4)
+
+        // Кілька віршів: кнопка над першим, копіює весь діапазон.
+        verseRow(18).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
+        XCUIElement.perform(withKeyModifiers: .shift) {
+            verseRow(16).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
+        }
+        NSPasteboard.general.clearContents()
+        button.click()
+        let range = pasteboardText()
+        XCTAssertTrue(range?.hasSuffix("(John 3:16-18)") == true, range ?? "буфер порожній")
 
         search("Rom 1")
         expectTitle("Romans 1")
