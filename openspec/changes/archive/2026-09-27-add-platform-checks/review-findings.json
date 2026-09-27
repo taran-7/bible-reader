@@ -1,0 +1,22 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-platform-checks",
+  "change": "add-platform-checks",
+  "baseRef": "0bfa443",
+  "headRef": "feature/add-platform-checks",
+  "dimensions": {
+    "correctness": { "confirmed": 7, "contested": 0, "rejected": 0, "fixed": 6, "deferred": 1 }
+  },
+  "fixed": [
+    "M1: --skip-build could pass on a stale build/ — option removed, the script always builds (NFR-1, NFR-5)",
+    "L2: build failure lost Result line; NaN size passed silently — try/catch with Result: FAIL, finite-size guard (NFR-5)",
+    "L3: universal binary passed the arm64 check — architectures must be exactly [arm64] (NFR-1)",
+    "M4: scanner missed URL(string:, NSURL, URLComponents, NW*, CF sockets, import WebKit/@testable import — tokens and import regex added, fixture covers them (NFR-2)",
+    "M5: NFR-5 proxy test summed a hand-picked list; config test used substring contains — whole Resources dir, exact trimmed lines, labelled as pre-build proxy (NFR-1, NFR-5)",
+    "M6: qa-verify built the app twice (Debug + Release) — app-build member is now the Release check-platform (NFR-1, NFR-5)"
+  ],
+  "deferred": "M6 CI: an extra Release build (~1 min) in CI is accepted; caching build/platform can come later",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T20:27:51Z"
+}

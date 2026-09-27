@@ -20,6 +20,13 @@
       "processComplete": true
     },
     {
+      "slice": "2026-09-27-add-platform-checks",
+      "reviewEvidence": "clean",
+      "trailerCommits": 2,
+      "libDomains": [],
+      "processComplete": true
+    },
+    {
       "slice": "2026-09-27-add-reading-comfort",
       "reviewEvidence": "clean",
       "trailerCommits": 2,

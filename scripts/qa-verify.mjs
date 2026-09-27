@@ -99,10 +99,11 @@ const commands = [
   // PD-9: eval-ratchet is deferred to the add-illustrations slice (v1.4) —
   // listed in DEFERRED below and printed on every run, never counted as PASS.
   {
-    // Swift adaptation: the native app build is the production build.
+    // Swift adaptation + PD-12: the Release app build is the production build;
+    // on it check NFR-1 (macOS 14+, arm64 only) and NFR-5 (.app < 100 МБ).
     name: "app-build",
-    command: "xcodebuild",
-    args: ["-quiet", "-project", "BibleReaderApp/BibleReader.xcodeproj", "-scheme", "BibleReader", "build"],
+    command: "node",
+    args: ["scripts/check-platform.mjs"],
   },
   // PD-11: XCUITest (FR-7, FR-10, FR-13, FR-14) drives the real mouse, keyboard and
   // clipboard, so locally it runs only with QA_UI_TESTS=1; CI always runs it.
