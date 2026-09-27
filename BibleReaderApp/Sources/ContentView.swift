@@ -4,6 +4,7 @@ import SwiftUI
 struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
+    @Environment(UserData.self) private var userData
 
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
 
@@ -28,9 +29,10 @@ struct ContentView: View {
                     }
                 }
                 .font(.system(size: scale.systemFontSize))
-                .toolbar { ReaderToolbar(model: model, scale: scale) }
+                .toolbar { ReaderToolbar(model: model, userData: userData, scale: scale) }
                 .modifier(ToolbarTheme())
             }
+            .safeAreaInset(edge: .top) { UserDataWarning() }
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
@@ -51,5 +53,30 @@ struct DatabaseErrorView: View {
         .textSelection(.enabled)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("database-error")
+    }
+}
+
+/// Помилка бази користувача: без неї нотатки тихо губилися б після перезапуску.
+struct UserDataWarning: View {
+    @Environment(UserData.self) private var userData
+
+    var body: some View {
+        if let error = userData.lastError {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                Text(userData.isInMemoryOnly
+                     ? "Закладки й нотатки не зберігаються: базу користувача не відкрито (\(error))."
+                     : "Не вдалося зберегти зміну: \(error)")
+                    .textSelection(.enabled)
+                Spacer()
+                if !userData.isInMemoryOnly {
+                    Button("Закрити") { userData.dismissError() }
+                }
+            }
+            .padding(8)
+            .background(.bar)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("userdata-error")
+        }
     }
 }

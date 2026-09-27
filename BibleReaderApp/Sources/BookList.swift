@@ -5,6 +5,7 @@ struct BookList: View {
     let model: ReaderViewModel
     let fontSize: Double
     @Environment(\.theme) private var theme
+    @Environment(UserData.self) private var userData
 
     private var selection: Binding<Int?> {
         Binding(
@@ -18,6 +19,27 @@ struct BookList: View {
 
     var body: some View {
         List(selection: selection) {
+            if !userData.bookmarks.isEmpty {
+                Section {
+                    ForEach(userData.bookmarks) { bookmark in
+                        Button {
+                            model.open(Location(book: bookmark.target.book, chapter: bookmark.target.chapter), focus: bookmark.target.verse)
+                        } label: {
+                            Label(bookmark.target.reference.format(in: model.translation),
+                                  systemImage: bookmark.target.verse == nil ? "book" : "bookmark")
+                                .font(.system(size: fontSize))
+                                .foregroundStyle(Color(theme.text))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("bookmark-row")
+                        .contextMenu {
+                            Button("Прибрати закладку") { userData.toggleBookmark(bookmark.target) }
+                        }
+                    }
+                } header: {
+                    Text("Закладки").foregroundStyle(Color(theme.secondaryText))
+                }
+            }
             section("Старий Заповіт", .old)
             section("Новий Заповіт", .new)
         }

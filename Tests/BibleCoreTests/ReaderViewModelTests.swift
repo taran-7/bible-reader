@@ -289,3 +289,16 @@ extension ReaderViewModelTests {
         #expect(model.takeFocus() == 16)
     }
 }
+
+extension ReaderViewModelTests {
+    // @trace FR-24
+    @Test func testOpenNoteClosesResultsAndFocusesVerse() {
+        let model = makeModel()
+        model.query = "love"
+        model.submitSearch()
+        model.openNote(VerseKey(book: 19, chapter: 2, verse: 1))
+        #expect(model.results == nil)
+        #expect(model.location == Location(book: 19, chapter: 2))
+        #expect(model.takeFocus() == 1)
+    }
+}

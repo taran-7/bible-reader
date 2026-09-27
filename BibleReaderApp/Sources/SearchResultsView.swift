@@ -3,10 +3,13 @@ import SwiftUI
 
 struct SearchResultsView: View {
     @Bindable var model: ReaderViewModel
+    @Environment(UserData.self) private var userData
     @Environment(\.interfaceScale) private var scale
     @Environment(\.theme) private var theme
 
     var body: some View {
+        // Нотатки з текстом запиту (FR-24) — над віршами; рахуємо один раз.
+        let notes = userData.searchNotes(model.submittedQuery)
         // Панель області видно й на екрані помилки: інакше область, з якою пошук упав, не змінити.
         VStack(spacing: 0) {
             header
@@ -16,8 +19,8 @@ struct SearchResultsView: View {
                     systemImage: "exclamationmark.triangle",
                     lines: ["Запит «\(model.submittedQuery)»: \(error)"])
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if let results = model.results, !results.isEmpty {
-                list(results)
+            } else if !(model.results ?? []).isEmpty || !notes.isEmpty {
+                list(model.results ?? [], notes: notes)
             } else {
                 MessageView(
                     title: "Нічого не знайдено",
@@ -65,8 +68,33 @@ struct SearchResultsView: View {
         return book.name(in: model.translation)
     }
 
-    private func list(_ results: [SearchResult]) -> some View {
+    private func list(_ results: [SearchResult], notes: [Note]) -> some View {
         List {
+            if !notes.isEmpty {
+                Section("Нотатки") {
+                    ForEach(notes) { note in
+                        Button {
+                            model.openNote(note.key)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Label(note.key.reference.format(in: model.translation), systemImage: "note.text")
+                                    .font(.system(size: scale.systemFontSize * 1.1, weight: .semibold))
+                                    .foregroundStyle(Color(theme.accent))
+                                Text(note.text).lineLimit(3).foregroundStyle(Color(theme.text))
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("note-result")
+                        .listRowBackground(Color(theme.results))
+                        .listRowSeparator(.hidden)
+                    }
+                }
+            }
+            if !results.isEmpty, !notes.isEmpty {
+                Section("Вірші") {}
+            }
             ForEach(results) { result in
                 Button { model.open(result) } label: {
                     VStack(alignment: .leading, spacing: 4) {

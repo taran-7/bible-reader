@@ -22,10 +22,10 @@
     "FR-19": "MVP",
     "FR-20": "MVP",
     "FR-21": "MVP",
-    "FR-22": "Future",
-    "FR-23": "Future",
-    "FR-24": "Future",
-    "FR-25": "Future",
+    "FR-22": "MVP",
+    "FR-23": "MVP",
+    "FR-24": "MVP",
+    "FR-25": "MVP",
     "FR-26": "Future",
     "FR-27": "Future",
     "FR-28": "MVP",
@@ -485,6 +485,88 @@
       "recordings": []
     },
     {
+      "id": "FR-22",
+      "specs": [
+        "openspec/specs/user-notes/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-23",
+      "specs": [
+        "openspec/specs/user-notes/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-24",
+      "specs": [
+        "openspec/specs/user-notes/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-25",
+      "specs": [
+        "openspec/specs/user-notes/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleCoreTests/UserDataTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleCoreTests/UserDataTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
       "id": "FR-28",
       "specs": [
         "openspec/specs/bible-reading/spec.md",
@@ -664,6 +746,22 @@
     {
       "check": "recording-evidence",
       "msg": "FR-21 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-22 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-23 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-24 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-25 is not referenced by any recording manifest under docs/qa/"
     },
     {
       "check": "recording-evidence",

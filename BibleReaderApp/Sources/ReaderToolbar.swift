@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ReaderToolbar: ToolbarContent {
     @Bindable var model: ReaderViewModel
+    let userData: UserData
     /// Елементи тулбара живуть у `NSToolbar`, тож масштаб задаємо кожному явно.
     let scale: InterfaceScale
 
@@ -29,6 +30,15 @@ struct ReaderToolbar: ToolbarContent {
             }
             .controlSize(scale.controlSize)
             .fixedSize()
+        }
+        ToolbarItem {
+            let chapter = Bookmark.Target(book: model.location.book, chapter: model.location.chapter, verse: nil)
+            let marked = userData.isBookmarked(chapter)
+            Button(marked ? "Прибрати закладку розділу" : "Закладка на розділ",
+                   systemImage: marked ? "bookmark.fill" : "bookmark") { userData.toggleBookmark(chapter) }
+                .help(marked ? "Прибрати закладку розділу (⌘D)" : "Закладка на розділ (⌘D)")
+                .accessibilityIdentifier("bookmark-chapter")
+                .controlSize(scale.controlSize)
         }
         ToolbarItem {
             // Меню, а не сегменти: перекладів чотири й далі більшатиме; у пунктах — мова.

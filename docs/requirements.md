@@ -69,10 +69,10 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 | FR-19 | MVP | Search | Фільтр області пошуку: Біблія / СЗ / НЗ / поточна книга (PRD 6.5). | local-verifiable |
 | FR-20 | MVP | Search | Усі результати з лічильником «Знайдено: N» і довантаженням (PRD 6.6). | local-verifiable |
 | FR-21 | MVP | Search | Пошук точної фрази в лапках (PRD 6.7). | local-verifiable |
-| FR-22 | Future | Notes | Закладки на вірш чи розділ (PRD 6.8). | local-verifiable |
-| FR-23 | Future | Notes | Кольорова підсвітка віршів (PRD 6.9). | local-verifiable |
-| FR-24 | Future | Notes | Нотатки до віршів з пошуком (PRD 6.10). | local-verifiable |
-| FR-25 | Future | Reading | Відкриття на останньому місці читання (PRD 6.11). | local-verifiable |
+| FR-22 | MVP | Notes | Закладки на вірш чи розділ (PRD 6.8). | local-verifiable |
+| FR-23 | MVP | Notes | Кольорова підсвітка віршів (PRD 6.9). | local-verifiable |
+| FR-24 | MVP | Notes | Нотатки до віршів з пошуком (PRD 6.10). | local-verifiable |
+| FR-25 | MVP | Reading | Відкриття на останньому місці читання (PRD 6.11). | local-verifiable |
 | FR-26 | Future | Parallel | Два переклади поруч із синхронним прокручуванням (PRD 6.12). | local-verifiable |
 | FR-27 | Future | Parallel | Таблиця відповідностей нумерації KJV ↔ Синодальний (PRD 6.13). | local-verifiable |
 | FR-28 | MVP | Import | Переклад Огієнка (PRD 6.14). | local-verifiable |

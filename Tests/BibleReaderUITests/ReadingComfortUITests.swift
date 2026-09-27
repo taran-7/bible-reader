@@ -10,6 +10,8 @@ final class ReadingComfortUITests: XCTestCase {
     override func setUp() async throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        // Свій профіль користувача: останнє місце попереднього тесту не впливає на цей.
+        app.launchEnvironment = ["BIBLE_READER_PROFILE": UUID().uuidString]
     }
 
     override func tearDown() async throws {
