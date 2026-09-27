@@ -4,6 +4,8 @@ import Testing
 /// Кожна книга має 3 розділи по 5 віршів; пошук повертає Ин 3:16 для будь-якого запиту.
 final class FakeRepository: BibleRepository, @unchecked Sendable {
     var searches: [String] = []
+    var limits: [Int] = []
+    struct Boom: Error {}
 
     func books(translation: Translation) throws -> [Book] { Book.all }
     func chapterCount(book: Int, translation: Translation) throws -> Int { 3 }
@@ -12,6 +14,8 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
     }
     func search(_ query: String, translation: Translation, limit: Int) throws -> [SearchResult] {
         searches.append(query)
+        limits.append(limit)
+        if query == "boom" { throw Boom() }
         guard query != "nothing" else { return [] }
         let verse = Verse(translation: translation, book: 43, chapter: 3, verse: 16, text: "found")
         return [SearchResult(verse: verse, segments: [.init(text: "found", isMatch: true)])]
@@ -127,5 +131,59 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         let model = ReaderViewModel { throw Boom() }
         #expect(model.loadError != nil)
         #expect(model.verses.isEmpty)
+    }
+
+    // @trace FR-13
+    @Test func testSameVerseNumberInAnotherBookRefocuses() {
+        let model = makeModel()
+        model.query = "Ин 3:16"
+        model.submitSearch()
+        let first = model.focusRequest
+        model.query = "Рим 3:16"
+        model.submitSearch()
+        #expect(model.focusedVerse == 16)
+        #expect(model.focusRequest != first)
+    }
+
+    // @trace FR-13
+    @Test func testSameReferenceAgainRefocuses() {
+        let model = makeModel()
+        model.query = "Ин 3:16"
+        model.submitSearch()
+        let first = model.focusRequest
+        model.submitSearch()
+        #expect(model.focusRequest != first)
+    }
+
+    // @trace FR-11
+    @Test func testTranslationSwitchRerunsSubmittedQuery() {
+        let model = makeModel()
+        model.query = "love"
+        model.submitSearch()
+        model.query = "John 3"
+        model.translation = .synodal
+        #expect(repository.searches.last == "love")
+        #expect(model.results != nil)
+        #expect(model.location == Location(book: 1, chapter: 1))
+    }
+
+    // @trace FR-11
+    @Test func testSearchLimitIs200() {
+        let model = makeModel()
+        model.query = "love"
+        model.submitSearch()
+        #expect(repository.limits == [200])
+    }
+
+    // @trace FR-12
+    @Test func testSearchErrorIsNotNothingFound() {
+        let model = makeModel()
+        model.query = "boom"
+        model.submitSearch()
+        #expect(model.searchError != nil)
+        #expect(model.results == nil)
+        model.query = "love"
+        model.submitSearch()
+        #expect(model.searchError == nil)
     }
 }

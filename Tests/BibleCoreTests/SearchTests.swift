@@ -27,6 +27,15 @@ import Testing
         #expect(upper.map(\.verse.id) == lower.map(\.verse.id))
     }
 
+    // @trace FR-2
+    @Test func testYoFoldsToYe() throws {
+        let results = try repository.search("четвертый", translation: .synodal)
+        let withYo = try #require(results.first { $0.verse.text.contains("четвёртый") })
+        // Фрагмент показує оригінальний текст із «ё», а не згорнутий.
+        #expect(withYo.segments.filter(\.isMatch).contains { $0.text.lowercased() == "четвёртый" })
+        #expect(try repository.search("четвёртый", translation: .synodal).map(\.verse.id) == results.map(\.verse.id))
+    }
+
     // @trace FR-11
     @Test func testOnlyActiveTranslation() throws {
         #expect(try repository.search("любовь", translation: .kjv).isEmpty)

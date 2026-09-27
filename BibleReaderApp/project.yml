@@ -34,10 +34,9 @@ targets:
       - name: Generate bible.sqlite
         basedOnDependencyAnalysis: false
         script: |
-          # База не комітиться: генеруємо з data/raw, якщо її ще немає.
-          if [ ! -f "$SRCROOT/Resources/bible.sqlite" ]; then
-            cd "$SRCROOT/.." && make db
-          fi
+          # База не комітиться: make перебудовує її, якщо її немає або змінилися
+          # data/raw чи код імпорту (інакше стара схема тихо лишається в додатку).
+          cd "$SRCROOT/.." && make db
 schemes:
   BibleReader:
     build:

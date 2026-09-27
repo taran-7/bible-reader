@@ -18,7 +18,8 @@ if (files.length === 0) {
 const sum = (key) => {
   const count = files.reduce((n, f) => n + f.summary[key].count, 0);
   const covered = files.reduce((n, f) => n + f.summary[key].covered, 0);
-  const pct = count === 0 ? 100 : Math.round((covered / count) * 10000) / 100;
+  // 0 of 0 is not 100%: Swift collects no branch coverage, so an empty metric stays null.
+  const pct = count === 0 ? null : Math.round((covered / count) * 10000) / 100;
   return { total: count, covered, pct };
 };
 // llvm-cov has no statements metric; regions are the closest equivalent.
@@ -30,4 +31,4 @@ const total = {
 };
 mkdirSync("coverage", { recursive: true });
 writeFileSync("coverage/coverage-summary.json", `${JSON.stringify({ total }, null, 2)}\n`);
-console.log(`coverage: lines ${total.lines.pct}% · regions ${total.statements.pct}% · functions ${total.functions.pct}% · branches ${total.branches.pct}% (${files.length} files)`);
+console.log(`coverage: lines ${total.lines.pct}% · regions ${total.statements.pct}% · functions ${total.functions.pct}% · branches ${total.branches.pct ?? "n/a"}% (${files.length} files)`);

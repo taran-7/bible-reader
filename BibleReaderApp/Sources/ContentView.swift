@@ -13,7 +13,12 @@ struct ContentView: View {
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
                 Group {
-                    if let results = model.results {
+                    if let error = model.searchError {
+                        ContentUnavailableView(
+                            "Пошук не вдався",
+                            systemImage: "exclamationmark.triangle",
+                            description: Text("Запит «\(model.submittedQuery)»: \(error)"))
+                    } else if let results = model.results {
                         SearchResultsView(model: model, results: results)
                     } else {
                         ChapterView(model: model)
@@ -25,9 +30,6 @@ struct ContentView: View {
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
-            }
-            .onChange(of: model.translation) { _, _ in
-                if model.results != nil { model.submitSearch() }
             }
         }
     }

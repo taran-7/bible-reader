@@ -87,7 +87,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/QuoteTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -95,7 +95,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/SearchQueryTests.swift",
+        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -120,7 +120,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-16": [
@@ -128,7 +128,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-17": [
@@ -136,7 +136,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-18": [
@@ -144,7 +144,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-19": [
@@ -152,7 +152,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-20": [
@@ -160,7 +160,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-21": [
@@ -168,7 +168,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-22": [
@@ -176,7 +176,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-23": [
@@ -184,7 +184,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-24": [
@@ -192,7 +192,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-25": [
@@ -200,7 +200,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-26": [
@@ -208,7 +208,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-27": [
@@ -216,7 +216,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-28": [
@@ -224,7 +224,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-29": [
@@ -232,7 +232,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "FR-30": [
@@ -240,7 +240,47 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
+      }
+    ],
+    "FR-31": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
+      }
+    ],
+    "FR-32": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
+      }
+    ],
+    "FR-33": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
+      }
+    ],
+    "FR-34": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
+      }
+    ],
+    "FR-35": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": null,
+        "status": "future-pending"
       }
     ],
     "NFR-1": [
@@ -248,7 +288,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "NFR-2": [
@@ -256,7 +296,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "NFR-3": [
@@ -264,7 +304,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "NFR-4": [
@@ -272,7 +312,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ],
     "NFR-5": [
@@ -280,7 +320,7 @@
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
         "artifact": null,
-        "status": "missing-artifact"
+        "status": "future-pending"
       }
     ]
   }

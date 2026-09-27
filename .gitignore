@@ -11,3 +11,5 @@ xcuserdata/
 node_modules/
 coverage/
 **/raw/
+trace/ledger.jsonl
+trace/ledger-*.jsonl
