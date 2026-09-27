@@ -11,10 +11,11 @@ import Testing
     @Test func testFindsNetworkUsage() throws {
         let dir = try TestSupport.tempDirectory()
         try "import Foundation\nlet task = URLSession.shared\n".write(to: dir.appendingPathComponent("Bad.swift"), atomically: true, encoding: .utf8)
-        try "let ok = 1\n".write(to: dir.appendingPathComponent("Good.swift"), atomically: true, encoding: .utf8)
+        try "let ok = URL(fileURLWithPath: \"/tmp\")\n".write(to: dir.appendingPathComponent("Good.swift"), atomically: true, encoding: .utf8)
+        try "@testable import Network\nlet d = Data(contentsOf: URL(string: host)!)\n".write(to: dir.appendingPathComponent("Sneaky.swift"), atomically: true, encoding: .utf8)
         let report = NetworkScanner.scan(directories: [dir], relativeTo: dir)
-        #expect(report.findings == ["Bad.swift:2: URLSession"])
-        #expect(report.scannedFiles == 2)
+        #expect(report.findings == ["Bad.swift:2: URLSession", "Sneaky.swift:1: import", "Sneaky.swift:2: URL(string:"])
+        #expect(report.scannedFiles == 3)
     }
 
     // @trace NFR-2

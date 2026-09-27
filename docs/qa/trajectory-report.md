@@ -5,13 +5,14 @@ archived slice took: review evidence, `Slice:` trailers, and module scope.
 It does NOT verify test-first ordering or test integrity (not derivable from
 one-commit-per-slice history) — those are graded by the trajectory-eval workflow.
 
-Scope: 6 archived slice(s).
+Scope: 7 archived slice(s).
 Result: PASS, 1 warning(s)
 
 | Slice | Review evidence | Trailer commits | design+tasks | lib domains touched |
 |---|---|---|---|---|
 | 2026-09-25-bible-reader-mvp | clean | 1 | yes | BibleCore |
 | 2026-09-27-add-copy-button | clean | 2 | yes | BibleCore |
+| 2026-09-27-add-platform-checks | clean | 2 | yes | - |
 | 2026-09-27-add-reading-comfort | clean | 2 | yes | BibleCore |
 | 2026-09-27-add-themes | clean | 3 | yes | BibleCore |
 | 2026-09-27-add-translations | clean | 6 | yes | BibleCore |

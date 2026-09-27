@@ -18,7 +18,7 @@
 
 | # | Слайс (OpenSpec change) | Вимоги | Залежність | Паралельність |
 |---|---|---|---|---|
-| 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | у роботі |
+| 0 | `add-platform-checks` | NFR-1, NFR-2, NFR-5 | — | зроблено 2026-09-27 (архів `2026-09-27-add-platform-checks`) |
 | 0a | `add-ui-tests` (XCUITest) | FR-7, FR-10, FR-13, FR-14 (UI-докази) | — | зроблено 2026-09-27 (архів `2026-09-27-add-ui-tests`) |
 | 0b | `add-a11y-launch-checks` | NFR-3 (запуск < 1 с), NFR-4 (VoiceOver, клавіатура) | 0a | parallel-safe з 0 |
 | 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16 | — | зроблено 2026-09-27 (архів `2026-09-27-add-reading-comfort`) |
