@@ -16,6 +16,10 @@ struct SettingsView: View {
                 ForEach(InterfaceScale.allCases, id: \.self) { Text($0.title).tag($0) }
             }
             .accessibilityIdentifier("interface-scale")
+            Picker("Тема", selection: $preferences.preferences.theme) {
+                ForEach(ThemeChoice.allCases, id: \.self) { Text($0.title).tag($0) }
+            }
+            .accessibilityIdentifier("theme")
             Button("Скинути до стандартних") { preferences.reset() }
         }
         .formStyle(.grouped)
