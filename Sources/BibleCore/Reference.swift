@@ -71,20 +71,25 @@ public enum Quote {
         let sorted = verses.sorted { $0.verse < $1.verse }
         guard let first = sorted.first else { return nil }
 
-        var runs: [(Int, Int)] = []
-        for verse in sorted {
-            if let last = runs.last, verse.verse == last.1 + 1 {
-                runs[runs.count - 1].1 = verse.verse
-            } else {
-                runs.append((verse.verse, verse.verse))
-            }
-        }
-        let verseList = runs.map { $0.0 == $0.1 ? "\($0.0)" : "\($0.0)-\($0.1)" }.joined(separator: ",")
+        let verseList = Self.verseList(sorted.map(\.verse))
         let label = Book(number: first.book)?.name(in: first.translation) ?? "\(first.book)"
         let reference = "(\(label) \(first.chapter):\(verseList))"
         guard sorted.count > 1 else { return "«\(first.text)» \(reference)" }
         // Кілька віршів: номер перед кожним, кожен з нового рядка, посилання окремим рядком.
         let lines = sorted.map { "\($0.verse) \($0.text)" }.joined(separator: "\n")
         return "«\(lines)»\n\(reference)"
+    }
+
+    /// Номери віршів одного розділу: `[16, 17, 19]` → `16-17,19`.
+    static func verseList(_ numbers: [Int]) -> String {
+        var runs: [(Int, Int)] = []
+        for number in numbers.sorted() {
+            if let last = runs.last, number == last.1 + 1 {
+                runs[runs.count - 1].1 = number
+            } else {
+                runs.append((number, number))
+            }
+        }
+        return runs.map { $0.0 == $0.1 ? "\($0.0)" : "\($0.0)-\($0.1)" }.joined(separator: ",")
     }
 }

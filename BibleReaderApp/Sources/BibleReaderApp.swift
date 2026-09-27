@@ -44,6 +44,13 @@ struct BibleReaderApp: App {
             TranslationCommands(model: model)
         }
 
+        WindowGroup("Порівняти", id: "compare", for: CompareRequest.self) { $request in
+            if let request {
+                CompareView(request: request, model: model, preferences: preferences)
+                    .modifier(ThemedScene(preferences: preferences))
+            }
+        }
+
         Settings {
             SettingsView(preferences: preferences)
                 .modifier(ThemedScene(preferences: preferences))

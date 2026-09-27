@@ -10,6 +10,7 @@ struct ChapterView: View {
     /// Вірш, нотатку до якого редагують.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
+    @Environment(\.openWindow) private var openWindow
     /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
     @FocusState private var listFocused: Bool
     @Environment(\.theme) private var theme
@@ -28,11 +29,15 @@ struct ChapterView: View {
                     VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize,
                              marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) })
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
-                        .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection) ? CopyButton.width(for: scale) + 8 : 36)
+                        .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
+                                  ? CopyButton.width(for: scale) + CompareButton.width(for: scale) + 12 : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
-                                CopyButton { [verses = selection] in copy(verses) }
+                                HStack(spacing: 4) {
+                                    CompareButton { [verses = selection] in compare(verses) }
+                                    CopyButton { [verses = selection] in copy(verses) }
+                                }
                             }
                         }
                         .listRowBackground(rowBackground(verse.verse, marks[verse.verse]?.highlight))
@@ -47,6 +52,7 @@ struct ChapterView: View {
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)
+                Button("Порівняти в перекладах") { compare(verses) }.disabled(verses.isEmpty)
                 if let first = verses.min() {
                     Divider()
                     let target = Bookmark.Target(book: model.location.book, chapter: model.location.chapter, verse: first)
@@ -95,6 +101,11 @@ struct ChapterView: View {
     private func rowBackground(_ verse: Int, _ highlight: HighlightColor?) -> Color {
         if selection.contains(verse) { return Color(theme.selection) }
         return highlight.map(Color.highlight) ?? .clear
+    }
+
+    private func compare(_ verses: Set<Int>) {
+        guard !verses.isEmpty else { return }
+        openWindow(id: "compare", value: CompareRequest(book: model.location.book, chapter: model.location.chapter, verses: verses))
     }
 
     private func copy(_ verses: Set<Int>) {

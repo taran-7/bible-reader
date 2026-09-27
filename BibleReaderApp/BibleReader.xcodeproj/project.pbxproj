@@ -13,6 +13,7 @@
 		2A65813327426C8F15346ED7 /* BookList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3CC1095AD1CF6E94F9D879 /* BookList.swift */; };
 		55A1E2D1859F2E2A7F8E2D66 /* InterfaceScaleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CE2F605BA848371F0FC274 /* InterfaceScaleEnvironment.swift */; };
 		5C56C4271C726EEF58B005AE /* BibleReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */; };
+		5FC1128356A9EC1170678F0E /* CompareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7C29A2F7C826E0957B81E0E /* CompareView.swift */; };
 		6EE7558DC20375DFFB61127C /* ReaderToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */; };
 		8E6694DDF54665DA0CC8646B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0680B909E57955FF203BFA /* ContentView.swift */; };
 		9CA19D111B4DCB9F64FD418C /* SearchResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38894779BE1FD47096475E87 /* SearchResultsView.swift */; };
@@ -56,6 +57,7 @@
 		C438F53C73BE6A2DB8D0650F /* bible.sqlite */ = {isa = PBXFileReference; lastKnownFileType = file; path = bible.sqlite; sourceTree = "<group>"; };
 		C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterView.swift; sourceTree = "<group>"; };
 		DB0680B909E57955FF203BFA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		E7C29A2F7C826E0957B81E0E /* CompareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 				BC44C5784EF821CCCD52ACF8 /* BibleReaderApp.swift */,
 				6E3CC1095AD1CF6E94F9D879 /* BookList.swift */,
 				C6D717782431D7ADDF8CA9E0 /* ChapterView.swift */,
+				E7C29A2F7C826E0957B81E0E /* CompareView.swift */,
 				DB0680B909E57955FF203BFA /* ContentView.swift */,
 				2244055B7979ACCDC45215F3 /* CopyButton.swift */,
 				63CE2F605BA848371F0FC274 /* InterfaceScaleEnvironment.swift */,
@@ -268,6 +271,7 @@
 				5C56C4271C726EEF58B005AE /* BibleReaderApp.swift in Sources */,
 				2A65813327426C8F15346ED7 /* BookList.swift in Sources */,
 				AA1417D551D3328DCE86EC12 /* ChapterView.swift in Sources */,
+				5FC1128356A9EC1170678F0E /* CompareView.swift in Sources */,
 				8E6694DDF54665DA0CC8646B /* ContentView.swift in Sources */,
 				C0022578980865C80C3C6FA1 /* CopyButton.swift in Sources */,
 				55A1E2D1859F2E2A7F8E2D66 /* InterfaceScaleEnvironment.swift in Sources */,
