@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from convert_getbible import clean, convert, from_bolls  # noqa: E402
+from convert_getbible import align_to, clean, convert, from_bolls  # noqa: E402
 
 
 def book(nr, chapters):
@@ -55,6 +55,30 @@ class ConvertTests(unittest.TestCase):
         out = convert(from_bolls(verses))
         self.assertEqual([b["abbrev"] for b in out], [str(n) for n in range(1, 67)])
         self.assertEqual(out[18]["chapters"], [["a"], ["Псалом Давидів.", "Господи"]])
+
+    def test_align_to_kjv(self):
+        books = [{"abbrev": str(n), "name": str(n), "chapters": [["a"]]} for n in range(1, 67)]
+        reference = [{"chapters": [["x"]]} for _ in range(66)]
+        # Пс 1: надпис у двох віршах → зливаються з першим віршем тексту.
+        books[18]["chapters"] = [["Надпис.", "Продовження надпису.", "Перший.", "Другий."]]
+        reference[18]["chapters"] = [["1", "2"]]
+        # 1 Сам 20–21: 21:1 — кінець 20-го розділу.
+        books[8]["chapters"] = [["a"]] * 19 + [["20:1", "20:2"], ["хвіст", "21:1"]]
+        reference[8]["chapters"] = [["x"]] * 19 + [["1", "2"], ["1"]]
+        # 3 Ів: останні два вірші — один у KJV.
+        books[63]["chapters"] = [["1", "14", "15"]]
+        reference[63]["chapters"] = [["1", "14"]]
+        out = align_to(books, reference)
+        self.assertEqual(out[18]["chapters"][0], ["Надпис. Продовження надпису. Перший.", "Другий."])
+        self.assertEqual(out[8]["chapters"][19], ["20:1", "20:2 хвіст"])
+        self.assertEqual(out[8]["chapters"][20], ["21:1"])
+        self.assertEqual(out[63]["chapters"][0], ["1", "14 15"])
+
+    def test_align_rejects_unknown_mismatch(self):
+        books = [{"abbrev": str(n), "name": str(n), "chapters": [["a", "b"]]} for n in range(1, 67)]
+        reference = [{"chapters": [["x"]]} for _ in range(66)]
+        with self.assertRaises(SystemExit):
+            align_to(books, reference)
 
     def test_ascii_quotes_become_ukrainian(self):
         self.assertEqual(clean('"Я мандрував по землі."'), "„Я мандрував по землі.“")

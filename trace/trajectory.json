@@ -40,7 +40,7 @@
     {
       "slice": "2026-09-27-add-translations",
       "reviewEvidence": "clean",
-      "trailerCommits": 3,
+      "trailerCommits": 4,
       "libDomains": [
         "BibleCore"
       ],

@@ -38,9 +38,15 @@ import Testing
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%' || char(769) || '%' OR text LIKE '%<%' OR text LIKE '%{%')", in: db) == 0)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'bkr'", in: db) == 31_102)
         // Огієнко з bolls.life (UBIO, 1962): повний текст; число фіксуємо, щоб перегенерація не змінила його тихо.
-        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'ohienko'", in: db) == 31_170)
-        // Надписи псалмів — окремий вірш 1, розділи як у KJV.
-        #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'ohienko' AND book = 19 AND chapter = 3 AND verse = 1", in: db)?.hasPrefix("Псалом Давидів") == true)
+        // Нумерація як у KJV — вірш у вірш: надпис псалма входить у вірш 1.
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'ohienko'", in: db) == 31_102)
+        #expect(try TestSupport.count("""
+            SELECT COUNT(*) FROM (SELECT book, chapter, COUNT(*) n FROM verses WHERE translation = 'ohienko' GROUP BY 1, 2) o
+            JOIN (SELECT book, chapter, COUNT(*) n FROM verses WHERE translation = 'kjv' GROUP BY 1, 2) k USING (book, chapter)
+            WHERE o.n != k.n
+            """, in: db) == 0)
+        let psalm3 = try TestSupport.string("SELECT text FROM verses WHERE translation = 'ohienko' AND book = 19 AND chapter = 3 AND verse = 1", in: db) ?? ""
+        #expect(psalm3.hasPrefix("Псалом Давидів") && psalm3.contains("Господи, як багато моїх ворогів"))
         #expect(try TestSupport.count("SELECT MAX(chapter) FROM verses WHERE translation = 'ohienko' AND book = 29", in: db) == 3)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%\\%' OR text LIKE '%\"%')", in: db) == 0)
         #expect(try TestSupport.count("SELECT MAX(chapter) FROM verses WHERE translation = 'bkr' AND book = 19", in: db) == 150)
