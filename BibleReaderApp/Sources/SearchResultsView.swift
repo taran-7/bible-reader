@@ -17,7 +17,7 @@ struct SearchResultsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(Reference(book: result.verse.book, chapter: result.verse.chapter, verseStart: result.verse.verse)
                             .format(in: result.verse.translation))
-                            .font(.headline)
+                            .bold()
                         Text(highlighted(result.segments))
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
