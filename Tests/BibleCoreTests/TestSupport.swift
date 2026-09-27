@@ -14,8 +14,8 @@ enum TestSupport {
         return url
     }
 
-    /// Дві книги в кожному перекладі у форматі thiagobodruk.
-    static func writeFixture(to dir: URL, kjv: String? = nil, synodal: String? = nil) throws {
+    /// Дві книги в кожному з чотирьох перекладів у форматі thiagobodruk.
+    static func writeFixture(to dir: URL, kjv: String? = nil, synodal: String? = nil, ohienko: String? = nil, bkr: String? = nil) throws {
         let kjvJSON = kjv ?? """
         [{"abbrev":"gn","name":"Genesis","chapters":[["In the beginning God created the heaven and the earth.","And the earth was {without} form."]]},
          {"abbrev":"ex","name":"Exodus","chapters":[["Now these are the names."],["And there went a man."]]}]
@@ -24,6 +24,17 @@ enum TestSupport {
         [{"abbrev":"1","name":"Genesis","chapters":[["В начале сотворил Бог небо и землю.","Земля же была безвидна и пуста."]]},
          {"abbrev":"2","name":"Exodus","chapters":[["Вот имена сынов Израилевых."],["Некто из племени Левиина."]]}]
         """
+        let ohienkoJSON = ohienko ?? """
+        [{"abbrev":"1","name":"Genesis","chapters":[["На початку Бог створив небо та землю.","А земля була пуста та порожня."]]},
+         {"abbrev":"2","name":"Exodus","chapters":[["Оце ймення Ізраїлевих синів."],["І пішов один чоловік."]]}]
+        """
+        let bkrJSON = bkr ?? """
+        [{"abbrev":"1","name":"Genesis","chapters":[["Na počátku stvořil Bůh nebe a zemi.","Země pak byla nesličná a pustá."]]},
+         {"abbrev":"2","name":"Exodus","chapters":[["Tato jsou jména synů Izraelských."],["Odšel pak muž jeden."]]}]
+        """
+        for (json, translation) in [(ohienkoJSON, Translation.ohienko), (bkrJSON, .bkr)] where !json.isEmpty {
+            try Data(json.utf8).write(to: dir.appendingPathComponent(translation.sourceFileName))
+        }
         if !kjvJSON.isEmpty {
             try Data(kjvJSON.utf8).write(to: dir.appendingPathComponent(Translation.kjv.sourceFileName))
         }

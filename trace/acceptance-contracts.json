@@ -223,16 +223,16 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ImporterTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-29": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ImporterTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-30": [

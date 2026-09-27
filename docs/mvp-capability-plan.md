@@ -28,7 +28,8 @@
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
 | 4 | `add-illustrations` (v1.4) | FR-33, FR-34, FR-35 | 1a (кнопка поруч із 6.3) | serialize |
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |
-| 6 | `add-translations` (v2.1) | FR-28, FR-29, FR-30 | 5 (для Огієнка) | serialize |
+| 6 | `add-translations` (v2.1) | FR-28, FR-29 | — (нумерація Огієнка = Синодальний; таблиця потрібна лише паралельному перегляду) | зроблено 2026-09-27 (архів `2026-09-27-add-translations`) |
+| 6a | `add-translation-modules` (v2.1) | FR-30 | 6 | serialize |
 
 Механізми NFR (затверджено 2026-09-27):
 

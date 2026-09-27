@@ -31,10 +31,17 @@ struct ReaderToolbar: ToolbarContent {
             .fixedSize()
         }
         ToolbarItem {
-            Picker("Переклад", selection: $model.translation) {
-                ForEach(Translation.allCases, id: \.self) { Text($0.title).tag($0) }
+            // Меню, а не сегменти: перекладів чотири й далі більшатиме; у пунктах — мова.
+            Menu {
+                Picker("Переклад", selection: $model.translation) {
+                    ForEach(Translation.allCases, id: \.self) { Text($0.menuTitle).tag($0) }
+                }
+                .pickerStyle(.inline)
+            } label: {
+                Text(model.translation.title)
             }
-            .pickerStyle(.segmented)
+            .help("Переклад")
+            .accessibilityIdentifier("translation")
             .controlSize(scale.controlSize)
         }
     }

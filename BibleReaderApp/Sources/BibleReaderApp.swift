@@ -24,6 +24,7 @@ struct BibleReaderApp: App {
         .commands {
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
+            TranslationCommands(model: model)
         }
 
         Settings {
@@ -62,6 +63,22 @@ struct FontCommands: Commands {
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.isVerseFontDefault)
             Divider()
+        }
+    }
+}
+
+/// Меню «Переклад» з ⌘⌥1…4.
+struct TranslationCommands: Commands {
+    let model: ReaderViewModel
+
+    var body: some Commands {
+        CommandMenu("Переклад") {
+            ForEach(Array(Translation.allCases.enumerated()), id: \.element) { index, translation in
+                Toggle(translation.menuTitle, isOn: Binding(
+                    get: { model.translation == translation },
+                    set: { if $0 { model.translation = translation } }))
+                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [.command, .option])
+            }
         }
     }
 }
