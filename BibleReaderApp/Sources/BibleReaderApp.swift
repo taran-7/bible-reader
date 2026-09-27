@@ -29,6 +29,7 @@ struct BibleReaderApp: App {
     }
 
     private static func makePreferences() -> PreferencesStore {
+        ThemeFonts.register()
         let store = PreferencesStore(storage: UserDefaults.standard)
         #if DEBUG
         // UI-тести стартують зі стандартних налаштувань.
@@ -53,6 +54,10 @@ struct FontCommands: Commands {
             Button("Стандартний розмір") { preferences.preferences.resetVerseFont() }
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.isVerseFontDefault)
+            Divider()
+            Picker("Тема", selection: Bindable(preferences).preferences.theme) {
+                ForEach(ThemeChoice.allCases, id: \.self) { Text($0.title).tag($0) }
+            }
         }
     }
 }

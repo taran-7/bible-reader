@@ -5,12 +5,37 @@ struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
 
+    @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var contrast
+
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
+    private var choice: ThemeChoice { preferences.preferences.theme }
+    private var theme: ThemeTokens {
+        Theme.tokens(
+            for: choice.resolve(systemIsDark: systemScheme == .dark),
+            reduceTransparency: reduceTransparency,
+            increaseContrast: contrast == .increased)
+    }
 
     var body: some View {
+        themed(content)
+    }
+
+    /// Для «Як у системі» схему не нав'язуємо, інакше `systemScheme` перестане відбивати macOS.
+    private func themed(_ view: some View) -> some View {
+        view
+            .environment(\.theme, theme)
+            .environment(\.interfaceScale, scale)
+            .foregroundStyle(Color(theme.text))
+            .tint(Color(theme.accent))
+            .preferredColorScheme(choice == .system ? nil : theme.preferredColorScheme)
+    }
+
+    @ViewBuilder private var content: some View {
         if let error = model.loadError {
             DatabaseErrorView(message: error)
-                .environment(\.interfaceScale, scale)
+                .background(ThemeBackground())
         } else {
             NavigationSplitView {
                 BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
@@ -22,6 +47,8 @@ struct ContentView: View {
                             title: "Пошук не вдався",
                             systemImage: "exclamationmark.triangle",
                             lines: ["Запит «\(model.submittedQuery)»: \(error)"])
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(ThemeBackground())
                     } else if let results = model.results {
                         SearchResultsView(model: model, results: results)
                     } else {
@@ -30,8 +57,8 @@ struct ContentView: View {
                 }
                 .font(.system(size: scale.systemFontSize))
                 .toolbar { ReaderToolbar(model: model, scale: scale) }
+                .modifier(ToolbarTheme())
             }
-            .environment(\.interfaceScale, scale)
             .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in

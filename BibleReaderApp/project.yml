@@ -15,6 +15,9 @@ targets:
       - path: Resources/bible.sqlite
         buildPhase: resources
         optional: true
+      - path: Resources/Fonts
+        type: folder
+        buildPhase: resources
     dependencies:
       - package: BibleCore
     settings:

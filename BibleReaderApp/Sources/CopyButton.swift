@@ -8,6 +8,7 @@ struct CopyButton: View {
     @State private var copies = 0
     @State private var showCopied = false
     @State private var isHovered = false
+    @Environment(\.theme) private var theme
 
     var body: some View {
         Button {
@@ -23,12 +24,15 @@ struct CopyButton: View {
                 }
             }
             .font(.callout)
+            .foregroundStyle(Color(theme.accent))
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6))
+            // Напівпрозора лише підкладка: іконка лишається контрастною (FR-32).
+            .background(
+                Color(theme.copyButton).opacity(isHovered || showCopied ? 1 : 0.6),
+                in: RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.borderless)
-        .opacity(isHovered || showCopied ? 1 : 0.6)
         .onHover { isHovered = $0 }
         .help("Копіювати цитату")
         .accessibilityLabel(showCopied ? "Скопійовано" : "Копіювати цитату")
