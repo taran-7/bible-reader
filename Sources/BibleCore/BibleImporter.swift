@@ -78,22 +78,28 @@ public enum BibleImporter {
               chapter     INTEGER NOT NULL,
               verse       INTEGER NOT NULL,
               text        TEXT    NOT NULL,
+              search_text TEXT,
               PRIMARY KEY (translation, book, chapter, verse)
             );
+            CREATE VIEW verses_search AS
+              SELECT rowid AS rowid, coalesce(search_text, text) AS search_text FROM verses;
             CREATE VIRTUAL TABLE verses_fts USING fts5(
-              text,
-              content='verses',
+              search_text,
+              content='verses_search',
               tokenize='unicode61 remove_diacritics 2'
             );
             """)
     }
 
     private static func insert(_ books: [SourceBook], translation: Translation, into db: Database) throws {
-        let statement = try db.makeStatement(sql: "INSERT INTO verses (translation, book, chapter, verse, text) VALUES (?, ?, ?, ?, ?)")
+        let statement = try db.makeStatement(sql: "INSERT INTO verses (translation, book, chapter, verse, text, search_text) VALUES (?, ?, ?, ?, ?, ?)")
         for (bookIndex, book) in books.enumerated() {
             for (chapterIndex, verses) in book.chapters.enumerated() {
                 for (verseIndex, text) in verses.enumerated() {
-                    try statement.execute(arguments: [translation.rawValue, bookIndex + 1, chapterIndex + 1, verseIndex + 1, clean(text)])
+                    let text = clean(text)
+                    let folded = SearchText.fold(text)
+                    try statement.execute(arguments: [translation.rawValue, bookIndex + 1, chapterIndex + 1, verseIndex + 1, text,
+                                                      folded == text ? nil : folded])
                 }
             }
         }

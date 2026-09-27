@@ -9,6 +9,10 @@
 > чекпоінті baseline sign-off. Продуктовий опис і пріоритети лишаються в
 > [PRD](product-specs/prd.md); тут канонічні ID для ланцюга FR → spec → план → тест.
 
+> **Baseline sign-off (2026-09-27).** Власник підтвердив FR-1…FR-14 як є.
+> Відомі прогалини доказів (FR-10 і FR-14 на рівні UI)
+> закриваються окремо: [project-factory.md](project-factory.md#відкриті-питання-після-онбордингу-2026-09-26), пункт 5.
+
 ## 1 Огляд продукту
 
 Легкий нативний читач Біблії для macOS без мережі й акаунтів: знайти місце за
@@ -75,6 +79,11 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 | FR-28 | Future | Import | Переклад Огієнка (PRD 6.14). | local-verifiable |
 | FR-29 | Future | Import | Біблія Кралицька 1613 (PRD 6.15). | local-verifiable |
 | FR-30 | Future | Import | Модулі перекладів: новий переклад без змін коду (PRD 6.16). | local-verifiable |
+| FR-31 | Future | Themes | П'ять тем (Світла, Темна, Скло, Пастельна, Манускрипт) і «Як у системі»; тема змінює весь інтерфейс без перезапуску і зберігається між запусками (PRD 6.18). | local-verifiable |
+| FR-32 | Future | Themes | Тема як набір токенів у `BibleCore`; кожна пара «текст/фон» кожної теми проходить контраст: основний текст ≥ 7:1, другорядний і акцент ≥ 4,5:1 (PRD 6.18). | local-verifiable |
+| FR-33 | Future | Illustrations | Кнопка «Пошук ілюстрацій» на виділенні відкриває вікно з ≤ 7 історіями (реальні люди, місце, час, джерело); без мережі чи при помилці повідомлення і «Повторити» (PRD 6.17). | local-verifiable |
+| FR-34 | Future | Illustrations | Джерела лише з allowlist доменів; православні й католицькі в blocklist; історію з будь-яким джерелом поза allowlist відкинуто (PRD 6.17). | local-verifiable |
+| FR-35 | Future | Illustrations | Локальний FTS-індекс ілюстрацій (окремо від `bible.sqlite`) працює офлайн; жодних мережевих запитів до кліку, крім оновлення індексу (PRD 6.17). | local-verifiable |
 
 ## 3 Non-Functional Requirements (NFR)
 
@@ -85,15 +94,18 @@ NFR з PRD §3 і §7 поки не мають автоматичного мех
 | ID | Phase | Area | Description | Verification |
 |---|---|---|---|---|
 | NFR-1 | Future | Platform | macOS 14+, Apple Silicon та Intel. | local-verifiable |
-| NFR-2 | Future | Privacy | Офлайн, жодних мережевих викликів і телеметрії. | local-verifiable |
+| NFR-2 | Future | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35), лише домени з allowlist. | local-verifiable |
 | NFR-3 | Future | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії. | local-verifiable |
 | NFR-4 | Future | A11y | VoiceOver читає номери й тексти віршів; повна робота з клавіатури; контраст WCAG AA. | local-verifiable |
 | NFR-5 | Future | Size | Розмір додатка < 60 МБ з трьома перекладами. | local-verifiable |
 
 ## 4 Прогалини baseline
 
+- **FR-7, FR-13:** як і FR-10/FR-14, прив'язка SwiftUI (екран помилки, відправка пошуку) перевірена лише через `ReaderViewModel`; закривається слайсом `add-ui-tests`.
+
 - **FR-10, FR-14:** тести покривають логіку `ReaderViewModel` (формування
   цитати, відкриття результату), але не SwiftUI-прив'язку (⌘C, контекстне
   меню, клік). UI перевіряли вручну; ручну перевірку 7.6 винесено в tech debt #7.
-- **FR-2 (діакритика):** тест перевіряє кількість записів індексу, але не
-  нечутливість до діакритики.
+- ~~**FR-2 (діакритика)**~~ закрито 2026-09-27: тест `testFtsIgnoresDiacritics`
+  знайшов, що `unicode61` не згортає кирилічне «ё»; додано згортання `ё → е`
+  (`SearchText.fold`, колонка `search_text`), тест `testYoFoldsToYe`.

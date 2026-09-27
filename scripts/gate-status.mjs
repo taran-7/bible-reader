@@ -73,7 +73,7 @@ const GATE_COMMANDS = {
   // (release strictness over an empty scaffold is pending, not broken).
   traceabilityRelease: {
     script: "check-traceability",
-    args: ["--release", "--strict-tests", "--strict-recordings"],
+    args: ["--release", "--strict-tests"], // PD-9: no --strict-recordings (native macOS, no Playwright recordings)
     releaseTier: true,
   },
   trajectoryRelease: {
@@ -193,14 +193,17 @@ const GATES = [
   { g: "G3", desc: "capability plan + acceptance methods exist", keys: ["acceptanceExistence"], fixed: (fold) => worst(has("docs/mvp-capability-plan.md") ? "needs sign-off" : "FAIL", fold) },
   { g: "G4", desc: "per-slice", keys: ["traceability", "trajectory", "acceptanceArtifact", "integrity"] },
   { g: "G5", desc: "hardening (coverage)", keys: ["coverage"] },
-  { g: "G6", desc: "QA proof", keys: ["recordings", "evals", "acceptanceArtifact", "visual"] },
-  { g: "G7", desc: "release", keys: ["traceabilityRelease", "trajectoryRelease", "recordings", "acceptanceArtifact", "integrity"] },
+  // PD-9 (bible-reader, native macOS): recordings/visual are web-only and not
+  // gate inputs here; evals are deferred to the add-illustrations slice (v1.4).
+  // Their rows still print below — visible, never counted as PASS.
+  { g: "G6", desc: "QA proof", keys: ["acceptanceArtifact"], deferred: ["evals → add-illustrations"] },
+  { g: "G7", desc: "release", keys: ["traceabilityRelease", "trajectoryRelease", "acceptanceArtifact", "integrity"] },
   { g: "G8", desc: "UAT (trace regressions)", keys: ["traceability"] },
 ];
 const gateRows = GATES.map((gate, idx) => {
   const fold = gate.keys.length ? worst(...gate.keys.map((k) => checks[k].status)) : "PASS";
   let status = gate.fixed ? gate.fixed(fold) : fold;
-  const notes = [];
+  const notes = (gate.deferred ?? []).map((d) => `deferred (PD-9): ${d}`);
   // NOT-EARNED is red for G4+; pending emptiness over product code is unearned
   // even when it came from an uninstalled ("n/a") constituent.
   if (idx >= 4 && status === "SKIP-pending" && productCode) {

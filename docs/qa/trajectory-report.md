@@ -6,11 +6,11 @@ It does NOT verify test-first ordering or test integrity (not derivable from
 one-commit-per-slice history) — those are graded by the trajectory-eval workflow.
 
 Scope: 1 archived slice(s).
-Result: PASS, 2 warning(s)
+Result: PASS
 
 | Slice | Review evidence | Trailer commits | design+tasks | lib domains touched |
 |---|---|---|---|---|
-| 2026-09-25-bible-reader-mvp | **missing** | **0** | yes | - |
+| 2026-09-25-bible-reader-mvp | clean | 1 | yes | BibleCore |
 
 ## Cross-slice module overlap
 
@@ -22,5 +22,4 @@ None.
 
 ## Warnings
 
-- **review-evidence**: 2026-09-25-bible-reader-mvp: review-findings.json is missing (review must have run clean before archive)
-- **trailer**: 2026-09-25-bible-reader-mvp: no commit carries a "Slice: bible-reader-mvp" trailer
+None.

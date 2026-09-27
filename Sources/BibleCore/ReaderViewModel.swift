@@ -5,7 +5,12 @@ import Observation
 @MainActor @Observable
 public final class ReaderViewModel {
     public var translation: Translation = .kjv {
-        didSet { if translation != oldValue { reload() } }
+        didSet {
+            guard translation != oldValue else { return }
+            reload()
+            // Той самий запит, що дав результати, а не недописаний текст у полі.
+            if results != nil || searchError != nil { runSearch(submittedQuery) }
+        }
     }
     public private(set) var location = Location(book: 1, chapter: 1)
     public private(set) var books: [Book] = []
@@ -13,12 +18,17 @@ public final class ReaderViewModel {
     public private(set) var verses: [Verse] = []
     /// Вірш, до якого треба прокрутити і який підсвітити.
     public var focusedVerse: Int?
+    /// Змінюється на кожен запит фокусу, навіть якщо номер вірша той самий
+    /// (Ин 3:16 → Рим 3:16), щоб SwiftUI `onChange` спрацював.
+    public private(set) var focusRequest = 0
     public var query = ""
     /// `nil`, коли пошук не активний; порожній масив означає «Нічого не знайдено».
     public private(set) var results: [SearchResult]?
     /// Запит, за яким отримано `results` (поле пошуку могли вже змінити).
     public private(set) var submittedQuery = ""
     public private(set) var loadError: String?
+    /// Помилка пошуку (не плутати з «Нічого не знайдено»).
+    public private(set) var searchError: String?
 
     private let repository: BibleRepository?
 
@@ -47,6 +57,7 @@ public final class ReaderViewModel {
     public func open(_ target: Location, focus verse: Int? = nil) {
         location = target
         focusedVerse = verse
+        if verse != nil { focusRequest += 1 }
         reload()
     }
 
@@ -62,12 +73,25 @@ public final class ReaderViewModel {
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
             results = nil
+            searchError = nil
         } else if let reference = Reference.parse(text) {
             results = nil
+            searchError = nil
             open(Location(book: reference.book, chapter: reference.chapter), focus: reference.verseStart)
         } else {
-            submittedQuery = text
-            results = (try? repository.search(text, translation: translation, limit: 200)) ?? []
+            runSearch(text)
+        }
+    }
+
+    private func runSearch(_ text: String) {
+        guard let repository else { return }
+        submittedQuery = text
+        do {
+            results = try repository.search(text, translation: translation, limit: 200)
+            searchError = nil
+        } catch {
+            results = nil
+            searchError = "\(error)"
         }
     }
 
