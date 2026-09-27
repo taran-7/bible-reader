@@ -45,6 +45,8 @@ jobs:
           brew install xcodegen
           (cd BibleReaderApp && xcodegen generate)
           make ui-test
+      - name: Platform and size (NFR-1, NFR-5)
+        run: node scripts/check-platform.mjs
 
       # --- докази ---
       - name: Upload QA evidence

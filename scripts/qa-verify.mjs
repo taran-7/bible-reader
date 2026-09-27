@@ -104,6 +104,12 @@ const commands = [
     command: "xcodebuild",
     args: ["-quiet", "-project", "BibleReaderApp/BibleReader.xcodeproj", "-scheme", "BibleReader", "build"],
   },
+  {
+    // PD-12: NFR-1 (macOS 14+, arm64) і NFR-5 (.app < 100 МБ) на Release-збірці.
+    name: "platform",
+    command: "node",
+    args: ["scripts/check-platform.mjs"],
+  },
   // PD-11: XCUITest (FR-7, FR-10, FR-13, FR-14) drives the real mouse, keyboard and
   // clipboard, so locally it runs only with QA_UI_TESTS=1; CI always runs it.
   ...(process.env.CI || process.env.QA_UI_TESTS === "1"

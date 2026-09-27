@@ -92,11 +92,11 @@ NFR з PRD §3 і §7 поки не мають автоматичного мех
 
 | ID | Phase | Area | Description | Verification |
 |---|---|---|---|---|
-| NFR-1 | Future | Platform | macOS 14+, Apple Silicon та Intel. | local-verifiable |
-| NFR-2 | Future | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35), лише домени з allowlist. | local-verifiable |
+| NFR-1 | MVP | Platform | macOS 14+, лише Apple Silicon (`arm64`); Intel поза обсягом (рішення власника 2026-09-27, open source: хто потребує — збере сам). | local-verifiable |
+| NFR-2 | MVP | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35), лише домени з allowlist. | local-verifiable |
 | NFR-3 | Future | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії. | local-verifiable |
 | NFR-4 | Future | A11y | VoiceOver читає номери й тексти віршів; повна робота з клавіатури; контраст WCAG AA. | local-verifiable |
-| NFR-5 | Future | Size | Розмір додатка < 60 МБ з трьома перекладами. | local-verifiable |
+| NFR-5 | MVP | Size | Розмір Release `.app` < 100 МБ (попередження від 80 МБ); межу піднято з 60 МБ рішенням власника 2026-09-27. | local-verifiable |
 
 ## 4 Прогалини baseline
 

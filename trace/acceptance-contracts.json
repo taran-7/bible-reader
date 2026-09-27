@@ -287,16 +287,16 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/PlatformTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-2": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/NetworkIsolationTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-3": [
@@ -319,8 +319,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/PlatformTests.swift",
+        "status": "artifact-ok"
       }
     ]
   }

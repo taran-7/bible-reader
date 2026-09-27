@@ -13,3 +13,6 @@ coverage/
 **/raw/
 trace/ledger.jsonl
 trace/ledger-*.jsonl
+
+# Release-збірка для check-platform (NFR-1, NFR-5)
+build/
