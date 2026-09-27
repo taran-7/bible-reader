@@ -19,4 +19,4 @@
 ## 4. Документи і рев'ю
 
 - [x] 4.1 Product spec, PRD, `THIRD_PARTY.md` (EB Garamond, OFL)
-- [ ] 4.2 Рев'ю; FR-31, FR-32 → MVP; архів
+- [x] 4.2 Рев'ю (4 medium, 7 low: виправлено 9, 1 спростовано скриншотом, решта в tech debt #18–#19); FR-31, FR-32 → MVP; архів
