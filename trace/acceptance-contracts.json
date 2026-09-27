@@ -239,8 +239,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-31": [

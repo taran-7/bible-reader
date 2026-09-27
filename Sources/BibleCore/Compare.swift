@@ -64,9 +64,8 @@ public struct ComparePanels: Equatable, Codable, Sendable {
 }
 
 extension Translation {
-    /// KJV, Kralická й Огієнко нумеровані однаково (Огієнко вирівняно при конвертації);
-    /// Синодальний — ні, доки немає таблиці відповідностей (6.13).
-    public var sharesKJVNumbering: Bool { self != .synodal }
+    /// Нумерація модуля (`numbering` у маніфесті) збігається з KJV; інакше вірші зіставляє `Versification`.
+    public var sharesKJVNumbering: Bool { numbering == .kjv }
 }
 
 /// Одна панель: вірші в перекладі і посилання мовою перекладу.

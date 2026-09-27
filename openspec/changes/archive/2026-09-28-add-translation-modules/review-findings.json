@@ -1,0 +1,21 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-translation-modules",
+  "change": "add-translation-modules",
+  "baseRef": "095456f",
+  "headRef": "feature/add-translation-modules",
+  "dimensions": {
+    "correctness": { "confirmed": 7, "contested": 0, "rejected": 0, "fixed": 5, "deferred": 2 }
+  },
+  "fixed": [
+    "1 (critical): Character(\"10\") trapped at the 10th module — ⌘⌥ only for the first nine (TranslationShortcut, tested)",
+    "3: required built-in codes — test asserts them in the bundled manifest; documented in Translation.swift and docs",
+    "4: unknown code in saved compare panels — only that code is dropped (tested)",
+    "6: Book.spellings rebuilt per call — module spellings computed once",
+    "7: comments named specific translations — described via numbering"
+  ],
+  "deferred": "2 (only kjv/synodal numbering — tech debt #25); 5 (Bundle.module in the app — verified: BibleReader_BibleCore.bundle/translations.json is in the built .app and the app launches; UI tests in CI launch it too)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T05:30:00Z"
+}

@@ -98,17 +98,21 @@ struct FontCommands: Commands {
     }
 }
 
-/// Меню «Переклад» з ⌘⌥1…4.
+/// Меню «Переклад»: перші дев'ять перекладів з маніфесту мають ⌘⌥1…9, решта — без скорочення.
 struct TranslationCommands: Commands {
     let model: ReaderViewModel
 
     var body: some Commands {
         CommandMenu("Переклад") {
             ForEach(Array(Translation.allCases.enumerated()), id: \.element) { index, translation in
-                Toggle(translation.menuTitle, isOn: Binding(
+                let toggle = Toggle(translation.menuTitle, isOn: Binding(
                     get: { model.translation == translation },
                     set: { if $0 { model.translation = translation } }))
-                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [.command, .option])
+                if let key = TranslationShortcut.digit(forIndex: index) {
+                    toggle.keyboardShortcut(KeyEquivalent(key), modifiers: [.command, .option])
+                } else {
+                    toggle
+                }
             }
         }
     }

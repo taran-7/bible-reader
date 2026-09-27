@@ -1,0 +1,6 @@
+[
+  {"code": "kjv", "title": "KJV", "language": "en", "languageTitle": "English", "numbering": "kjv", "file": "en_kjv.json"},
+  {"code": "bkr", "title": "Kralická", "language": "cs", "languageTitle": "čeština", "numbering": "kjv", "file": "cs_bkr.json"},
+  {"code": "ohienko", "title": "Огієнко", "language": "uk", "languageTitle": "українська", "numbering": "kjv", "file": "uk_ohienko.json"},
+  {"code": "synodal", "title": "Синодальний", "language": "ru", "languageTitle": "русский", "numbering": "synodal", "file": "ru_synodal.json"}
+]
