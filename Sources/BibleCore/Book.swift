@@ -30,17 +30,33 @@ public struct Book: Hashable, Identifiable, Sendable {
         self.aliases = aliases
     }
 
+    public var ukrainianName: String { Book.ukrainian[number - 1].name }
+    public var ukrainianAbbreviation: String { Book.ukrainian[number - 1].abbreviation }
+    public var czechName: String { Book.czech[number - 1].name }
+    public var czechAbbreviation: String { Book.czech[number - 1].abbreviation }
+
     public func name(in translation: Translation) -> String {
-        translation == .kjv ? englishName : russianName
+        switch translation.language {
+        case .english: englishName
+        case .russian: russianName
+        case .ukrainian: ukrainianName
+        case .czech: czechName
+        }
     }
 
     public func abbreviation(in translation: Translation) -> String {
-        translation == .kjv ? englishAbbreviation : russianAbbreviation
+        switch translation.language {
+        case .english: englishAbbreviation
+        case .russian: russianAbbreviation
+        case .ukrainian: ukrainianAbbreviation
+        case .czech: czechAbbreviation
+        }
     }
 
     /// Усі написання: назви, скорочення, синоніми.
     var spellings: [String] {
-        [englishName, englishAbbreviation, russianName, russianAbbreviation] + aliases
+        [englishName, englishAbbreviation, russianName, russianAbbreviation,
+         ukrainianName, ukrainianAbbreviation, czechName, czechAbbreviation] + aliases
     }
 
     public static let all: [Book] = [
@@ -110,5 +126,42 @@ public struct Book: Hashable, Identifiable, Sendable {
         Book(64, "3 John", "3 John", "3 Иоанна", "3 Ин", ["3 Jn"]),
         Book(65, "Jude", "Jude", "Иуды", "Иуд", []),
         Book(66, "Revelation", "Rev", "Откровение", "Откр", ["Revelation of John", "Апокалипсис"]),
+    ]
+
+    /// Українські назви (як у виданні Огієнка) і скорочення; індекс + 1 = номер книги.
+    static let ukrainian: [(name: String, abbreviation: String)] = [
+        ("Буття", "Бут"), ("Вихід", "Вих"), ("Левит", "Лев"), ("Числа", "Чис"), ("Повторення Закону", "Повт"),
+        ("Ісус Навин", "Нав"), ("Суддів", "Суд"), ("Рут", "Рут"), ("1 Самуїлова", "1 Сам"), ("2 Самуїлова", "2 Сам"),
+        // «1 Цар» у російській — 1 Самуїлова, тож скорочення царів інші.
+        ("1 царів", "1 Цр"), ("2 царів", "2 Цр"), ("1 хроніки", "1 Хр"), ("2 хроніки", "2 Хр"), ("Ездра", "Езд"),
+        ("Неемія", "Неем"), ("Естер", "Ест"), ("Йов", "Йов"), ("Псалми", "Пс"), ("Приповісті", "Прип"),
+        ("Екклезіяст", "Екл"), ("Пісня над піснями", "Пісн"), ("Ісая", "Іс"), ("Єремія", "Єр"), ("Плач Єремії", "Плач"),
+        ("Єзекіїль", "Єз"), ("Даниїл", "Дан"), ("Осія", "Ос"), ("Йоїл", "Йоїл"), ("Амос", "Ам"),
+        ("Овдій", "Овд"), ("Йона", "Йон"), ("Михей", "Мих"), ("Наум", "Наум"), ("Авакум", "Ав"),
+        ("Софонія", "Соф"), ("Огій", "Ог"), ("Захарій", "Зах"), ("Малахії", "Мал"),
+        ("Від Матвія", "Мт"), ("Від Марка", "Мр"), ("Від Луки", "Лк"), ("Від Івана", "Ів"), ("Дії апостолів", "Дії"),
+        ("До римлян", "Рим"), ("1 до коринтян", "1 Кор"), ("2 до коринтян", "2 Кор"), ("До галатів", "Гал"), ("До ефесян", "Еф"),
+        ("До филип'ян", "Флп"), ("До колоссян", "Кол"), ("1 до солунян", "1 Сол"), ("2 до солунян", "2 Сол"),
+        ("1 до Тимофія", "1 Тим"), ("2 до Тимофія", "2 Тим"), ("До Тита", "Тит"), ("До Филимона", "Флм"), ("До євреїв", "Євр"),
+        ("Якова", "Як"), ("1 Петра", "1 Пет"), ("2 Петра", "2 Пет"), ("1 Івана", "1 Ів"), ("2 Івана", "2 Ів"),
+        ("3 Івана", "3 Ів"), ("Юди", "Юд"), ("Об'явлення", "Об"),
+    ]
+
+    /// Чеські назви і скорочення за Českým ekumenickým překladem; індекс + 1 = номер книги.
+    static let czech: [(name: String, abbreviation: String)] = [
+        ("Genesis", "Gn"), ("Exodus", "Ex"), ("Leviticus", "Lv"), ("Numeri", "Nu"), ("Deuteronomium", "Dt"),
+        ("Jozue", "Joz"), ("Soudců", "Sd"), ("Rút", "Rt"), ("1. Samuelova", "1S"), ("2. Samuelova", "2S"),
+        ("1. Královská", "1Kr"), ("2. Královská", "2Kr"), ("1. Paralipomenon", "1Pa"), ("2. Paralipomenon", "2Pa"), ("Ezdráš", "Ezd"),
+        ("Nehemjáš", "Neh"), ("Ester", "Est"), ("Jób", "Jb"), ("Žalmy", "Ž"), ("Přísloví", "Př"),
+        ("Kazatel", "Kaz"), ("Píseň písní", "Pís"), ("Izajáš", "Iz"), ("Jeremjáš", "Jr"), ("Pláč", "Pl"),
+        ("Ezechiel", "Ez"), ("Daniel", "Da"), ("Ozeáš", "Oz"), ("Jóel", "Jl"), ("Ámos", "Am"),
+        ("Abdijáš", "Abd"), ("Jonáš", "Jon"), ("Micheáš", "Mi"), ("Nahum", "Na"), ("Abakuk", "Abk"),
+        ("Sofonjáš", "Sf"), ("Ageus", "Ag"), ("Zacharjáš", "Za"), ("Malachiáš", "Mal"),
+        ("Matouš", "Mt"), ("Marek", "Mk"), ("Lukáš", "L"), ("Jan", "J"), ("Skutky apoštolů", "Sk"),
+        ("Římanům", "Ř"), ("1. Korintským", "1K"), ("2. Korintským", "2K"), ("Galatským", "Ga"), ("Efezským", "Ef"),
+        ("Filipským", "Fp"), ("Koloským", "Ko"), ("1. Tesalonickým", "1Te"), ("2. Tesalonickým", "2Te"),
+        ("1. Timoteovi", "1Tm"), ("2. Timoteovi", "2Tm"), ("Titovi", "Tt"), ("Filemonovi", "Fm"), ("Židům", "Žd"),
+        ("Jakubův", "Jk"), ("1. Petrův", "1P"), ("2. Petrův", "2P"), ("1. Janův", "1J"), ("2. Janův", "2J"),
+        ("3. Janův", "3J"), ("Judův", "Ju"), ("Zjevení", "Zj"),
     ]
 }

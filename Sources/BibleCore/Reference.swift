@@ -29,20 +29,26 @@ public struct Reference: Hashable, Sendable {
         return Reference(book: book, chapter: chapter, verseStart: start, verseEnd: end)
     }
 
-    /// `Ин. 3:16-18` для Синодального, `John 3:16-18` для KJV.
+    /// `Ин. 3:16-18` для Синодального, `John 3:16-18` для KJV, `Ів. 3:16` для Огієнка, `J 3:16` для BKR.
     public func format(in translation: Translation) -> String {
         "\(Reference.bookLabel(book, in: translation)) \(chapter)" + (verseStart.map { ":\($0)" + (verseEnd.map { "-\($0)" } ?? "") } ?? "")
     }
 
     static func bookLabel(_ number: Int, in translation: Translation) -> String {
         let abbreviation = Book(number: number)?.abbreviation(in: translation) ?? "\(number)"
-        return translation == .synodal ? abbreviation + "." : abbreviation
+        // Кириличні скорочення з крапкою (`Ин. 3:16`, `Ів. 3:16`), латинські — без.
+        switch translation.language {
+        case .russian, .ukrainian: return abbreviation + "."
+        case .english, .czech: return abbreviation
+        }
     }
 
-    /// Нижній регістр, без крапок і пробілів, ё → е.
+    /// Нижній регістр, без крапок і пробілів, ё → е, типографські апострофи → '.
     static func normalize(_ spelling: String) -> String {
         spelling.lowercased()
             .replacingOccurrences(of: "ё", with: "е")
+            .replacingOccurrences(of: "’", with: "'")
+            .replacingOccurrences(of: "ʼ", with: "'")
             .filter { !$0.isWhitespace && $0 != "." }
     }
 

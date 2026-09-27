@@ -26,5 +26,17 @@ import Testing
         #expect(try text(.synodal, 1, 1, 1).hasPrefix("В начале сотворил Бог"))
         #expect(try text(.kjv, 43, 3, 16).hasPrefix("For God so loved the world"))
         #expect(try text(.synodal, 43, 3, 16).hasPrefix("Ибо так возлюбил Бог мир"))
+        #expect(try text(.ohienko, 1, 1, 1).hasPrefix("На початку Бог створив"))
+        #expect(try text(.ohienko, 43, 3, 16).hasPrefix("Так бо Бог полюбив світ"))
+        #expect(try text(.bkr, 1, 1, 1).hasPrefix("Na počátku stvořil Bůh"))
+        #expect(try text(.bkr, 43, 3, 16).hasPrefix("Nebo tak Bůh miloval svět"))
+    }
+
+    // @trace FR-29
+    @Test func testNewTranslationsAreClean() throws {
+        // Без знаків наголосу, тегів і фігурних дужок.
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%' || char(769) || '%' OR text LIKE '%<%' OR text LIKE '%{%')", in: db) == 0)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'bkr'", in: db) == 31_102)
+        #expect(try TestSupport.count("SELECT MAX(chapter) FROM verses WHERE translation = 'bkr' AND book = 19", in: db) == 150)
     }
 }

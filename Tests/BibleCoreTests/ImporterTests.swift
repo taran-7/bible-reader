@@ -10,7 +10,7 @@ import Testing
         let out = dir.appendingPathComponent("bible.sqlite")
         try BibleImporter.run(rawDirectory: dir, output: out)
 
-        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 8)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 16)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'kjv' AND book = 2 AND chapter = 2 AND verse = 1", in: out) == 1)
         #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'synodal' AND book = 1 AND chapter = 1 AND verse = 1", in: out) == "В начале сотворил Бог небо и землю.")
     }
@@ -33,7 +33,7 @@ import Testing
         let out = dir.appendingPathComponent("bible.sqlite")
         try BibleImporter.run(rawDirectory: dir, output: out)
 
-        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts", in: out) == 8)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts", in: out) == 16)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'НАЧАЛЕ'", in: out) == 1)
     }
 
@@ -85,6 +85,29 @@ import Testing
         try BibleImporter.run(rawDirectory: dir, output: out)
         try BibleImporter.run(rawDirectory: dir, output: out)
 
-        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 8)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 16)
+    }
+
+    // @trace FR-28
+    @Test func testEmptyVerseIsSkippedWithoutShift() throws {
+        let dir = try TestSupport.tempDirectory()
+        let ohienko = #"[{"abbrev":"19","name":"Psalms","chapters":[["", "Господи, як багато моїх ворогів"]]}]"#
+        try TestSupport.writeFixture(to: dir, ohienko: ohienko)
+        let out = dir.appendingPathComponent("bible.sqlite")
+        try BibleImporter.run(rawDirectory: dir, output: out)
+
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'ohienko' AND verse = 1", in: out) == 0)
+        #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'ohienko' AND verse = 2", in: out) == "Господи, як багато моїх ворогів")
+    }
+
+    // @trace FR-29
+    @Test func testImportsFourTranslations() throws {
+        let dir = try TestSupport.tempDirectory()
+        try TestSupport.writeFixture(to: dir)
+        let out = dir.appendingPathComponent("bible.sqlite")
+        try BibleImporter.run(rawDirectory: dir, output: out)
+        #expect(try TestSupport.count("SELECT COUNT(DISTINCT translation) FROM verses", in: out) == 4)
+        // Чеська діакритика згортається: «buh» знаходить «Bůh».
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'buh'", in: out) == 1)
     }
 }

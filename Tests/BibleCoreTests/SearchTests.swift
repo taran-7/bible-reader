@@ -64,4 +64,14 @@ import Testing
     @Test func testLimit() throws {
         #expect(try repository.search("the", translation: .kjv, limit: 5).count == 5)
     }
+
+    // @trace FR-28
+    @Test func testSearchInUkrainianAndCzech() throws {
+        let uk = try repository.search("полюбив світ", translation: .ohienko)
+        #expect(uk.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
+        // Без чеської діакритики: «buh miloval» знаходить «Bůh miloval».
+        let cs = try repository.search("buh miloval", translation: .bkr)
+        #expect(cs.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
+    }
 }
+
