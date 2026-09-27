@@ -63,6 +63,16 @@
       "processComplete": true
     },
     {
+      "slice": "2026-09-28-improve-search",
+      "reviewEvidence": "clean",
+      "trailerCommits": 2,
+      "libDomains": [
+        "BibleCore",
+        "CSnowball"
+      ],
+      "processComplete": true
+    },
+    {
       "slice": "2026-09-28-tweak-reading-ui",
       "reviewEvidence": "clean",
       "trailerCommits": 3,
@@ -82,6 +92,7 @@
         "2026-09-27-add-themes",
         "2026-09-27-add-translations",
         "2026-09-27-add-ui-tests",
+        "2026-09-28-improve-search",
         "2026-09-28-tweak-reading-ui"
       ]
     }
@@ -90,7 +101,7 @@
   "warnings": [
     {
       "check": "in-scope",
-      "msg": "lib/BibleCore/ modified by 7 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-tweak-reading-ui) — review for scope drift"
+      "msg": "lib/BibleCore/ modified by 8 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift"
     }
   ]
 }

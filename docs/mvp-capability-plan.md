@@ -24,7 +24,7 @@
 | 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16 | — | зроблено 2026-09-27 (архів `2026-09-27-add-reading-comfort`) |
 | 1a | `add-copy-button` (v1.1) | FR-17 | 1 | зроблено 2026-09-27 (архів `2026-09-27-add-copy-button`) |
 | 1b | `add-themes` (v1.1) | FR-31, FR-32, NFR-4 (контраст, зокрема кнопки копіювання 0,6) | 1 (масштаб шрифтів у всіх темах) | зроблено 2026-09-27 (архів `2026-09-27-add-themes`; a11y-частина NFR-4 — у 0b) |
-| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | parallel-safe з 1 |
+| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | зроблено 2026-09-28 (архів `2026-09-28-improve-search`) |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
 | 3a | `add-verse-compare` (v1.5) | FR-36 | 1a (кнопка поруч із копіюванням) | serialize |
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |

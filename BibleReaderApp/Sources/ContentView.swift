@@ -21,15 +21,8 @@ struct ContentView: View {
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
                 Group {
-                    if let error = model.searchError {
-                        MessageView(
-                            title: "Пошук не вдався",
-                            systemImage: "exclamationmark.triangle",
-                            lines: ["Запит «\(model.submittedQuery)»: \(error)"])
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(ThemeBackground())
-                    } else if let results = model.results {
-                        SearchResultsView(model: model, results: results)
+                    if model.searchError != nil || model.results != nil {
+                        SearchResultsView(model: model)
                     } else {
                         ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
                     }

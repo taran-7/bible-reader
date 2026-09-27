@@ -97,14 +97,20 @@ public struct SearchResult: Identifiable, Hashable, Sendable {
 
     public var id: VerseID { verse.id }
 
-    /// Підсвічує слова, чия основа є в запиті, і слова з фраз у лапках.
+    /// Підсвічує слова, чия основа є в запиті, і фрази з лапок — лише там, де слова стоять поспіль.
     static func segments(for text: String, query: SearchQuery, stemmer: Stemmer) -> [Segment] {
         let stems = Set(query.words.map(stemmer.stem))
-        let exact = Set(query.phrases.joined().map(SearchText.key))
+        let words = Stemmer.words(in: text)
+        let keys = words.map { SearchText.key($0.text) }
+        var matched = words.indices.map { stems.contains(stemmer.stem(words[$0].text)) }
+        for phrase in query.phrases.map({ $0.map(SearchText.key) }) where phrase.count <= keys.count {
+            for start in 0...(keys.count - phrase.count) where keys[start..<(start + phrase.count)].elementsEqual(phrase) {
+                for index in start..<(start + phrase.count) { matched[index] = true }
+            }
+        }
         var segments: [Segment] = []
         var position = text.startIndex
-        for word in Stemmer.words(in: text)
-        where stems.contains(stemmer.stem(word.text)) || exact.contains(SearchText.key(word.text)) {
+        for (index, word) in words.enumerated() where matched[index] {
             if position < word.range.lowerBound {
                 segments.append(Segment(text: String(text[position..<word.range.lowerBound]), isMatch: false))
             }

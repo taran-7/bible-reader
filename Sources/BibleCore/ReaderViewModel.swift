@@ -28,6 +28,8 @@ public final class ReaderViewModel {
     public private(set) var results: [SearchResult]?
     /// Загальна кількість збігів в області, для напису «Знайдено: N».
     public private(set) var resultTotal = 0
+    /// Помилка довантаження наступної сторінки: вже завантажені результати лишаються на екрані.
+    public private(set) var pageError: String?
     /// Область пошуку (FR-19); зміна перезапускає активний пошук.
     public var searchScope: SearchScope = .bible {
         didSet {
@@ -113,9 +115,11 @@ public final class ReaderViewModel {
             let page = try repository.searchPage(submittedQuery, translation: translation, scope: searchScope,
                                                  offset: loaded.count, limit: Self.pageSize)
             results = loaded + page.results
-            resultTotal = page.results.isEmpty ? loaded.count : page.total
+            // Коротка сторінка — кінець списку, навіть якщо лічильник обіцяв більше: інакше індикатор висів би вічно.
+            resultTotal = page.results.count < Self.pageSize ? loaded.count + page.results.count : page.total
+            pageError = nil
         } catch {
-            searchError = "\(error)"
+            pageError = "\(error)"
         }
     }
 
@@ -127,6 +131,7 @@ public final class ReaderViewModel {
             results = page.results
             resultTotal = page.total
             searchError = nil
+            pageError = nil
         } catch {
             results = nil
             resultTotal = 0

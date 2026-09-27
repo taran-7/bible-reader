@@ -100,6 +100,9 @@ import Testing
         #expect(phrase.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
         #expect(phrase.allSatisfy { $0.verse.text.lowercased().contains("only begotten son") })
         #expect(phrase.first?.segments.filter(\.isMatch).map { $0.text.lowercased() } == ["only", "begotten", "son"])
+        // Слова фрази поза фразою не підсвічуються: у Буття 1:1 лише «In the beginning», а не друге «the».
+        let genesis = try #require(try repository.search(#""in the beginning""#, translation: .kjv).first)
+        #expect(genesis.segments.filter(\.isMatch).map(\.text) == ["In", "the", "beginning"])
         // Точна форма: «loved» у лапках не знаходить «love».
         let exact = try repository.search(#""loved""#, translation: .kjv, limit: 2_000)
         #expect(!exact.isEmpty)
