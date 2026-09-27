@@ -1,0 +1,19 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "tweak-reading-ui",
+  "change": "tweak-reading-ui",
+  "baseRef": "8865ff2",
+  "headRef": "feature/tweak-reading-ui",
+  "dimensions": {
+    "correctness": { "confirmed": 5, "contested": 0, "rejected": 0, "fixed": 3, "deferred": 2 }
+  },
+  "fixed": [
+    "M1: 132 pt right margin on every row cost ~23% of an 800 pt window — wide margin only on the row carrying the button (FR-17)",
+    "L2: copy button ignored the interface scale — font and width follow InterfaceScale (FR-16, FR-17)",
+    "L5: no test for the mixed state at a bound — verse at 32, book list grows alone (FR-15)"
+  ],
+  "deferred": "L3 (ratio drift near bounds, long book names at 30+ pt — documented in design.md); L4 (no gap marker between non-contiguous verses — numbers and the 16-17,19 reference show it)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T21:09:46Z"
+}
