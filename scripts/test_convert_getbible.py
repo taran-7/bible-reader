@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from convert_getbible import clean, convert  # noqa: E402
+from convert_getbible import clean, convert, from_bolls  # noqa: E402
 
 
 def book(nr, chapters):
@@ -46,6 +46,20 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(clean("і { сказав"), "і сказав")
         self.assertEqual(clean("яспіс. \\"), "яспіс.")
         self.assertEqual(clean("„ви боги\"?"), "„ви боги“?")
+
+    def test_bolls_flat_list(self):
+        # Плаский список віршів у довільному порядку → книги 1..66, розділи й вірші за номерами.
+        verses = [{"book": nr, "chapter": 1, "verse": 1, "text": "a"} for nr in range(66, 0, -1)]
+        verses += [{"book": 19, "chapter": 2, "verse": 2, "text": "Господи"},
+                   {"book": 19, "chapter": 2, "verse": 1, "text": "Псалом Давидів."}]
+        out = convert(from_bolls(verses))
+        self.assertEqual([b["abbrev"] for b in out], [str(n) for n in range(1, 67)])
+        self.assertEqual(out[18]["chapters"], [["a"], ["Псалом Давидів.", "Господи"]])
+
+    def test_ascii_quotes_become_ukrainian(self):
+        self.assertEqual(clean('"Я мандрував по землі."'), "„Я мандрував по землі.“")
+        self.assertEqual(clean('спів: „На смерть сина". Псалом'), "спів: „На смерть сина“. Псалом")
+        self.assertEqual(clean("відрочив їм <i>справу</i>, говорячи"), "відрочив їм справу, говорячи")
 
     def test_rejects_unexpected_characters(self):
         with self.assertRaises(SystemExit):

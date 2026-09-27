@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Конвертує переклад getBible v2 (api.getbible.net/v2/<код>.json) у формат data/raw.
+"""Конвертує переклад у формат data/raw з двох джерел:
+- getBible v2 (api.getbible.net/v2/<код>.json): {books: [{nr, chapters: [{chapter, verses}]}]};
+- bolls.life (bolls.life/static/translations/<код>.zip): плаский список {book, chapter, verse, text}.
 
-Книги сортуються за полем nr (в Огієнка масив не впорядкований). Вірш з номером n
+Книги сортуються за номером. Вірш з номером n
 стає на позицію n-1; відсутні вірші — порожні рядки (імпорт їх пропускає, номери
 наступних зберігаються). Прибирає знаки наголосу U+0301, теги <…> і одиночні
 фігурні дужки; у BKR альтернативні слова {слово} стають (слово).
+ASCII-лапки стають українськими „…“, курсив <i>…</i> — звичайним текстом.
 Використання:
-    python3 scripts/convert_getbible.py ukrogienko.json data/raw/uk_ohienko.json
-    python3 scripts/convert_getbible.py bkr.json data/raw/cs_bkr.json
+    python3 scripts/convert_getbible.py UBIO.json data/raw/uk_ohienko.json   # bolls.life
+    python3 scripts/convert_getbible.py bkr.json data/raw/cs_bkr.json        # getBible
 """
 import json
 import re
@@ -15,7 +18,8 @@ import sys
 
 # Контрольні вірші: (книга, розділ, вірш) → початок тексту після очищення.
 CHECKS = {
-    "ukrogienko": {(1, 1, 1): "На початку Бог створив", (43, 3, 16): "Так бо Бог полюбив світ"},
+    "UBIO": {(1, 1, 1): "На початку Бог створив", (43, 3, 16): "Так бо Бог полюбив світ",
+             (19, 3, 1): "Псалом Давидів"},
     "bkr": {(1, 1, 1): "Na počátku stvořil Bůh", (43, 3, 16): "Nebo tak Bůh miloval svět"},
 }
 
@@ -29,13 +33,29 @@ def clean(text):
     text = re.sub(r"<[^>]*>", "", text)
     text = re.sub(r"\{([^{}]*)\}", r"(\1)", text)
     text = text.replace("{", "").replace("}", "").replace("\\", "")
-    # В Огієнка лапки „…“; зрідка закривна — ASCII ".
+    # В Огієнка лапки „…“; у джерелах трапляються ASCII ": перед словом — відкривна, інакше закривна.
+    text = re.sub(r'(^|[\s(\[—–-])"', "\\1„", text)
     text = text.replace('"', "“")
     text = re.sub(r"\s+", " ", text).strip()
     odd = {c for c in text if not (c.isalpha() or c.isdigit() or c in ALLOWED_PUNCTUATION)}
     if odd:
         sys.exit(f"неочікувані символи {sorted(odd)} у «{text[:60]}»")
     return text
+
+
+def from_bolls(verses):
+    """Плаский список bolls.life → структура getBible (розділи й вірші за номерами)."""
+    books = {}
+    for v in verses:
+        books.setdefault(v["book"], {}).setdefault(v["chapter"], []).append(v)
+    return {
+        "abbreviation": verses[0].get("translation", "") if verses else "",
+        "books": [
+            {"nr": nr, "name": str(nr),
+             "chapters": [{"chapter": c, "verses": chapters[c]} for c in sorted(chapters)]}
+            for nr, chapters in books.items()
+        ],
+    }
 
 
 def convert(source):
@@ -69,6 +89,8 @@ def convert(source):
 
 def main(src, dst):
     source = json.load(open(src, encoding="utf-8"))
+    if isinstance(source, list):
+        source = from_bolls(source)
     books = convert(source)
     code = source.get("abbreviation", "")
     for (b, c, v), prefix in CHECKS.get(code, {}).items():
