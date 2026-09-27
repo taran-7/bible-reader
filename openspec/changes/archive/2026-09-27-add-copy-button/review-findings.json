@@ -1,0 +1,21 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-copy-button",
+  "change": "add-copy-button",
+  "baseRef": "a78f246",
+  "headRef": "feature/add-copy-button",
+  "dimensions": {
+    "correctness": { "confirmed": 7, "contested": 0, "rejected": 0, "fixed": 5, "deferred": 2 }
+  },
+  "fixed": [
+    "M1: 'Скопійовано' pill is wider than the 36 pt margin and covers the text edge — spec narrowed to the resting button (PRD 6.3 wording); design documents the 1.5 s overlap (FR-17)",
+    "M2: clicking the button inside a List row could collapse a multi-verse selection — selection captured at render; UI test copies John 3:16-18 (FR-17)",
+    "L3: reset compared ContinuousClock sleep with wall-clock Date and could stick; unstructured Task — .task(id:) with a @State flag (FR-17)",
+    "L4: .id(tick) hack removed with L3 (FR-17)",
+    "L6: initial 'no button' check ran before the list loaded — waits for verse-1 first (FR-17)"
+  ],
+  "deferred": "L5 (fresh button state on anchor change — documented in design.md); L7 (0.6 opacity contrast in dark mode — checked with themes, slice add-themes)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-27T16:09:27Z"
+}

@@ -17,7 +17,7 @@
     "FR-14": "MVP",
     "FR-15": "MVP",
     "FR-16": "MVP",
-    "FR-17": "Future",
+    "FR-17": "MVP",
     "FR-18": "Future",
     "FR-19": "Future",
     "FR-20": "Future",
@@ -102,7 +102,11 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/IdentityTests.swift",
+        "Tests/BibleCoreTests/IdentityTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/IdentityTests.swift",
+        "tests/BibleCoreTests/IdentityTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift"
       ],
       "recordings": []
@@ -320,8 +324,10 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/IdentityTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/IdentityTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
@@ -370,6 +376,24 @@
         "Tests/BibleReaderUITests/ReadingComfortUITests.swift",
         "tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "tests/BibleReaderUITests/ReadingComfortUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-17",
+      "specs": [
+        "openspec/specs/scripture-reference/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
     }
@@ -441,8 +465,8 @@
       "msg": "FR-16 is not referenced by any recording manifest under docs/qa/"
     },
     {
-      "check": "active-changes",
-      "msg": "active change \"add-copy-button\" is not archived"
+      "check": "recording-evidence",
+      "msg": "FR-17 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }

@@ -23,7 +23,8 @@ struct ChapterView: View {
                         .padding(.trailing, 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
-                                CopyButton { copy(selection) }
+                                // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
+                                CopyButton { [verses = selection] in copy(verses) }
                             }
                         }
                         .tag(verse.verse)
