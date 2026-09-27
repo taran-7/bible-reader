@@ -14,14 +14,14 @@ Result: PASS, 14 warning(s)
 | FR-4 | yes | yes | 2 | - |
 | FR-5 | yes | yes | 8 | - |
 | FR-6 | yes | yes | 18 | - |
-| FR-7 | yes | yes | 6 | - |
+| FR-7 | yes | yes | 14 | - |
 | FR-8 | yes | yes | 14 | - |
 | FR-9 | yes | yes | 10 | - |
-| FR-10 | yes | yes | 2 | - |
+| FR-10 | yes | yes | 6 | - |
 | FR-11 | yes | yes | 26 | - |
 | FR-12 | yes | yes | 10 | - |
-| FR-13 | yes | yes | 6 | - |
-| FR-14 | yes | yes | 2 | - |
+| FR-13 | yes | yes | 10 | - |
+| FR-14 | yes | yes | 4 | - |
 
 ## Failures
 

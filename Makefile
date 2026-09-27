@@ -7,7 +7,7 @@ TEST_FLAGS := -Xswiftc -F$(FW) -Xswiftc -Xfrontend -Xswiftc -disable-cross-impor
 	-Xlinker -rpath -Xlinker $(CLT)/Library/Developer/usr/lib
 endif
 
-.PHONY: test db check coverage
+.PHONY: test db check coverage ui-test
 
 test:
 	swift test $(TEST_FLAGS)
@@ -26,3 +26,8 @@ check: test
 coverage:
 	swift test --enable-code-coverage $(TEST_FLAGS)
 	node scripts/swift-coverage-summary.mjs
+
+# Збірка додатка і XCUITest (Tests/BibleReaderUITests). Локально потрібен Automation Mode
+# (перший запуск просить підтвердження; або `sudo automationmodetool enable-automationmode-without-authentication`).
+ui-test:
+	xcodebuild test -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader -destination 'platform=macOS'

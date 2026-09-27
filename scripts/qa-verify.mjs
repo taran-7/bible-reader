@@ -43,7 +43,12 @@ import { pathToFileURL } from "node:url";
 // over a red sandbox during validation. Run this from the project root.
 // PD-9 (bible-reader): battery members deferred to a named slice. Visible on
 // every run and in the report; they are not run and never count as PASS.
-const DEFERRED = [{ name: "eval-ratchet", reason: "LLM evals start with the add-illustrations slice (v1.4)" }];
+const DEFERRED = [
+  { name: "eval-ratchet", reason: "LLM evals start with the add-illustrations slice (v1.4)" },
+  ...(process.env.CI || process.env.QA_UI_TESTS === "1"
+    ? []
+    : [{ name: "app-ui-tests", reason: "XCUITest drives the real mouse/keyboard — run with QA_UI_TESTS=1 (always runs in CI)" }]),
+];
 const root = process.cwd();
 
 const commands = [
@@ -99,6 +104,11 @@ const commands = [
     command: "xcodebuild",
     args: ["-quiet", "-project", "BibleReaderApp/BibleReader.xcodeproj", "-scheme", "BibleReader", "build"],
   },
+  // PD-11: XCUITest (FR-7, FR-10, FR-13, FR-14) drives the real mouse, keyboard and
+  // clipboard, so locally it runs only with QA_UI_TESTS=1; CI always runs it.
+  ...(process.env.CI || process.env.QA_UI_TESTS === "1"
+    ? [{ name: "app-ui-tests", command: "make", args: ["ui-test"] }]
+    : []),
   {
     name: "openspec-all",
     command: "npx",
