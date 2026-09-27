@@ -65,7 +65,7 @@
     {
       "slice": "2026-09-28-add-user-notes",
       "reviewEvidence": "clean",
-      "trailerCommits": 3,
+      "trailerCommits": 4,
       "libDomains": [
         "BibleCore"
       ],

@@ -148,9 +148,9 @@ struct VerseRow: View {
         }
         .padding(.vertical, 2)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(verse.verse) \(verse.text)")
+        // Позначки — у кінці мітки: value рядка списку macOS не віддає ні VoiceOver, ні XCUI.
+        .accessibilityLabel(accessibilityMarks.isEmpty ? "\(verse.verse) \(verse.text)" : "\(verse.verse) \(verse.text); \(accessibilityMarks)")
         .accessibilityIdentifier("verse-\(verse.verse)")
-        .accessibilityValue(accessibilityMarks)
         .accessibilityAction(named: "Нотатка") { openNote() }
     }
 }

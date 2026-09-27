@@ -248,13 +248,13 @@ final class ReaderUITests: XCTestCase {
         app.menuItems["paste:"].click()
     }
 
-    /// Позначки вірша (підсвітка, закладка, нотатка) VoiceOver читає з value рядка.
+    /// Позначки вірша (підсвітка, закладка, нотатка) VoiceOver читає в кінці мітки рядка.
     private func expectMarks(_ verse: Int, contain text: String, file: StaticString = #filePath, line: UInt = #line) {
         let element = app.descendants(matching: .any)["verse-\(verse)"].firstMatch
         XCTAssertTrue(element.waitForExistence(timeout: 5), file: file, line: line)
-        let predicate = NSPredicate(format: "value CONTAINS %@", text)
+        let predicate = NSPredicate(format: "label CONTAINS %@", text)
         XCTAssertEqual(XCTWaiter.wait(for: [expectation(for: predicate, evaluatedWith: element)], timeout: 5), .completed,
-                       "вірш \(verse): «\(text)» у \(element.value ?? "")", file: file, line: line)
+                       "вірш \(verse): «\(text)» у «\(element.label)»", file: file, line: line)
     }
 
     // @trace FR-22
