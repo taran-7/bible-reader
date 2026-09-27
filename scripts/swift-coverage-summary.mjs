@@ -1,7 +1,8 @@
 // Swift adaptation for check-coverage-ratchet: converts the llvm-cov export
 // of `swift test --enable-code-coverage` into the Istanbul-style
 // coverage/coverage-summary.json that the ratchet reads.
-// Scope: Sources/ only (tests and .build are excluded).
+// Scope: Sources/ only (tests and .build are excluded); vendored third-party
+// code (Sources/CSnowball: generated Snowball C, see THIRD_PARTY.md) is excluded too.
 //
 // Wire as: "test:coverage": "make coverage"
 import { execFileSync } from "node:child_process";
@@ -9,7 +10,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const path = execFileSync("swift", ["test", "--show-codecov-path"], { encoding: "utf8" }).trim();
 const report = JSON.parse(readFileSync(path, "utf8"));
-const files = report.data.flatMap((d) => d.files).filter((f) => f.filename.includes("/Sources/"));
+const files = report.data.flatMap((d) => d.files).filter((f) => f.filename.includes("/Sources/") && !f.filename.includes("/Sources/CSnowball/"));
 if (files.length === 0) {
   console.error(`swift-coverage-summary: no Sources/ files in ${path}`);
   process.exit(1);

@@ -194,5 +194,48 @@ final class ReaderUITests: XCTestCase {
         expectTitle("Jan 3")
         expectSelected(16)
     }
-}
 
+    private func foundCount() -> Int? {
+        let label = app.staticTexts["search-count"]
+        guard label.waitForExistence(timeout: 5) else { return nil }
+        let text = (label.value as? String).flatMap { $0.isEmpty ? nil : $0 } ?? label.label
+        return Int(text.filter(\.isNumber))
+    }
+
+    private func waitForCount(_ predicate: @escaping (Int) -> Bool, file: StaticString = #filePath, line: UInt = #line) -> Int? {
+        let deadline = Date().addingTimeInterval(5)
+        var count = foundCount()
+        while count.map(predicate) != true, Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            count = foundCount()
+        }
+        XCTAssertTrue(count.map(predicate) == true, "Знайдено: \(count.map(String.init) ?? "—")", file: file, line: line)
+        return count
+    }
+
+    // @trace FR-18
+    // @trace FR-19
+    // @trace FR-20
+    // @trace FR-21
+    func testSearchScopeCountAndPhrase() {
+        launch()
+        search("loveth")
+        // Морфологія: «loveth» знаходить і «love», і «loved» — набагато більше 100 віршів.
+        guard let all = waitForCount({ $0 > 300 }) else { return }
+        XCTAssertTrue(app.buttons.matching(identifier: "search-result").firstMatch.waitForExistence(timeout: 5))
+        let scope = app.descendants(matching: .any)["search-scope"].firstMatch
+        XCTAssertTrue(scope.waitForExistence(timeout: 5))
+        scope.radioButtons["Новий Завіт"].click()
+        guard let newTestament = waitForCount({ $0 > 0 && $0 < all }) else { return }
+        scope.radioButtons["Старий Завіт"].click()
+        _ = waitForCount({ $0 == all - newTestament })
+        let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
+        attachment.name = "search-scope"
+        attachment.lifetime = .keepAlways
+        add(attachment)
+
+        scope.radioButtons["Уся Біблія"].click()
+        search("\"only begotten Son\"")
+        _ = waitForCount({ $0 > 0 && $0 < 10 })
+    }
+}

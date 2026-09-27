@@ -18,7 +18,7 @@ DB := BibleReaderApp/Resources/bible.sqlite
 # База перебудовується, коли змінилися тексти або код імпорту чи пошуку (схема).
 db: $(DB)
 
-$(DB): $(wildcard data/raw/*.json) $(wildcard Sources/BibleCore/*.swift) $(wildcard Sources/bible-import/*.swift)
+$(DB): $(wildcard data/raw/*.json) $(wildcard Sources/BibleCore/*.swift) $(wildcard Sources/bible-import/*.swift) $(wildcard Sources/CSnowball/*/*.c)
 	swift run bible-import data/raw $(DB)
 
 check: test

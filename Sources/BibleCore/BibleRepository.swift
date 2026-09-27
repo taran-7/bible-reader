@@ -16,7 +16,8 @@ public protocol BibleRepository: Sendable {
     func books(translation: Translation) throws -> [Book]
     func chapterCount(book: Int, translation: Translation) throws -> Int
     func verses(book: Int, chapter: Int, translation: Translation) throws -> [Verse]
-    func search(_ query: String, translation: Translation, limit: Int) throws -> [SearchResult]
+    /// Сторінка результатів у порядку книг і загальна кількість збігів в області.
+    func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage
 }
 
 public final class SQLiteBibleRepository: BibleRepository {

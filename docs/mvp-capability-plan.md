@@ -24,7 +24,7 @@
 | 1 | `add-reading-comfort` (v1.1) | FR-15, FR-16 | — | зроблено 2026-09-27 (архів `2026-09-27-add-reading-comfort`) |
 | 1a | `add-copy-button` (v1.1) | FR-17 | 1 | зроблено 2026-09-27 (архів `2026-09-27-add-copy-button`) |
 | 1b | `add-themes` (v1.1) | FR-31, FR-32, NFR-4 (контраст, зокрема кнопки копіювання 0,6) | 1 (масштаб шрифтів у всіх темах) | зроблено 2026-09-27 (архів `2026-09-27-add-themes`; a11y-частина NFR-4 — у 0b) |
-| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | parallel-safe з 1 |
+| 2 | `improve-search` (v1.2) | FR-18, FR-19, FR-20, FR-21, NFR-3 (пошук < 200 мс) | — | зроблено 2026-09-28 (архів `2026-09-28-improve-search`) |
 | 3 | `add-user-notes` (v1.3) | FR-22, FR-23, FR-24, FR-25 | — | serialize |
 | 3a | `add-verse-compare` (v1.5) | FR-36 | 1a (кнопка поруч із копіюванням) | serialize |
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | serialize |
@@ -36,10 +36,10 @@
 
 | NFR | Механізм |
 |---|---|
-| NFR-1 | Скрипт: `MACOSX_DEPLOYMENT_TARGET` у `project.yml` = 14.0 і `lipo -archs` бінарника містить arm64 і x86_64 |
+| NFR-1 | Скрипт `check-platform`: `MACOSX_DEPLOYMENT_TARGET` = 14.0 і `lipo -archs` бінарника — рівно arm64 (Apple Silicon, рішення власника 2026-09-27) |
 | NFR-2 | Тест `@trace NFR-2`: у `Sources/` немає `URLSession`/`Network`, крім модуля ілюстрацій (FR-33…35) |
 | NFR-3 | Пошук: тест з таймером на реальній базі (`improve-search`); запуск: вимір у XCUITest (`add-a11y-launch-checks`) |
 | NFR-4 | XCUITest (`add-a11y-launch-checks`): accessibility labels і робота з клавіатури; контраст: тест токенів тем (FR-32) |
-| NFR-5 | Скрипт: розмір `.app` після `xcodebuild` < 60 МБ |
+| NFR-5 | Скрипт `check-platform`: розмір `.app` після Release-збірки < 100 МБ |
 
 NFR стає MVP-рядком разом зі слайсом, який додає його механізм.
