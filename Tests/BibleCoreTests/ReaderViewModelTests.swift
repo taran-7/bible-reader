@@ -121,7 +121,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         let model = makeModel()
         model.translation = .synodal
         model.open(Location(book: 43, chapter: 3))
-        #expect(model.quote(for: [3, 2]) == "«synodal 43:3:2 synodal 43:3:3» (От Иоанна 3:2-3)")
+        #expect(model.quote(for: [3, 2]) == "«2 synodal 43:3:2\n3 synodal 43:3:3»\n(От Иоанна 3:2-3)")
         #expect(model.quote(for: []) == nil)
     }
 

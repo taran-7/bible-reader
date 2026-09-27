@@ -32,7 +32,7 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
     public static let defaultVerseFontSize = 15.0
     public static let defaultBookListFontSize = 13.0
     public static let verseFontRange = 11.0...32.0
-    public static let bookListFontRange = 11.0...24.0
+    public static let bookListFontRange = 11.0...32.0
 
     public var verseFontSize: Double {
         didSet { verseFontSize = verseFontSize.clamped(to: Self.verseFontRange) }
@@ -65,13 +65,31 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
             theme: (try? c.decodeIfPresent(ThemeChoice.self, forKey: .theme)) ?? .system)
     }
 
-    public var canIncreaseVerseFont: Bool { verseFontSize < Self.verseFontRange.upperBound }
-    public var canDecreaseVerseFont: Bool { verseFontSize > Self.verseFontRange.lowerBound }
-    public var isVerseFontDefault: Bool { verseFontSize == Self.defaultVerseFontSize }
+    // ⌘+ / ⌘− / ⌘0 змінюють текст віршів і список книг разом; кожен обрізається своїми межами.
+    public var canIncreaseFonts: Bool {
+        verseFontSize < Self.verseFontRange.upperBound || bookListFontSize < Self.bookListFontRange.upperBound
+    }
+    public var canDecreaseFonts: Bool {
+        verseFontSize > Self.verseFontRange.lowerBound || bookListFontSize > Self.bookListFontRange.lowerBound
+    }
+    public var areFontsDefault: Bool {
+        verseFontSize == Self.defaultVerseFontSize && bookListFontSize == Self.defaultBookListFontSize
+    }
 
-    public mutating func increaseVerseFont() { verseFontSize += 1 }
-    public mutating func decreaseVerseFont() { verseFontSize -= 1 }
-    public mutating func resetVerseFont() { verseFontSize = Self.defaultVerseFontSize }
+    public mutating func increaseFonts() {
+        verseFontSize += 1
+        bookListFontSize += 1
+    }
+
+    public mutating func decreaseFonts() {
+        verseFontSize -= 1
+        bookListFontSize -= 1
+    }
+
+    public mutating func resetFonts() {
+        verseFontSize = Self.defaultVerseFontSize
+        bookListFontSize = Self.defaultBookListFontSize
+    }
 }
 
 private extension Double {

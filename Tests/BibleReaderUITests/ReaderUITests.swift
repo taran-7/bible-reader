@@ -164,7 +164,11 @@ final class ReaderUITests: XCTestCase {
         NSPasteboard.general.clearContents()
         button.click()
         let range = pasteboardText()
-        XCTAssertTrue(range?.hasSuffix("(John 3:16-18)") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.hasSuffix("»\n(John 3:16-18)") == true, range ?? "буфер порожній")
+        // Номер перед кожним віршем, кожен з нового рядка.
+        XCTAssertTrue(range?.hasPrefix("«16 For God so loved") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.contains("\n17 For God sent not") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.contains("\n18 He that believeth") == true, range ?? "буфер порожній")
 
         search("Rom 1")
         expectTitle("Romans 1")
@@ -184,8 +188,8 @@ final class ReaderUITests: XCTestCase {
         XCTAssertTrue(firstVerse.waitForExistence(timeout: 5))
         wait(for: [expectation(for: NSPredicate(format: "value CONTAINS 'На початку Бог створив'"), evaluatedWith: firstVerse)], timeout: 5)
 
-        // ⌘⌥4 — Kralická; посилання чеською.
-        app.typeKey("4", modifierFlags: [.command, .option])
+        // ⌘⌥2 — Kralická (порядок: KJV, Kralická, Огієнко, Синодальний); посилання чеською.
+        app.typeKey("2", modifierFlags: [.command, .option])
         search("J 3:16")
         expectTitle("Jan 3")
         expectSelected(16)

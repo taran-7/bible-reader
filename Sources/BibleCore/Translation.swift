@@ -13,11 +13,12 @@ public enum Language: String, Sendable {
 }
 
 /// Переклад, який показується на екрані.
+/// Порядок `case` — порядок у меню і в ⌘⌥1…4 (рішення власника 2026-09-27).
 public enum Translation: String, CaseIterable, Sendable, Codable {
     case kjv
-    case synodal
-    case ohienko
     case bkr
+    case ohienko
+    case synodal
 
     public var title: String {
         switch self {

@@ -58,10 +58,15 @@ final class ReadingComfortUITests: XCTestCase {
     func testVerseFontScalesAndPersists() {
         launch(reset: true)
         let standard = verseHeight()
+        let book = app.staticTexts["Genesis"].firstMatch
+        XCTAssertTrue(book.waitForExistence(timeout: 5))
+        let bookStandard = book.frame.height
 
         let plus = physicalKey(kVK_ANSI_Equal, fallback: "=")
         for _ in 0..<5 { app.typeKey(plus, modifierFlags: .command) }
         waitForHeight({ $0 > standard + 3 }, "⌘+ збільшує рядок")
+        // Назви книг ростуть разом із текстом віршів.
+        XCTAssertGreaterThan(book.frame.height, bookStandard + 3, "⌘+ збільшує назву книги")
         let enlarged = firstVerse.frame.height
 
         app.terminate()

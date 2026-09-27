@@ -24,21 +24,21 @@ import Testing
     // @trace FR-9
     @Test func testRangeKjv() {
         let quote = Quote.format([verse(.kjv, 16, "a"), verse(.kjv, 17, "b"), verse(.kjv, 18, "c")])
-        #expect(quote?.hasSuffix("(John 3:16-18)") == true)
+        #expect(quote == "«16 a\n17 b\n18 c»\n(John 3:16-18)")
         let kings = Quote.format([Verse(translation: .kjv, book: 12, chapter: 4, verse: 16, text: "a")])
         #expect(kings == "«a» (2 Kings 4:16)")
     }
 
     // @trace FR-9
-    @Test func testJoinsTextsWithSpace() {
+    @Test func testEachVerseOnItsOwnNumberedLine() {
         let quote = Quote.format([verse(.kjv, 17, "b"), verse(.kjv, 16, "a")])
-        #expect(quote == "«a b» (John 3:16-17)")
+        #expect(quote == "«16 a\n17 b»\n(John 3:16-17)")
     }
 
     // @trace FR-9
     @Test func testNonContiguousSelection() {
         let quote = Quote.format([verse(.kjv, 16, "a"), verse(.kjv, 17, "b"), verse(.kjv, 19, "d")])
-        #expect(quote == "«a b d» (John 3:16-17,19)")
+        #expect(quote == "«16 a\n17 b\n19 d»\n(John 3:16-17,19)")
     }
 
     // @trace FR-9
