@@ -1,4 +1,5 @@
 import AppKit
+import QuartzCore
 import BibleCore
 import SwiftUI
 
@@ -73,6 +74,10 @@ struct ChapterView: View {
                 return [NSItemProvider(object: quote as NSString)]
             }
             .onChange(of: model.location) { _, _ in selection = [] }
+            .onAppear {
+                // Після коміту першого кадру з віршами (NFR-3).
+                CATransaction.setCompletionBlock { model.markFirstChapterShown() }
+            }
             .onChange(of: model.focusRequest, initial: true) { _, _ in
                 guard let verse = model.takeFocus() else { return }
                 selection = [verse]
