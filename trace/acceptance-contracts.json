@@ -135,8 +135,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-18": [
