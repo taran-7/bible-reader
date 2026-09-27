@@ -34,6 +34,7 @@ public enum BibleImporter {
                     try insert(books, translation: translation, into: db)
                 }
                 try db.execute(sql: "INSERT INTO verses_fts(verses_fts) VALUES('rebuild')")
+                try indexStems(db)
             }
             try queue.close()
             if fm.fileExists(atPath: output.path) {
@@ -88,7 +89,25 @@ public enum BibleImporter {
               content='verses_search',
               tokenize='unicode61 remove_diacritics 2'
             );
+            -- Основи слів для морфологічного пошуку (FR-18); rowid = verses.rowid.
+            CREATE VIRTUAL TABLE verses_stem_fts USING fts5(
+              stems,
+              content='',
+              tokenize='unicode61 remove_diacritics 2'
+            );
             """)
+    }
+
+    /// Заповнює `verses_stem_fts` основами слів кожного вірша стемером мови перекладу.
+    private static func indexStems(_ db: Database) throws {
+        let insert = try db.makeStatement(sql: "INSERT INTO verses_stem_fts(rowid, stems) VALUES (?, ?)")
+        for translation in Translation.allCases {
+            let stemmer = Stemmer(language: translation.language)
+            let rows = try Row.fetchCursor(db, sql: "SELECT rowid, text FROM verses WHERE translation = ?", arguments: [translation.rawValue])
+            while let row = try rows.next() {
+                try insert.execute(arguments: [row["rowid"] as Int64, stemmer.stemmed(row["text"])])
+            }
+        }
     }
 
     private static func insert(_ books: [SourceBook], translation: Translation, into db: Database) throws {

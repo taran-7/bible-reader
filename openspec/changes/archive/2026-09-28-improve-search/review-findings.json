@@ -1,0 +1,23 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "improve-search",
+  "change": "improve-search",
+  "baseRef": "9664487",
+  "headRef": "feature/improve-search",
+  "dimensions": {
+    "correctness": { "confirmed": 9, "contested": 0, "rejected": 0, "fixed": 7, "deferred": 2 }
+  },
+  "fixed": [
+    "M1: page load error replaced loaded results with the error screen — separate pageError row with Retry (FR-20)",
+    "M2: scope picker hidden on the search error screen — scope bar shown above errors too (FR-19)",
+    "M3: short page left the spinner forever — a page shorter than the limit ends the list (FR-20)",
+    "M4: phrase words highlighted outside the phrase — only consecutive runs are highlighted (FR-21)",
+    "L6: Ukrainian stemmer comment/code mismatch and duplicate ending",
+    "L8: 'nothing found' message now names the scope",
+    "L9: duplicate counter — window title shows the query, the bar shows 'Знайдено: N'"
+  ],
+  "deferred": "L5 (Czech stemmer runs on diacritic-free words by design so 'buh' finds 'Bůh' — documented in Stemmer.swift and design.md); L7 (a stem tokenized into several unicode61 tokens becomes a phrase — low confidence, escaping is correct)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T01:10:00Z"
+}

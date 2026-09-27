@@ -65,10 +65,10 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 | FR-15 | MVP | Reading | Масштаб шрифту віршів і списку книг, ⌘+ / ⌘− / ⌘0, зберігається між запусками (PRD 6.1). | local-verifiable |
 | FR-16 | MVP | Reading | Загальний масштаб інтерфейсу в Settings, поважає системний розмір тексту (PRD 6.2). | local-verifiable |
 | FR-17 | MVP | Reference | Напівпрозора кнопка копіювання над виділенням, напис «Скопійовано» ~1,5 с (PRD 6.3). | local-verifiable |
-| FR-18 | Future | Search | Морфологічний пошук (стемер en/ru) (PRD 6.4). | local-verifiable |
-| FR-19 | Future | Search | Фільтр області пошуку: Біблія / СЗ / НЗ / поточна книга (PRD 6.5). | local-verifiable |
-| FR-20 | Future | Search | Усі результати з лічильником «Знайдено: N» і довантаженням (PRD 6.6). | local-verifiable |
-| FR-21 | Future | Search | Пошук точної фрази в лапках (PRD 6.7). | local-verifiable |
+| FR-18 | MVP | Search | Морфологічний пошук: en/ru — Snowball, uk/cs — легкі стемери (PRD 6.4). | local-verifiable |
+| FR-19 | MVP | Search | Фільтр області пошуку: Біблія / СЗ / НЗ / поточна книга (PRD 6.5). | local-verifiable |
+| FR-20 | MVP | Search | Усі результати з лічильником «Знайдено: N» і довантаженням (PRD 6.6). | local-verifiable |
+| FR-21 | MVP | Search | Пошук точної фрази в лапках (PRD 6.7). | local-verifiable |
 | FR-22 | Future | Notes | Закладки на вірш чи розділ (PRD 6.8). | local-verifiable |
 | FR-23 | Future | Notes | Кольорова підсвітка віршів (PRD 6.9). | local-verifiable |
 | FR-24 | Future | Notes | Нотатки до віршів з пошуком (PRD 6.10). | local-verifiable |
@@ -95,7 +95,7 @@ NFR з PRD §3 і §7 поки не мають автоматичного мех
 |---|---|---|---|---|
 | NFR-1 | MVP | Platform | macOS 14+, лише Apple Silicon (`arm64`); Intel поза обсягом (рішення власника 2026-09-27, open source: хто потребує — збере сам). | local-verifiable |
 | NFR-2 | MVP | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35), лише домени з allowlist. | local-verifiable |
-| NFR-3 | Future | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії. | local-verifiable |
+| NFR-3 | Future | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії (пошук перевіряє тест `improve-search`; запуск — `add-a11y-launch-checks`). | local-verifiable |
 | NFR-4 | Future | A11y | VoiceOver читає номери й тексти віршів; повна робота з клавіатури; контраст WCAG AA. | local-verifiable |
 | NFR-5 | MVP | Size | Розмір Release `.app` < 100 МБ (попередження від 80 МБ); межу піднято з 60 МБ рішенням власника 2026-09-27. | local-verifiable |
 

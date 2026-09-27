@@ -8,7 +8,7 @@ import Testing
     @Test func testLatin() throws {
         let results = try repository.search("love", translation: .kjv)
         #expect(!results.isEmpty)
-        #expect(results.allSatisfy { $0.verse.text.lowercased().contains("love") && $0.verse.translation == .kjv })
+        #expect(results.allSatisfy { $0.verse.text.lowercased().contains("lov") && $0.verse.translation == .kjv })
         #expect(results.map(\.verse.book) == results.map(\.verse.book).sorted())
     }
 
@@ -16,7 +16,7 @@ import Testing
     @Test func testAllWordsRequired() throws {
         let results = try repository.search("God so loved", translation: .kjv)
         #expect(results.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
-        #expect(results.allSatisfy { $0.verse.text.contains("loved") })
+        #expect(results.allSatisfy { $0.verse.text.lowercased().contains("lov") })
     }
 
     // @trace FR-11
@@ -63,6 +63,94 @@ import Testing
     // @trace FR-11
     @Test func testLimit() throws {
         #expect(try repository.search("the", translation: .kjv, limit: 5).count == 5)
+    }
+
+    // @trace FR-18
+    @Test func testMorphologyRussianAndEnglish() throws {
+        let russian = try repository.search("любовь", translation: .synodal)
+        for form in ["любви", "любовью"] {
+            #expect(russian.contains { $0.verse.text.lowercased().contains(form) }, "\(form)")
+        }
+        let english = try repository.search("love", translation: .kjv, limit: 2_000)
+        for form in ["loved", "loveth", "loving"] {
+            #expect(english.contains { $0.verse.text.lowercased().contains(form) }, "\(form)")
+        }
+    }
+
+    // @trace FR-18
+    @Test func testMorphologyUkrainianAndCzech() throws {
+        let ukrainian = try repository.search("любов", translation: .ohienko, limit: 2_000)
+        #expect(ukrainian.contains { $0.verse.text.lowercased().contains("любові") })
+        let czech = try repository.search("láska", translation: .bkr, limit: 2_000)
+        #expect(czech.contains { $0.verse.text.lowercased().contains("lásky") })
+    }
+
+    // @trace FR-18
+    @Test func testMorphologyHighlightsEveryForm() throws {
+        let result = try #require(try repository.search("love", translation: .kjv, limit: 2_000)
+            .first { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
+        #expect(result.segments.filter(\.isMatch).map(\.text) == ["loved"])
+        // Сегменти складаються в повний текст вірша.
+        #expect(result.segments.map(\.text).joined() == result.verse.text)
+    }
+
+    // @trace FR-21
+    @Test func testQuotedPhraseIsExact() throws {
+        let phrase = try repository.search(#""only begotten Son""#, translation: .kjv)
+        #expect(phrase.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
+        #expect(phrase.allSatisfy { $0.verse.text.lowercased().contains("only begotten son") })
+        #expect(phrase.first?.segments.filter(\.isMatch).map { $0.text.lowercased() } == ["only", "begotten", "son"])
+        // Слова фрази поза фразою не підсвічуються: у Буття 1:1 лише «In the beginning», а не друге «the».
+        let genesis = try #require(try repository.search(#""in the beginning""#, translation: .kjv).first)
+        #expect(genesis.segments.filter(\.isMatch).map(\.text) == ["In", "the", "beginning"])
+        // Точна форма: «loved» у лапках не знаходить «love».
+        let exact = try repository.search(#""loved""#, translation: .kjv, limit: 2_000)
+        #expect(!exact.isEmpty)
+        #expect(exact.allSatisfy { SearchText.fold($0.verse.text).lowercased().contains("loved") })
+        #expect(try repository.search("«так возлюбил Бог мир»", translation: .synodal).count == 1)
+    }
+
+    // @trace FR-19
+    @Test func testScope() throws {
+        let all = try repository.searchPage("love", translation: .kjv, scope: .bible, offset: 0, limit: 10)
+        let old = try repository.searchPage("love", translation: .kjv, scope: .oldTestament, offset: 0, limit: 10)
+        let new = try repository.searchPage("love", translation: .kjv, scope: .newTestament, offset: 0, limit: 10)
+        let john = try repository.searchPage("love", translation: .kjv, scope: .book(43), offset: 0, limit: 1_000)
+        #expect(old.total > 0 && new.total > 0)
+        #expect(old.total + new.total == all.total)
+        #expect(old.results.allSatisfy { $0.verse.book <= 39 })
+        #expect(new.results.allSatisfy { $0.verse.book >= 40 })
+        #expect(john.total == john.results.count && john.results.allSatisfy { $0.verse.book == 43 })
+    }
+
+    // @trace FR-20
+    @Test func testPagingCoversAllResults() throws {
+        let first = try repository.searchPage("the", translation: .kjv, scope: .bible, offset: 0, limit: 100)
+        #expect(first.total > 20_000)
+        #expect(first.results.count == 100)
+        let second = try repository.searchPage("the", translation: .kjv, scope: .bible, offset: 100, limit: 100)
+        #expect(second.total == first.total)
+        #expect(Set(first.results.map(\.id)).isDisjoint(with: second.results.map(\.id)))
+        let firstIDs = first.results.map(\.id), secondIDs = second.results.map(\.id)
+        #expect(firstIDs.last.map { last in secondIDs.first.map { SearchTests.order($0) > SearchTests.order(last) } ?? false } == true)
+        let tail = try repository.searchPage("the", translation: .kjv, scope: .bible, offset: first.total - 3, limit: 100)
+        #expect(tail.results.count == 3)
+    }
+
+    static func order(_ id: VerseID) -> Int { id.book * 1_000_000 + id.chapter * 1_000 + id.verse }
+
+    // @trace NFR-3
+    @Test func testSearchIsFastOnWholeBible() throws {
+        // Найчастіші слова кожної мови: найгірший випадок для підрахунку й першої сторінки.
+        for (query, translation) in [("the", Translation.kjv), ("и", .synodal), ("і", .ohienko), ("a", .bkr), (#""and the""#, .kjv)] {
+            _ = try repository.searchPage(query, translation: translation, scope: .bible, offset: 0, limit: 100)
+            let clock = ContinuousClock()
+            let times = try (0..<3).map { _ in
+                try clock.measure { _ = try repository.searchPage(query, translation: translation, scope: .bible, offset: 0, limit: 100) }
+            }
+            let best = try #require(times.min())
+            #expect(best < .milliseconds(200), "\(query): \(best)")
+        }
     }
 
     // @trace FR-28
