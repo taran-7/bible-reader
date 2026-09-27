@@ -134,4 +134,29 @@ final class ReaderUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["database-error"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.searchFields.firstMatch.exists)
     }
+
+    // @trace FR-17
+    func testCopyButtonCopiesQuote() {
+        launch()
+        let button = app.buttons.matching(identifier: "copy-button").firstMatch
+        XCTAssertFalse(button.exists, "без виділення кнопки немає")
+
+        search("John 3:16")
+        expectSelected(16)
+        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        NSPasteboard.general.clearContents()
+        button.click()
+        let text = pasteboardText()
+        XCTAssertTrue(text?.hasPrefix("«For God so loved the world") == true, text ?? "буфер порожній")
+        XCTAssertTrue(text?.hasSuffix("(John 3:16)") == true, text ?? "буфер порожній")
+
+        let copied = NSPredicate(format: "label == 'Скопійовано'")
+        wait(for: [expectation(for: copied, evaluatedWith: button)], timeout: 2)
+        let restored = NSPredicate(format: "label == 'Копіювати цитату'")
+        wait(for: [expectation(for: restored, evaluatedWith: button)], timeout: 4)
+
+        search("Rom 1")
+        expectTitle("Romans 1")
+        XCTAssertFalse(button.waitForExistence(timeout: 1), "новий розділ без виділення — кнопки немає")
+    }
 }
