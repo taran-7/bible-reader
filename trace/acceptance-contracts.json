@@ -287,8 +287,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/CompareTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-1": [

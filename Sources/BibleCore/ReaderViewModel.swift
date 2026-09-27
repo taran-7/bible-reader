@@ -54,6 +54,28 @@ public final class ReaderViewModel {
     public private(set) var searchError: String?
 
     private let repository: BibleRepository?
+    public struct Unavailable: Error, CustomStringConvertible {
+        public var description: String { "база Біблії недоступна" }
+    }
+
+    /// Панелі вікна «Порівняти» (FR-36) з тієї самої бази.
+    public func compare(_ request: CompareRequest, panels: ComparePanels) throws -> [ComparePanel] {
+        guard let repository else { throw Unavailable() }
+        return try VerseComparison.load(from: repository, book: request.book, chapter: request.chapter,
+                                        verses: Set(request.verses), panels: panels)
+    }
+
+    /// Відкриває місце в іншому перекладі одним перезавантаженням.
+    public func open(_ target: Location, in translation: Translation, focus verse: Int?) {
+        if translation != self.translation {
+            location = target
+            self.translation = translation  // didSet: reload, savePosition, повтор пошуку
+            focusedVerse = verse
+            if verse != nil { focusRequest += 1 }
+        } else {
+            open(target, focus: verse)
+        }
+    }
     @ObservationIgnored private let positionStore: KeyValueStore?
 
     /// Останнє місце читання (FR-25): переклад, книга, розділ.

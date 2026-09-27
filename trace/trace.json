@@ -36,7 +36,7 @@
     "FR-33": "Future",
     "FR-34": "Future",
     "FR-35": "Future",
-    "FR-36": "Future",
+    "FR-36": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "MVP",
@@ -659,6 +659,38 @@
         "tests/BibleCoreTests/ThemeTests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-36",
+      "specs": [
+        "openspec/specs/verse-compare/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleReaderUITests/CompareUITests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleReaderUITests/CompareUITests.swift"
+      ],
+      "recordings": []
     }
   ],
   "failures": [],
@@ -778,6 +810,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-36 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }
