@@ -38,6 +38,9 @@ public struct IllustrationNetwork: IllustrationHTTP {
         URL(string: story.source)
     }
 
+    /// Сторінка, де користувач бере безкоштовний ключ Brave Search API (посилання в Settings).
+    public static let braveKeyPage = URL(string: "https://brave.com/search/api/")!
+
     static let offlineCodes: Set<URLError.Code> = [
         .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff,
         .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .timedOut,

@@ -73,5 +73,6 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     @Test func testLinkForStory() {
         let story = Illustration(title: "T", text: "B", source: "https://www.imb.org/x", siteName: "IMB")
         #expect(IllustrationNetwork.link(for: story)?.host == "www.imb.org")
+        #expect(IllustrationNetwork.braveKeyPage.host == "brave.com")
     }
 }

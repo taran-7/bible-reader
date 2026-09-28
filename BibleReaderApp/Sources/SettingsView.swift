@@ -25,6 +25,18 @@ struct SettingsView: View {
                     .accessibilityIdentifier("brave-key")
                     .onSubmit { BraveKey.save(braveKey) }
                     .onChange(of: braveKey) { _, key in BraveKey.save(key) }
+                HStack {
+                    // Правильність ключа видно лише під час пошуку: тут — лише що він збережений.
+                    if braveKey.trimmingCharacters(in: .whitespaces).isEmpty {
+                        Label("Ключа немає", systemImage: "key").foregroundStyle(.secondary)
+                    } else {
+                        Label("Ключ збережено", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                    }
+                    Spacer()
+                    Link("Отримати ключ", destination: IllustrationNetwork.braveKeyPage)
+                        .accessibilityIdentifier("brave-key-link")
+                }
+                .accessibilityIdentifier("brave-key-status")
             } header: {
                 Text("Ілюстрації")
             } footer: {
