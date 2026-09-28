@@ -43,7 +43,7 @@ Result: PASS, 37 warning(s)
 | FR-33 | yes | yes | 42 | - |
 | FR-34 | yes | yes | 12 | - |
 | FR-35 | yes | yes | 4 | - |
-| FR-36 | yes | yes | 14 | - |
+| FR-36 | yes | yes | 16 | - |
 | FR-37 | yes | yes | 18 | - |
 
 ## Failures
