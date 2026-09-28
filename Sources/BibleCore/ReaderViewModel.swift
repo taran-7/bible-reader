@@ -328,7 +328,8 @@ public final class ReaderViewModel {
             texts += kjv.filter { wanted.contains($0.verse) }.map(\.text)
         }
         guard !texts.isEmpty else { return nil }
-        guard let book = Book(number: location.book)?.name(in: translation) else { return nil }
+        // `location` завжди в межах канону (його обрізають `open` і `reload`).
+        let book = Book.all[location.book - 1].name(in: translation)
         let reference = "\(book) \(location.chapter):\(Quote.verseList(chosen.map(\.verse)))"
         return IllustrationRequest(reference: reference, kjvText: texts)
     }

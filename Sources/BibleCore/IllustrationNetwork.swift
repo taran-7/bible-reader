@@ -24,10 +24,8 @@ public struct IllustrationNetwork: IllustrationHTTP {
         for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
         do {
             let (data, response) = try await session.data(for: request)
-            guard let http = response as? HTTPURLResponse else { throw IllustrationError.failed("\(host): не HTTP-відповідь") }
-            return (http.statusCode, data)
-        } catch let error as IllustrationError {
-            throw error
+            // Запит https — відповідь завжди HTTP.
+            return ((response as! HTTPURLResponse).statusCode, data)
         } catch let error as URLError where Self.offlineCodes.contains(error.code) {
             throw IllustrationError.offline
         } catch {

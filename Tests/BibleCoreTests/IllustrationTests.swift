@@ -284,3 +284,49 @@ extension IllustrationTests {
         #expect(try await brave.page("x", page: 1, http: http).stories.isEmpty)
     }
 }
+
+extension IllustrationTests {
+    // @trace FR-33
+    @Test func testKeywordsRankRepeatedWordsFirst() {
+        #expect(IllustrationQuery.keywords(from: ["faith upon grace", "grace and faith, grace"]) == ["grace", "faith"])
+    }
+
+    // @trace FR-33
+    @Test func testRelevantStoriesComeFirst() async throws {
+        let http = F.http(stories: 3)
+        http.responses["www.example.org/wp-json/wp/v2/posts/2"] = (200, F.wpPost(2, text: "Bless those who curse you."))
+        http.responses["www.example.org/wp-json/wp/v2/posts/3"] = (200,
+            #"{"title":{"rendered":"Love your enemies"},"content":{"rendered":"<p>They chose to love their enemies.</p>"},"link":"https://www.example.org/story-3/"}"#)
+        let search = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
+        // Ключові слова в заголовку важать удвічі; без збігів — в кінці, у порядку сайту.
+        #expect(try await search.next().map(\.title) == ["Love your enemies", "Story 2 – forgiveness", "Story 1 – forgiveness"])
+    }
+
+    // @trace FR-33
+    @Test func testWordPressSkipsBrokenHitsAndPosts() async throws {
+        let http = FakeIllustrationHTTP()
+        http.responses["www.example.org/wp-json/wp/v2/search#1"] = (200, #"""
+        [{"title":"No links","url":"https://www.example.org/a","subtype":"post"},
+         {"title":"Page","url":"https://www.example.org/p","subtype":"page","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/pages/1"}]}},
+         {"title":"Gone","url":"https://www.example.org/g","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/8"}]}},
+         {"title":"Empty","url":"https://www.example.org/e","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/9"}]}}]
+        """#)
+        http.responses["www.example.org/wp-json/wp/v2/posts/8"] = (404, "")
+        http.responses["www.example.org/wp-json/wp/v2/posts/9"] = (200, #"{"title":{"rendered":"E"},"content":{"rendered":"<p> </p>"},"link":"https://www.example.org/e"}"#)
+        let adapter = WordPressAdapter(site: F.sources.wordpress[0])
+        let page = try await adapter.page("x", page: 1, http: http)
+        #expect(page.stories.isEmpty && !page.hasMore)
+        http.responses["www.example.org/wp-json/wp/v2/search#2"] = (400, "")
+        #expect(try await adapter.page("x", page: 2, http: http).stories.isEmpty)
+    }
+}
+
+@MainActor extension IllustrationRequestTests {
+    // @trace FR-33
+    @Test func testNoKJVTextGivesNoRequest() {
+        let repository = FakeRepository()
+        let model = ReaderViewModel { repository }
+        repository.failNextVerses = true
+        #expect(model.illustrationRequest(for: [1]) == nil)
+    }
+}
