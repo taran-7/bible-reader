@@ -83,15 +83,6 @@ public struct IllustrationSources: Decodable, Sendable {
         }
     }
 
-    /// Хост адреси `scheme://host/...` у нижньому регістрі без `www.`; `nil` — не абсолютна адреса.
-    static func host(of address: String) -> String? {
-        guard let scheme = address.range(of: "://") else { return nil }
-        let rest = address[scheme.upperBound...]
-        let host = rest.prefix { $0 != "/" && $0 != "?" && $0 != "#" && $0 != ":" }
-        guard !host.isEmpty else { return nil }
-        return bare(String(host))
-    }
-
     /// Хост без `www.` у нижньому регістрі.
     static func bare(_ host: String) -> String {
         let lower = host.lowercased()
@@ -105,7 +96,7 @@ public struct IllustrationSources: Decodable, Sendable {
     /// FR-34: історія береться лише з домену allowlist; blocklist перевіряється першим і перемагає.
     public func isAllowed(_ address: String) -> Bool {
         // Лише захищені адреси (схема https).
-        guard let host = Self.host(of: address), address.split(separator: ":").first?.lowercased() == "https" else { return false }
+        guard let (scheme, host) = Self.parse(address), scheme == "https" else { return false }
         if block.contains(where: { Self.matches(host, $0) }) { return false }
         return allow.contains { Self.matches(host, $0) }
     }
@@ -359,6 +350,8 @@ public struct BraveAdapter: IllustrationProvider {
     public let key: String
     public let sites: [String]
     static let pageSize = 20
+    /// Скільки `site:` в одному запиті: ліміт Brave — 400 знаків і 50 слів разом із ключовими словами.
+    public static let sitesPerQuery = 5
     /// Brave віддає до 10 сторінок (offset 0…9).
     static let maxPages = 10
 
@@ -483,7 +476,13 @@ public actor IllustrationSearch {
         providers.append(WikipediaAdapter())
         // Вікіпедію Brave не шукає: її статті мають пройти фільтр категорій `WikipediaAdapter`.
         let braveSites = sources.allow.filter { $0 != WikipediaAdapter.host }
-        if let braveKey, !braveKey.isEmpty { providers.append(BraveAdapter(key: braveKey, sites: braveSites)) }
+        // Brave обмежує запит 400 знаками й 50 словами: allowlist ділимо на групи по `sitesPerQuery` `site:`.
+        if let braveKey, !braveKey.isEmpty {
+            for start in stride(from: 0, to: braveSites.count, by: BraveAdapter.sitesPerQuery) {
+                let group = Array(braveSites[start..<min(start + BraveAdapter.sitesPerQuery, braveSites.count)])
+                providers.append(BraveAdapter(key: braveKey, sites: group))
+            }
+        }
         return providers
     }
 
@@ -505,6 +504,8 @@ public actor IllustrationSearch {
     /// Помилка одного джерела не зупиняє інші; кидається, лише якщо нічого не знайшлося. Без мережі — одразу.
     public func next() async throws -> [Illustration] {
         lastError = nil
+        // Явний повтор («Повторити» чи «Отримати ще») знову питає джерела, що впали минулого разу.
+        failed.removeAll()
         while pending.count < Self.batchSize, try await fetchPage() {}
         if pending.isEmpty, let lastError { throw lastError }
         let batch = Array(pending.prefix(Self.batchSize))

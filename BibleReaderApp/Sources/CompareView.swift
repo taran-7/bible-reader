@@ -26,9 +26,12 @@ struct CompareView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                 }
-                .onAppear {
+                // І при першому показі, і коли «Переклади…» замінили порівняння.
+                .onChange(of: comparison.translations, initial: true) {
                     guard let first = comparison.highlighted.min() else { return }
-                    DispatchQueue.main.async { proxy.scrollTo(first, anchor: .top) }
+                    // Вірш перед виділеним теж у кадрі: видно, звідки починається думка.
+                    let target = comparison.rows.last { $0.id < first }?.id ?? first
+                    DispatchQueue.main.async { proxy.scrollTo(target, anchor: .top) }
                 }
             }
         }
@@ -123,6 +126,8 @@ struct CompareSetup: View {
                     get: { chosen.contains(translation) },
                     set: { _ in preferences.preferences.comparePanels.toggle(translation) }))
                     .toggleStyle(.checkbox)
+                    // Останній вибраний не зняти: порівнювати не буде з чим.
+                    .disabled(chosen == [translation])
                     .accessibilityIdentifier("compare-choice-\(translation.rawValue)")
             }
             HStack {

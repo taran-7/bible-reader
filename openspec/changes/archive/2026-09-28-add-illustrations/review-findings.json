@@ -1,0 +1,47 @@
+{
+  "generatedBy": "review-gate (manual dispatch: security, correctness, spec-compliance)",
+  "scope": "add-illustrations",
+  "change": "add-illustrations",
+  "baseRef": "62f2886",
+  "headRef": "252e6d4",
+  "dimensions": {
+    "security": {
+      "confirmed": 4,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 4,
+      "deferred": 0
+    },
+    "correctness": {
+      "confirmed": 11,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 8,
+      "deferred": 3
+    },
+    "spec-compliance": {
+      "confirmed": 4,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 2,
+      "deferred": 2
+    }
+  },
+  "fixed": [
+    "S1 major: allowlist bypass via userinfo (https://trusted.org:x@evil.example) — parse with URLComponents, reject user/password and backslash; link(for:) rechecks the allowlist",
+    "S2: privacy note in Settings — only up to three English keywords leave the device, after a click",
+    "S3/M4: Brave key saved on Return / close instead of every keystroke, SecItemUpdate then SecItemAdd with kSecAttrAccessibleWhenUnlockedThisDeviceOnly, status read from Keychain, save error shown",
+    "S4/L8: force cast of HTTPURLResponse removed",
+    "M1: retry and 'Отримати ще' ask previously failed sources again",
+    "M3: Brave query over the 400-char / 50-word limit — allowlist split into groups of 5 site: operators",
+    "M5: panel closes when the chapter or translation changes",
+    "L6: resize cursor popped when the panel closes under the pointer",
+    "L7: stored split fraction clamped on read",
+    "L9: URLSessionConfiguration copied, headers merged",
+    "L10: scheme and host parsed once"
+  ],
+  "deferred": "M2 (per-source warnings) → tech debt #27; spec-compliance UI tests for the panel → #28; L11 ranking within a batch is by design; tasks.md wording kept as historical record of the slice",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T16:30:00Z"
+}

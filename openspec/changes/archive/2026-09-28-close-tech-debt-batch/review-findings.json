@@ -1,0 +1,30 @@
+{
+  "generatedBy": "review-gate (manual dispatch: correctness, spec-compliance)",
+  "scope": "close-tech-debt-batch",
+  "change": "close-tech-debt-batch",
+  "baseRef": "ddf21cf",
+  "headRef": "67e4c00",
+  "dimensions": {
+    "correctness": {
+      "confirmed": 5,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 1,
+      "deferred": 4
+    },
+    "spec-compliance": {
+      "confirmed": 4,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 0,
+      "deferred": 4
+    }
+  },
+  "fixed": [
+    "⌘⌥1…9 monitor ignored Caps Lock (compares only command/option/control/shift)"
+  ],
+  "deferred": "monitor in Settings/sheets, SearchFieldStyler re-apply, custom numbering orphans, ImportCommand stdout → tech debt #31; weaker-than-spec test assertions noted",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T16:30:00Z"
+}
