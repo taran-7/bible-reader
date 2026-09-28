@@ -55,7 +55,7 @@ final class DraftsUITests: XCTestCase {
         search("John 3:16")
         guard let button = app.visibleButton("draft-button") else { return XCTFail("кнопки «В чорнетку» не видно") }
         button.click()
-        let text = element("draft-text")
+        let text = app.textViews["draft-text"].firstMatch
         let predicate = NSPredicate(format: "value CONTAINS %@", "(John 3:16)")
         wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: text)], timeout: 5)
         XCTAssertTrue(element("draft-references").exists, "живе посилання під текстом")
@@ -66,7 +66,7 @@ final class DraftsUITests: XCTestCase {
         XCTAssertTrue(element("sermon-mode").waitForExistence(timeout: 5))
         app.windows.firstMatch.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(element("sermon-mode").waitForNonExistence(timeout: 5))
-        XCTAssertTrue(element("draft-text").exists, "після Esc — знову панель із чорнеткою")
+        XCTAssertTrue(app.textViews["draft-text"].exists, "після Esc — знову панель із чорнеткою")
 
         app.terminate()
         launch()

@@ -147,8 +147,8 @@ struct DraftEditor: View {
                 }
             } else {
                 formatting
+                // Ідентифікатор `draft-text` — на самому NSTextView: на обгортці-прокрутці XCUI не бачив тексту (CI).
                 MarkdownEditor(text: $text, controller: editor, fontSize: scale.systemFontSize * 1.1, theme: theme)
-                    .accessibilityIdentifier("draft-text")
                 references
             }
         }
