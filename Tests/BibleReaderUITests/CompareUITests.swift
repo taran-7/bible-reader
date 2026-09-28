@@ -36,8 +36,10 @@ final class CompareUITests: XCTestCase {
 
     private func openCompare(_ reference: String) -> XCUIElement {
         search(reference)
-        let button = app.buttons.matching(identifier: "compare-button").firstMatch
-        XCTAssertTrue(button.waitForExistence(timeout: 5))
+        guard let button = app.visibleButton("compare-button") else {
+            XCTFail("кнопки «Порівняти» не видно")
+            return app.windows.firstMatch
+        }
         button.click()
         let window = app.windows.matching(NSPredicate(format: "title BEGINSWITH 'Порівняти'")).firstMatch
         XCTAssertTrue(window.waitForExistence(timeout: 5))
