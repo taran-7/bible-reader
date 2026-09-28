@@ -51,7 +51,7 @@ final class AccessibilityUITests: XCTestCase {
         let deadline = Date().addingTimeInterval(5)
         while Date() < deadline {
             let text = (report.value as? String).flatMap { $0.isEmpty ? nil : $0 } ?? report.label
-            if let milliseconds = Int(text) { return milliseconds }
+            if let milliseconds = Int(text.filter(\.isNumber)) { return milliseconds }
             RunLoop.current.run(until: Date().addingTimeInterval(0.2))
         }
         XCTFail("launch-time без числа: value «\(report.value ?? "")», label «\(report.label)»")

@@ -63,7 +63,7 @@ final class ParallelUITests: XCTestCase {
         // Рядок Пс 22:1 читається разом із паралельною колонкою: надпис і Пс 21:2.
         let verse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(verse.waitForExistence(timeout: 5))
-        let found = XCTWaiter.wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'Синодальний: 1 '"), evaluatedWith: verse)],
+        let found = XCTWaiter.wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'Синодальний: 21:1 '"), evaluatedWith: verse)],
                                    timeout: 5)
         let attachment = XCTAttachment(screenshot: app.windows.firstMatch.screenshot())
         attachment.name = "parallel-psalm-22"
@@ -74,7 +74,7 @@ final class ParallelUITests: XCTestCase {
         tree.lifetime = .keepAlways
         add(tree)
         XCTAssertEqual(found, .completed, "мітка вірша 1: «\(verse.label)»")
-        XCTAssertTrue(verse.label.contains("2 Боже мой! Боже мой!"), verse.label)
+        XCTAssertTrue(verse.label.contains("21:2 Боже мой! Боже мой!"), verse.label)
 
         // Перемикання на Синодальний: відкривається Пс 21, виділено вірш 2 (той самий зміст).
         app.menuBars.menuBarItems["Переклад"].click()

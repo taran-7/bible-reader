@@ -14,7 +14,7 @@ struct ContentView: View {
             .overlay(alignment: .bottomLeading) {
                 // Лише Debug; VoiceOver у Debug прочитає це число — свідомо, Release його не має.
                 if let launchMilliseconds = model.launchMilliseconds {
-                    Text("\(launchMilliseconds)")
+                    Text(verbatim: String(launchMilliseconds))
                         .font(.system(size: 1))
                         .opacity(0.01)
                         .accessibilityIdentifier("launch-time")
