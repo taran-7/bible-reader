@@ -15,10 +15,9 @@ struct ReaderToolbar: ToolbarContent {
             set: { preferences.preferences.parallelTranslation = $0 })
     }
 
-    private var chapter: Binding<Int> {
-        Binding(
-            get: { model.location.chapter },
-            set: { model.open(Location(book: model.location.book, chapter: $0)) })
+    private var chapterTitle: String {
+        let name = Book(number: model.location.book)?.name(in: model.translation) ?? ""
+        return "\(name) \(model.location.chapter)"
     }
 
     var body: some ToolbarContent {
@@ -31,13 +30,23 @@ struct ReaderToolbar: ToolbarContent {
                 .disabled(!model.canGoNext)
                 .keyboardShortcut("]", modifiers: .command)
                 .controlSize(scale.controlSize)
-        }
-        ToolbarItem(placement: .principal) {
-            Picker("Розділ", selection: chapter) {
-                ForEach(Array(1...max(model.chapterCount, 1)), id: \.self) { Text("Розділ \($0)").tag($0) }
+            // Назва розділу — кнопка: розділи відкритої книги донизу (FR-37).
+            Button { model.pickCurrentBook() } label: {
+                HStack(spacing: 4) {
+                    Text(verbatim: chapterTitle).font(.headline)
+                    Image(systemName: "chevron.down").imageScale(.small)
+                }
             }
+            .help("Обрати розділ")
+            .accessibilityLabel("Розділ: \(chapterTitle)")
+            .accessibilityIdentifier("chapter-title")
             .controlSize(scale.controlSize)
-            .fixedSize()
+            .popover(isPresented: model.chapterPickerBinding(book: model.location.book, origin: .title),
+                     arrowEdge: .bottom) {
+                if let picker = model.chapterPicker {
+                    ChapterPickerView(model: model, picker: picker)
+                }
+            }
         }
         ToolbarItem {
             let chapter = model.canonicalChapter

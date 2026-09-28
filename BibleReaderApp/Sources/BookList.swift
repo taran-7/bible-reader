@@ -7,13 +7,16 @@ struct BookList: View {
     @Environment(\.theme) private var theme
     @Environment(UserData.self) private var userData
 
+    /// Підсвічено книгу з відкритим вікном розділів, інакше — поточну.
+    private var highlighted: Int { model.chapterPicker?.book ?? model.location.book }
+
+    /// Вибір у `List` — це книга з відкритим вікном розділів; без вікна нічого не вибрано,
+    /// тож і клік по поточній книзі, і стрілки ↑ ↓ відкривають вікно (FR-37, NFR-4).
     private var selection: Binding<Int?> {
         Binding(
-            get: { model.location.book },
+            get: { model.chapterPicker?.book },
             set: { book in
-                if let book, book != model.location.book {
-                    model.open(Location(book: book, chapter: 1))
-                }
+                if let book { model.pickBook(book) } else { model.dismissChapterPicker() }
             })
     }
 
@@ -50,14 +53,24 @@ struct BookList: View {
     private func section(_ title: String, _ testament: Testament) -> some View {
         Section {
             ForEach(model.books.filter { $0.testament == testament }) { book in
+                // Клік показує розділи книги поверх тексту (FR-37), а не відкриває одразу перший.
                 Text(book.name(in: model.translation))
                     .font(.system(size: fontSize))
                     .foregroundStyle(Color(theme.text))
+                    .accessibilityIdentifier("book-\(book.number)")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    // Вікно розділів прикріплене збоку до цієї книги.
+                    .popover(isPresented: model.chapterPickerBinding(book: book.number, origin: .sidebar),
+                             arrowEdge: .trailing) {
+                        if let picker = model.chapterPicker {
+                            ChapterPickerView(model: model, picker: picker)
+                        }
+                    }
+                    .tag(book.number)
                     .listRowBackground(
-                        book.number == model.location.book
+                        book.number == highlighted
                             ? RoundedRectangle(cornerRadius: 6).fill(Color(theme.sidebarSelection)).padding(.horizontal, 8)
                             : nil)
-                    .tag(book.number)
             }
         } header: {
             Text(title).foregroundStyle(Color(theme.secondaryText))

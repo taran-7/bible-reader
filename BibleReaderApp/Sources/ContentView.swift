@@ -42,6 +42,7 @@ struct ContentView: View {
                 .font(.system(size: scale.systemFontSize))
                 .toolbar { ReaderToolbar(model: model, userData: userData, preferences: preferences, scale: scale) }
                 .modifier(ToolbarTheme())
+                .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
             // Паралельний переклад з налаштувань; той самий, що основний, — вимкнено.
@@ -93,6 +94,18 @@ struct UserDataWarning: View {
             .background(.bar)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("userdata-error")
+        }
+    }
+}
+
+/// Назву розділу в тулбарі показує кнопка вибору розділу; системний заголовок у тулбарі ховаємо,
+/// а заголовок вікна лишається (меню «Window», VoiceOver). На macOS 14 без API — обидва видно.
+struct HiddenToolbarTitle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 15, *) {
+            content.toolbar(removing: .title)
+        } else {
+            content
         }
     }
 }

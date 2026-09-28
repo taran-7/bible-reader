@@ -291,6 +291,14 @@
         "status": "artifact-ok"
       }
     ],
+    "FR-37": [
+      {
+        "method": "local-verifiable",
+        "mechanism": "npm:test:run",
+        "artifact": "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "status": "artifact-ok"
+      }
+    ],
     "NFR-1": [
       {
         "method": "local-verifiable",

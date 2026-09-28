@@ -7,6 +7,7 @@ public final class ReaderViewModel {
     public var translation: Translation = .kjv {
         didSet {
             guard translation != oldValue else { return }
+            chapterPicker = nil
             if !keepLocationOnSwitch { remap(from: oldValue) }
             reload()
             savePosition()
@@ -32,6 +33,8 @@ public final class ReaderViewModel {
     @ObservationIgnored private lazy var versification: Versification? =
         (repository as? SQLiteBibleRepository).flatMap { try? Versification.load(from: $0) }
     @ObservationIgnored private var keepLocationOnSwitch = false
+    /// Вікно з номерами розділів книги, по якій клікнули в списку (FR-37); `nil` — закрито.
+    public private(set) var chapterPicker: ChapterPicker?
     /// Вірш, до якого треба прокрутити і який підсвітити.
     public var focusedVerse: Int?
     /// Змінюється на кожен запит фокусу, навіть якщо номер вірша той самий
@@ -146,11 +149,40 @@ public final class ReaderViewModel {
     }
 
     public func open(_ target: Location, focus verse: Int? = nil) {
+        chapterPicker = nil
         location = target
         focusedVerse = verse
         if verse != nil { focusRequest += 1 }
         reload()
         savePosition()
+    }
+
+    /// Клік по книзі: показує її розділи поверх тексту, поточний розділ лишається відкритим (FR-37).
+    public func pickBook(_ book: Int, from origin: ChapterPicker.Origin = .sidebar) {
+        guard let count = try? repository?.chapterCount(book: book, translation: translation), count > 0 else {
+            chapterPicker = nil
+            return
+        }
+        chapterPicker = ChapterPicker(book: book, chapterCount: count,
+                                      current: book == location.book ? location.chapter : nil, origin: origin)
+    }
+
+    /// Клік по назві розділу в тулбарі: розділи відкритої книги донизу від назви.
+    public func pickCurrentBook() {
+        pickBook(location.book, from: .title)
+    }
+
+    /// Клік по номеру розділу у вікні: відкриває розділ і закриває вікно та результати пошуку.
+    public func pickChapter(_ chapter: Int) {
+        guard let picker = chapterPicker else { return }
+        chapterPicker = nil
+        results = nil
+        searchError = nil
+        open(Location(book: picker.book, chapter: chapter))
+    }
+
+    public func dismissChapterPicker() {
+        chapterPicker = nil
     }
 
     /// Відкриває вірш, до якого знайдено нотатку, і закриває результати.
@@ -353,4 +385,31 @@ public struct ParallelRow: Identifiable, Sendable {
     public let primary: Verse
     public let secondary: [Verse]
     public var id: Int { primary.verse }
+}
+
+/// Вміст вікна вибору розділу: книга, кількість розділів і поточний розділ, якщо це відкрита книга.
+public struct ChapterPicker: Equatable, Sendable {
+    public let book: Int
+    public let chapterCount: Int
+    public let current: Int?
+    /// Звідки відкрито: від книги в бічній панелі чи від назви розділу в тулбарі.
+    public let origin: Origin
+    public enum Origin: Sendable { case sidebar, title }
+    /// Стовпців у сітці: стрілки ↑ ↓ переходять на рядок, тобто на стільки розділів.
+    public static let columns = 10
+
+    public init(book: Int, chapterCount: Int, current: Int?, origin: Origin = .sidebar) {
+        self.book = book
+        self.chapterCount = chapterCount
+        self.current = current
+        self.origin = origin
+    }
+
+    /// Розділ під курсором клавіатури, коли вікно відкрилося: поточний або перший.
+    public var initialCursor: Int { current ?? 1 }
+
+    /// Курсор після стрілки; не виходить за межі книги.
+    public func move(_ cursor: Int, by delta: Int) -> Int {
+        min(max(cursor + delta, 1), chapterCount)
+    }
 }

@@ -87,7 +87,8 @@ final class AccessibilityUITests: XCTestCase {
         for id in ["bookmark-chapter", "translation"] {
             let element = app.descendants(matching: .any)[id].firstMatch
             XCTAssertTrue(element.waitForExistence(timeout: 5), id)
-            XCTAssertFalse(element.label.isEmpty, id)
+            // Кнопка-меню на новіших macOS віддає назву в AXTitle, а не в AXDescription; VoiceOver читає обидва.
+            XCTAssertFalse(element.label.isEmpty && element.title.isEmpty, id)
         }
         XCTAssertTrue(app.buttons["Наступний розділ"].exists)
         XCTAssertTrue(app.buttons["Попередній розділ"].exists)
@@ -101,7 +102,11 @@ final class AccessibilityUITests: XCTestCase {
         let field = app.searchFields.firstMatch
         app.typeKey(physicalKey(kVK_ANSI_F, fallback: "f"), modifierFlags: .command)
         wait(for: [expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: field)], timeout: 5)
-        app.typeText("John 3:16\r")
+        // Вставка ⌘V, а не набір: у кириличній розкладці XCUI не синтезує латиницю.
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString("John 3:16", forType: .string)
+        app.typeKey(physicalKey(kVK_ANSI_V, fallback: "v"), modifierFlags: .command)
+        app.typeKey(.return, modifierFlags: [])
         expectTitle("John 3")
         // Після переходу за посиланням фокус іде в список віршів: ↓ виділяє наступний, ⌘C копіює цитату.
         wait(for: [expectation(for: NSPredicate(format: "hasKeyboardFocus == false"), evaluatedWith: field)], timeout: 5)
