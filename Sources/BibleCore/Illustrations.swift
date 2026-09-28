@@ -192,7 +192,8 @@ public struct WordPressAdapter: IllustrationProvider {
     struct Hit: Hashable, Sendable {
         let title: String
         let url: String
-        let contentPath: String
+        /// Номер допису з адреси API `/wp-json/wp/v2/posts/<id>` того самого сайту.
+        let id: Int
     }
 
     private struct SearchItem: Decodable {
@@ -209,6 +210,7 @@ public struct WordPressAdapter: IllustrationProvider {
 
     private struct Post: Decodable {
         struct Rendered: Decodable { let rendered: String }
+        let id: Int
         let title: Rendered
         let content: Rendered
         let link: String
@@ -217,11 +219,7 @@ public struct WordPressAdapter: IllustrationProvider {
 
     public func page(_ query: String, page: Int, http: IllustrationHTTP) async throws -> IllustrationPage {
         let hits = try await search(query, page: page, http: http)
-        var stories: [Illustration] = []
-        for hit in hits {
-            if let story = try await illustration(hit, http: http) { stories.append(story) }
-        }
-        return IllustrationPage(stories: stories, hasMore: hits.count == Self.pageSize)
+        return IllustrationPage(stories: try await illustrations(hits, http: http), hasMore: hits.count == Self.pageSize)
     }
 
     /// Сторінка результатів; порожній масив — сторінок більше немає (WordPress на зайву сторінку дає 400).
@@ -235,29 +233,39 @@ public struct WordPressAdapter: IllustrationProvider {
         let items = try JSONDecoder().decode([SearchItem].self, from: body)
         var hits: [Hit] = []
         for item in items where item.subtype == nil || item.subtype == "post" {
-            guard let href = item._links?.links.first?.href, let path = Self.path(of: href, host: site.host) else { continue }
-            hits.append(Hit(title: HTMLText.plain(item.title), url: item.url, contentPath: path))
+            guard let href = item._links?.links.first?.href, let id = Self.postID(of: href, host: site.host) else { continue }
+            hits.append(Hit(title: HTMLText.plain(item.title), url: item.url, id: id))
         }
         return hits
     }
 
-    /// Початок допису (авторське право); `nil` — допис порожній або не читається.
-    func illustration(_ hit: Hit, http: IllustrationHTTP) async throws -> Illustration? {
-        let (status, body) = try await http.get(host: site.host, path: hit.contentPath,
-                                                query: [("_fields", "title,content,link,date")], headers: [:])
-        guard status == 200, let post = try? JSONDecoder().decode(Post.self, from: body) else { return nil }
-        let text = HTMLText.plain(post.content.rendered)
-        guard !text.isEmpty else { return nil }
-        let excerpt = IllustrationExcerpt.cut(text)
-        return Illustration(title: HTMLText.plain(post.title.rendered), text: excerpt.text, source: post.link,
-                            siteName: site.name, date: post.date.map { String($0.prefix(10)) }, isExcerpt: excerpt.truncated)
+    /// Тексти всіх дописів сторінки одним запитом (`include=`), у порядку пошуку: сайти обмежують частоту запитів
+    /// (Christianity Today відповідав 403 на десяток окремих). Початок ≤ 1500 символів — авторське право.
+    func illustrations(_ hits: [Hit], http: IllustrationHTTP) async throws -> [Illustration] {
+        guard !hits.isEmpty else { return [] }
+        let (status, body) = try await http.get(host: site.host, path: "/wp-json/wp/v2/posts", query: [
+            ("include", hits.map { "\($0.id)" }.joined(separator: ",")), ("per_page", "\(hits.count)"),
+            ("_fields", "id,title,content,link,date"),
+        ], headers: [:])
+        guard status == 200 else { throw IllustrationError.failed("\(site.host): HTTP \(status)") }
+        let posts = Dictionary((try JSONDecoder().decode([Post].self, from: body)).map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        var stories: [Illustration] = []
+        for hit in hits {
+            guard let post = posts[hit.id] else { continue }
+            let text = HTMLText.plain(post.content.rendered)
+            guard !text.isEmpty else { continue }
+            let excerpt = IllustrationExcerpt.cut(text)
+            stories.append(Illustration(title: HTMLText.plain(post.title.rendered), text: excerpt.text, source: post.link,
+                                        siteName: site.name, date: post.date.map { String($0.prefix(10)) }, isExcerpt: excerpt.truncated))
+        }
+        return stories
     }
 
-    /// Шлях `/wp-json/...` з адреси API того самого сайту; чужий хост — `nil`.
-    static func path(of href: String, host: String) -> String? {
+    /// Номер допису з адреси `…/wp-json/wp/v2/posts/<id>` того самого сайту; чужий хост чи інший тип — `nil`.
+    static func postID(of href: String, host: String) -> Int? {
         guard let hrefHost = IllustrationSources.host(of: href), hrefHost == IllustrationSources.bare(host),
-              let start = href.range(of: "/wp-json/") else { return nil }
-        return String(href[start.lowerBound...])
+              let range = href.range(of: "/wp-json/wp/v2/posts/") else { return nil }
+        return Int(href[range.upperBound...])
     }
 }
 
@@ -445,6 +453,9 @@ public actor IllustrationSearch {
     private var cursor: Cursor?
     private var pending: [Illustration] = []
     private var seen = Set<String>()
+    /// Джерела, що відповіли помилкою: пошук іде далі без них (сайт може обмежувати частоту запитів).
+    private var failed = Set<Int>()
+    private var lastError: IllustrationError?
 
     /// Джерела: сайти WordPress з конфігурації, Вікіпедія і, з ключем, Brave по всьому allowlist.
     public static func providers(sources: IllustrationSources, braveKey: String?) -> [IllustrationProvider] {
@@ -471,8 +482,11 @@ public actor IllustrationSearch {
     public var hasMore: Bool { cursor != nil || !pending.isEmpty }
 
     /// Наступні до 7 історій, найрелевантніші першими; менше — більше не знайшлося.
+    /// Помилка одного джерела не зупиняє інші; кидається, лише якщо нічого не знайшлося. Без мережі — одразу.
     public func next() async throws -> [Illustration] {
+        lastError = nil
         while pending.count < Self.batchSize, try await fetchPage() {}
+        if pending.isEmpty, let lastError { throw lastError }
         let batch = Array(pending.prefix(Self.batchSize))
         pending.removeFirst(batch.count)
         let ranked = batch.enumerated().map { (score: score($0.element), offset: $0.offset, story: $0.element) }
@@ -497,7 +511,18 @@ public actor IllustrationSearch {
     /// Ще одна сторінка одного джерела в `pending`; `false` — курсор вичерпано.
     private func fetchPage() async throws -> Bool {
         guard let position = cursor else { return false }
-        let page = try await providers[position.provider].page(queries[position.query], page: position.page, http: http)
+        let page: IllustrationPage
+        do {
+            page = failed.contains(position.provider)
+                ? IllustrationPage(stories: [], hasMore: false)
+                : try await providers[position.provider].page(queries[position.query], page: position.page, http: http)
+        } catch IllustrationError.offline {
+            throw IllustrationError.offline
+        } catch {
+            failed.insert(position.provider)
+            lastError = (error as? IllustrationError) ?? .failed("\(error)")
+            page = IllustrationPage(stories: [], hasMore: false)
+        }
         for story in page.stories where sources.isAllowed(story.source) {
             // Дублікат — та сама адреса або той самий заголовок з іншого джерела.
             guard !seen.contains(story.source), !seen.contains(Self.titleKey(story.title)) else { continue }

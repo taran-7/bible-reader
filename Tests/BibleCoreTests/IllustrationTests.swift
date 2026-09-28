@@ -5,6 +5,9 @@ import Testing
 /// Мережа з фікстур: відповідь за хостом і шляхом; журнал запитів — щоб перевірити, куди ходили.
 final class FakeIllustrationHTTP: IllustrationHTTP, @unchecked Sendable {
     var responses: [String: (Int, String)] = [:]
+    /// Дописи WordPress за номером: `/wp-json/wp/v2/posts?include=…` збирає з них відповідь.
+    var posts: [Int: String] = [:]
+    var postsStatus = 200
     var error: IllustrationError?
     private(set) var requests: [(host: String, path: String, query: [String: String], headers: [String: String])] = []
 
@@ -12,6 +15,10 @@ final class FakeIllustrationHTTP: IllustrationHTTP, @unchecked Sendable {
         let items = Dictionary(query, uniquingKeysWith: { a, _ in a })
         requests.append((host, path, items, headers))
         if let error { throw error }
+        if path == "/wp-json/wp/v2/posts", let include = items["include"] {
+            let bodies = include.split(separator: ",").compactMap { Int($0).flatMap { posts[$0] } }
+            return (postsStatus, Data(("[" + bodies.joined(separator: ",") + "]").utf8))
+        }
         let page = items["page"] ?? items["gsroffset"] ?? items["offset"] ?? ""
         let (status, body) = responses["\(host)\(path)#\(page)"] ?? responses["\(host)\(path)"] ?? (404, "")
         return (status, Data(body.utf8))
@@ -31,7 +38,7 @@ enum IllustrationFixtures {
     }
 
     static func wpPost(_ id: Int, text: String = "Hudson Taylor forgave the robbers in Ningbo, 1857.") -> String {
-        #"{"title":{"rendered":"Story \#(id) &#8211; forgiveness"},"content":{"rendered":"<p>\#(text)</p><script>x()</script><p>Second &amp; last.</p>"},"link":"https:\/\/www.example.org\/story-\#(id)\/","date":"2020-04-16T08:00:03"}"#
+        #"{"id":\#(id),"title":{"rendered":"Story \#(id) &#8211; forgiveness"},"content":{"rendered":"<p>\#(text)</p><script>x()</script><p>Second &amp; last.</p>"},"link":"https:\/\/www.example.org\/story-\#(id)\/","date":"2020-04-16T08:00:03"}"#
     }
 
     static let request = IllustrationRequest(reference: "Mt 5:44", kjvText: [
@@ -46,7 +53,7 @@ enum IllustrationFixtures {
             http.responses["www.example.org/wp-json/wp/v2/search#\(page)"] = first <= last ? (200, wpSearch(first...last)) : (200, "[]")
         }
         http.responses["www.example.org/wp-json/wp/v2/search#\((count + 9) / 10 + 1)"] = (400, #"{"code":"rest_post_invalid_page_number"}"#)
-        for id in 1...max(1, count) { http.responses["www.example.org/wp-json/wp/v2/posts/\(id)"] = (200, wpPost(id)) }
+        for id in 1...max(1, count) { http.posts[id] = wpPost(id) }
         http.responses["en.wikipedia.org/w/api.php"] = (200, #"{"batchcomplete":true}"#)
         return http
     }
@@ -138,16 +145,34 @@ extension IllustrationTests {
     @Test func testStoryOutsideAllowlistIsDropped() async throws {
         let http = F.http(stories: 2)
         // Допис посилається на чужий домен — історію відкинуто.
-        http.responses["www.example.org/wp-json/wp/v2/posts/2"] = (200, F.wpPost(2).replacingOccurrences(of: "www.example.org", with: "www.catholic.com"))
+        http.posts[2] = F.wpPost(2).replacingOccurrences(of: "www.example.org", with: "www.catholic.com")
         let search = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
         #expect(try await search.next().map(\.title) == ["Story 1 – forgiveness"])
     }
 
     // @trace FR-34
     @Test func testWordPressIgnoresForeignApiLinks() {
-        #expect(WordPressAdapter.path(of: "https://www.example.org/wp-json/wp/v2/posts/7", host: "www.example.org") == "/wp-json/wp/v2/posts/7")
-        #expect(WordPressAdapter.path(of: "https://evil.com/wp-json/wp/v2/posts/7", host: "www.example.org") == nil)
-        #expect(WordPressAdapter.path(of: "https://www.example.org/posts/7", host: "www.example.org") == nil)
+        #expect(WordPressAdapter.postID(of: "https://www.example.org/wp-json/wp/v2/posts/7", host: "www.example.org") == 7)
+        #expect(WordPressAdapter.postID(of: "https://evil.com/wp-json/wp/v2/posts/7", host: "www.example.org") == nil)
+        #expect(WordPressAdapter.postID(of: "https://www.example.org/wp-json/wp/v2/pages/7", host: "www.example.org") == nil)
+    }
+
+    // @trace FR-33
+    @Test func testOneFailingSourceDoesNotStopOthers() async throws {
+        // Сайт обмежив частоту (403) на текстах — Вікіпедія все одно дає історії; помилки не показуємо.
+        let http = F.http(stories: 3)
+        http.postsStatus = 403
+        http.responses["en.wikipedia.org/w/api.php"] = (200, Self.wikipedia)
+        let search = IllustrationSearch(request: F.request, sources: F.sources,
+                                        providers: IllustrationSearch.providers(sources: F.sources, braveKey: nil), http: http)
+        #expect(try await search.next().map(\.title) == ["General Butt Naked"])
+        // Лише зламане джерело — помилка з поясненням.
+        let alone = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
+        await #expect(throws: IllustrationError.failed("www.example.org: HTTP 403")) { try await alone.next() }
+        // Зіпсована відповідь (не JSON) — теж помилка джерела, а не падіння.
+        http.responses["www.example.org/wp-json/wp/v2/search#1"] = (200, "<html>")
+        let garbled = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
+        await #expect(throws: (any Error).self) { try await garbled.next() }
     }
 }
 
@@ -294,9 +319,9 @@ extension IllustrationTests {
     // @trace FR-33
     @Test func testRelevantStoriesComeFirst() async throws {
         let http = F.http(stories: 3)
-        http.responses["www.example.org/wp-json/wp/v2/posts/2"] = (200, F.wpPost(2, text: "Bless those who curse you."))
-        http.responses["www.example.org/wp-json/wp/v2/posts/3"] = (200,
-            #"{"title":{"rendered":"Love your enemies"},"content":{"rendered":"<p>They chose to love their enemies.</p>"},"link":"https://www.example.org/story-3/"}"#)
+        http.posts[2] = F.wpPost(2, text: "Bless those who curse you.")
+        http.posts[3] =
+            #"{"id":3,"title":{"rendered":"Love your enemies"},"content":{"rendered":"<p>They chose to love their enemies.</p>"},"link":"https://www.example.org/story-3/"}"#
         let search = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
         // Ключові слова в заголовку важать удвічі; без збігів — в кінці, у порядку сайту.
         #expect(try await search.next().map(\.title) == ["Love your enemies", "Story 2 – forgiveness", "Story 1 – forgiveness"])
@@ -311,8 +336,8 @@ extension IllustrationTests {
          {"title":"Gone","url":"https://www.example.org/g","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/8"}]}},
          {"title":"Empty","url":"https://www.example.org/e","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/9"}]}}]
         """#)
-        http.responses["www.example.org/wp-json/wp/v2/posts/8"] = (404, "")
-        http.responses["www.example.org/wp-json/wp/v2/posts/9"] = (200, #"{"title":{"rendered":"E"},"content":{"rendered":"<p> </p>"},"link":"https://www.example.org/e"}"#)
+        // Допису 8 сайт не віддав, 9 — порожній.
+        http.posts[9] = #"{"id":9,"title":{"rendered":"E"},"content":{"rendered":"<p> </p>"},"link":"https://www.example.org/e"}"#
         let adapter = WordPressAdapter(site: F.sources.wordpress[0])
         let page = try await adapter.page("x", page: 1, http: http)
         #expect(page.stories.isEmpty && !page.hasMore)
