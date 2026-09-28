@@ -44,7 +44,8 @@ jobs:
         run: |
           brew install xcodegen
           (cd BibleReaderApp && xcodegen generate)
-          make ui-test
+          # PD-14: спільна VM CI в 1,5–2× повільніша за Mac користувача; межа NFR-3 тут 2000 мс, на Mac — 1000.
+          TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS=2000 make ui-test
       - name: Platform and size (NFR-1, NFR-5)
         run: node scripts/check-platform.mjs
 
