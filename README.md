@@ -1,10 +1,32 @@
 # Bible Reader
 
-Нативний macOS-додаток (SwiftUI) для читання Біблії: KJV і Синодальний переклад, навігація, повнотекстовий пошук, копіювання цитати з посиланням.
+Нативний macOS-додаток (SwiftUI) для читання Біблії офлайн. Capstone курсу fwdays «Crash Course: Agentic Engineering» (2026).
 
-Capstone курсу fwdays «Crash Course: Agentic Engineering» (2026).
+## Що вміє
 
-- Для агентів і розробників: [AGENTS.md](AGENTS.md)
+- **Чотири переклади:** KJV, Kralická, Огієнко, Синодальний. Меню й ⌘⌥1…4 працюють на будь-якій розкладці. Новий переклад додається рядком маніфесту, без змін коду.
+- **Паралельний перегляд і «Порівняти»:** вірш поруч в іншому перекладі. Таблиця відповідностей нумерації KJV ↔ Синодальний підтримує й інші системи через маніфест.
+- **Навігація:** клік по книзі або назві розділу відкриває сітку номерів розділів; ◀ ▶ і ⌘[ ⌘] переходять між розділами.
+- **Пошук:** слова в будь-якій формі (стемінг en/ru/uk/cs), точна фраза в лапках, область (Біблія, СЗ, НЗ, книга), лічильник «Знайдено: N» з довантаженням. Посилання (`Ин 3:16`, `Ів 3:16`, `John 3:16`) відкриває місце.
+- **Цитати:** ⌘C або кнопка на виділенні копіює вірші з посиланням мовою перекладу.
+- **Закладки, підсвітки, нотатки** з пошуком і експортом.
+- **Оформлення:** п'ять тем (Світла, Темна, Скло, Пастельна, Манускрипт), розмір шрифтів і масштаб інтерфейсу, доступність з VoiceOver і клавіатури.
+
+Вимоги: macOS 14+, Apple Silicon.
+
+## Збірка
+
+```bash
+make db
+cd BibleReaderApp && xcodegen generate
+xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build
+```
+
+Тести: `make test` (Swift Testing), UI-тести і всі гейти — у CI.
+
+## Документація
+
+- Для агентів і розробників: [AGENTS.md](AGENTS.md), поточний стан — [HANDOFF.md](docs/exec-plans/active/HANDOFF.md)
 - Архітектура: [ARCHITECTURE.md](ARCHITECTURE.md)
-- Специфікація MVP: [docs/product-specs/bible-reader-mvp.md](docs/product-specs/bible-reader-mvp.md)
-- План: [docs/exec-plans/active/bible-reader-mvp.md](docs/exec-plans/active/bible-reader-mvp.md)
+- Продукт: [PRD](docs/product-specs/prd.md), [вимоги](docs/requirements.md)
+- Процес (Project Factory): [docs/project-factory.md](docs/project-factory.md)
