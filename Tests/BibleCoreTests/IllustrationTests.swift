@@ -254,3 +254,33 @@ extension IllustrationTests {
         #expect(ReaderViewModel { throw FakeRepository.Boom() }.illustrationRequest(for: [1]) == nil)
     }
 }
+
+extension IllustrationTests {
+    // @trace FR-34
+    @Test func testWikipediaSparsePagesAndFullPage() async throws {
+        let http = FakeIllustrationHTTP()
+        // Без index і без категорій — не біографія; повна сторінка (10) — є наступна.
+        let pages = (1...10).map { #"{"title":"P\#($0)","extract":"x","fullurl":"https://en.wikipedia.org/wiki/P\#($0)"}"# }
+        http.responses["en.wikipedia.org/w/api.php"] = (200, #"{"query":{"pages":["# + pages.joined(separator: ",") + "]}}")
+        let page = try await WikipediaAdapter().page("x", page: 2, http: http)
+        #expect(page.stories.isEmpty && page.hasMore)
+        #expect(http.requests.first?.query["gsroffset"] == "10")
+        http.responses["en.wikipedia.org/w/api.php"] = (200, "{}")
+        #expect(try await WikipediaAdapter().page("x", page: 1, http: http).stories.isEmpty)
+        http.responses["en.wikipedia.org/w/api.php"] = (503, "")
+        await #expect(throws: IllustrationError.failed("en.wikipedia.org: HTTP 503")) { try await WikipediaAdapter().page("x", page: 1, http: http) }
+    }
+
+    // @trace FR-33
+    @Test func testBraveFullPageAndEmptyResponse() async throws {
+        let http = FakeIllustrationHTTP()
+        let results = (1...20).map { #"{"title":"T\#($0)","url":"https://www.imb.org/\#($0)"}"# }
+        http.responses["api.search.brave.com/res/v1/web/search"] = (200, #"{"web":{"results":["# + results.joined(separator: ",") + "]}}")
+        let brave = BraveAdapter(key: "k", sites: ["imb.org"])
+        let full = try await brave.page("x", page: 1, http: http)
+        #expect(full.stories.isEmpty && full.hasMore)          // без опису — картки немає, але сторінка повна
+        #expect(try await !brave.page("x", page: 10, http: http).hasMore)  // Brave: не більше 10 сторінок
+        http.responses["api.search.brave.com/res/v1/web/search"] = (200, "{}")
+        #expect(try await brave.page("x", page: 1, http: http).stories.isEmpty)
+    }
+}

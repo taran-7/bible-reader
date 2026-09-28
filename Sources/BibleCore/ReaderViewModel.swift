@@ -324,11 +324,11 @@ public final class ReaderViewModel {
         var texts: [String] = []
         for chapter in Set(keys.map(\.chapter)).sorted() {
             let wanted = Set(keys.filter { $0.chapter == chapter }.map(\.verse))
-            let kjv = (try? repository.verses(book: location.book, chapter: chapter, translation: .kjv)) ?? []
+            guard let kjv = try? repository.verses(book: location.book, chapter: chapter, translation: .kjv) else { continue }
             texts += kjv.filter { wanted.contains($0.verse) }.map(\.text)
         }
         guard !texts.isEmpty else { return nil }
-        let book = Book(number: location.book)?.name(in: translation) ?? "\(location.book)"
+        guard let book = Book(number: location.book)?.name(in: translation) else { return nil }
         let reference = "\(book) \(location.chapter):\(Quote.verseList(chosen.map(\.verse)))"
         return IllustrationRequest(reference: reference, kjvText: texts)
     }
