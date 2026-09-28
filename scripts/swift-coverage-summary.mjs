@@ -33,3 +33,10 @@ const total = {
 mkdirSync("coverage", { recursive: true });
 writeFileSync("coverage/coverage-summary.json", `${JSON.stringify({ total }, null, 2)}\n`);
 console.log(`coverage: lines ${total.lines.pct}% · regions ${total.statements.pct}% · functions ${total.functions.pct}% · branches ${total.branches.pct ?? "n/a"}% (${files.length} files)`);
+// Файли з непокритими функціями — щоб падіння ratchet у CI було видно без локального прогону.
+for (const f of files) {
+  const fn = f.summary.functions;
+  if (fn.covered < fn.count) {
+    console.log(`  uncovered: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} — functions ${fn.covered}/${fn.count}, lines ${f.summary.lines.covered}/${f.summary.lines.count}`);
+  }
+}

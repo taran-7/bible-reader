@@ -6,8 +6,8 @@ public struct IllustrationNetwork: IllustrationHTTP {
     public static let userAgent = "BibleReader/0.1 (macOS; github.com/taran-7/bible-reader)"
     private let session: URLSession
 
-    public init(timeout: TimeInterval = 15) {
-        let configuration = URLSessionConfiguration.ephemeral
+    /// `configuration` — для тестів (підставний `URLProtocol`), у додатку — ефемерна сесія без кешу й cookies.
+    public init(timeout: TimeInterval = 15, configuration: URLSessionConfiguration = .ephemeral) {
         configuration.timeoutIntervalForRequest = timeout
         configuration.httpAdditionalHeaders = ["User-Agent": Self.userAgent]
         session = URLSession(configuration: configuration)
