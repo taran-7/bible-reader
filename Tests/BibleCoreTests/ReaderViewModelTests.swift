@@ -7,11 +7,21 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
     var limits: [Int] = []
     var offsets: [Int] = []
     var scopes: [SearchScope] = []
+    var chapterCountCalls = 0
+    /// Разова помилка читання віршів (tech debt #11).
+    var failNextVerses = false
     struct Boom: Error {}
 
     func books(translation: Translation) throws -> [Book] { Book.all }
-    func chapterCount(book: Int, translation: Translation) throws -> Int { 3 }
+    func chapterCount(book: Int, translation: Translation) throws -> Int {
+        chapterCountCalls += 1
+        return 3
+    }
     func verses(book: Int, chapter: Int, translation: Translation) throws -> [Verse] {
+        if failNextVerses {
+            failNextVerses = false
+            throw Boom()
+        }
         (1...5).map { Verse(translation: translation, book: book, chapter: chapter, verse: $0, text: "\(translation.rawValue) \(book):\(chapter):\($0)") }
     }
     /// «many» дає 250 збігів (вірші 1…250 Буття 1), інше — один Ин 3:16.
@@ -151,7 +161,55 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         struct Boom: Error {}
         let model = ReaderViewModel { throw Boom() }
         #expect(model.loadError != nil)
+        #expect(!model.canRetryLoad)
         #expect(model.verses.isEmpty)
+    }
+
+    // @trace FR-7
+    @Test func testTransientReadErrorClearsOnNextSuccessfulLoad() {
+        let model = makeModel()
+        repository.failNextVerses = true
+        model.goNext()
+        #expect(model.loadError != nil)
+        #expect(model.canRetryLoad)
+        model.retryLoad()
+        #expect(model.loadError == nil)
+        #expect(model.location == Location(book: 1, chapter: 2))
+        #expect(model.verses.count == 5)
+    }
+
+    // @trace FR-8
+    @Test func testChapterPastBookEndOpensLastChapter() {
+        let model = makeModel()
+        model.query = "John 99"
+        model.submitSearch()
+        #expect(model.location == Location(book: 43, chapter: 3))
+    }
+
+    // @trace FR-6
+    @Test func testPrevNextCloseSearchResults() {
+        let model = makeModel()
+        model.query = "love"
+        model.submitSearch()
+        #expect(model.results != nil)
+        model.goNext()
+        #expect(model.results == nil)
+        model.query = "boom"
+        model.submitSearch()
+        #expect(model.searchError != nil)
+        model.goPrevious()
+        #expect(model.searchError == nil)
+    }
+
+    // @trace FR-6
+    @Test func testCanGoDoesNotQueryDatabaseOnEveryRead() {
+        let model = makeModel()
+        let before = repository.chapterCountCalls
+        for _ in 0..<10 {
+            _ = model.canGoPrevious
+            _ = model.canGoNext
+        }
+        #expect(repository.chapterCountCalls == before)
     }
 
     // @trace FR-13

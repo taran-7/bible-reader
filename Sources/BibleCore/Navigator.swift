@@ -30,6 +30,9 @@ public struct Navigator {
             return Location(book: location.book, chapter: location.chapter - 1)
         }
         guard location.book > 1 else { return nil }
-        return Location(book: location.book - 1, chapter: chapterCount(location.book - 1))
+        // Книга без розділів (зіпсована база) дала б «розділ 0».
+        let count = chapterCount(location.book - 1)
+        guard count > 0 else { return nil }
+        return Location(book: location.book - 1, chapter: count)
     }
 }

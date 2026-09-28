@@ -25,7 +25,7 @@ struct ContentView: View {
 
     @ViewBuilder private var content: some View {
         if let error = model.loadError {
-            DatabaseErrorView(message: error)
+            DatabaseErrorView(message: error, retry: model.canRetryLoad ? model.retryLoad : nil)
                 .background(ThemeBackground())
         } else {
             NavigationSplitView {
@@ -52,6 +52,7 @@ struct ContentView: View {
                 model.parallelTranslation = other == model.translation ? nil : other
             }
             .modifier(SearchField(query: $model.query))
+            .background(SearchFieldStyler())
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
@@ -62,13 +63,21 @@ struct ContentView: View {
 
 struct DatabaseErrorView: View {
     let message: String
+    /// Є, коли база відкрилась, а не прочиталась одна сторінка (tech debt #11).
+    var retry: (() -> Void)?
 
     var body: some View {
-        MessageView(
-            title: "Не вдалося відкрити базу",
-            systemImage: "exclamationmark.triangle",
-            lines: [message, "Перезберіть додаток після «make db»."])
-        .textSelection(.enabled)
+        VStack(spacing: 12) {
+            MessageView(
+                title: retry == nil ? "Не вдалося відкрити базу" : "Не вдалося прочитати базу",
+                systemImage: "exclamationmark.triangle",
+                lines: retry == nil ? [message, "Перезберіть додаток після «make db»."] : [message])
+            .textSelection(.enabled)
+            if let retry {
+                Button("Спробувати ще раз", action: retry)
+                    .accessibilityIdentifier("database-retry")
+            }
+        }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("database-error")
     }
@@ -122,5 +131,47 @@ struct SearchField: ViewModifier {
         #else
         content.searchable(text: $query, prompt: "Слово або посилання (Ин 3:16)")
         #endif
+    }
+}
+
+/// Поле пошуку в тулбарі малює AppKit, і `.searchable` не дає задати йому шрифт чи кольори:
+/// знаходимо `NSSearchField` у тулбарі вікна і застосовуємо масштаб інтерфейсу й тему (tech debt #15, #18).
+struct SearchFieldStyler: NSViewRepresentable {
+    @Environment(\.theme) private var theme
+    @Environment(\.interfaceScale) private var scale
+
+    func makeNSView(context: Context) -> NSView { NSView() }
+
+    func updateNSView(_ view: NSView, context: Context) {
+        let style = SearchFieldStyle(theme: theme, fontSize: scale.systemFontSize)
+        // Тулбар з'являється після першого проходу розкладки.
+        DispatchQueue.main.async { Self.apply(style, in: view.window) }
+    }
+
+    static func apply(_ style: SearchFieldStyle, in window: NSWindow?) {
+        guard let items = window?.toolbar?.items else { return }
+        let fields = items.compactMap { item -> NSSearchField? in
+            if let search = item as? NSSearchToolbarItem { return search.searchField }
+            return item.view.flatMap(searchField(in:))
+        }
+        for field in fields {
+            field.font = .systemFont(ofSize: style.fontSize)
+            field.textColor = NSColor(style.text)
+            field.backgroundColor = NSColor(style.background)
+            field.drawsBackground = true
+            field.appearance = NSAppearance(named: style.colorScheme == .dark ? .darkAqua : .aqua)
+            field.invalidateIntrinsicContentSize()
+        }
+    }
+
+    private static func searchField(in view: NSView) -> NSSearchField? {
+        if let field = view as? NSSearchField { return field }
+        return view.subviews.lazy.compactMap(searchField(in:)).first
+    }
+}
+
+extension NSColor {
+    convenience init(_ color: ThemeColor) {
+        self.init(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1)
     }
 }

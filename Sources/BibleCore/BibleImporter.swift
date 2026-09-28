@@ -4,11 +4,14 @@ import GRDB
 public enum ImportError: Error, Equatable, CustomStringConvertible {
     case missingFile(String)
     case malformed(String)
+    /// Урізаний файл: книг менше, ніж у каноні (tech debt #14).
+    case incomplete(String, books: Int, expected: Int)
 
     public var description: String {
         switch self {
         case .missingFile(let name): "Файл не знайдено: \(name)"
         case .malformed(let name): "Неочікуваний формат файлу: \(name)"
+        case .incomplete(let name, let books, let expected): "Неповний файл \(name): книг \(books) з \(expected)"
         }
     }
 }
@@ -20,9 +23,16 @@ public enum BibleImporter {
     }
 
     /// `translations` — модулі з маніфесту (FR-30); за замовчуванням вшитий каталог.
-    public static func run(rawDirectory: URL, output: URL, translations: [Translation] = Translation.allCases) throws {
+    /// `expectedBooks` — мінімум книг у кожному файлі (CLI вимагає весь канон; фікстури тестів коротші).
+    public static func run(rawDirectory: URL, output: URL, translations: [Translation] = Translation.allCases,
+                           expectedBooks: Int? = nil) throws {
         // Спочатку читаємо всі джерела, щоб не створювати базу при помилці вхідних даних.
         let sources = try translations.map { ($0, try load($0, from: rawDirectory)) }
+        if let expectedBooks {
+            for (translation, books) in sources where books.count < expectedBooks {
+                throw ImportError.incomplete(translation.sourceFileName, books: books.count, expected: expectedBooks)
+            }
+        }
 
         let fm = FileManager.default
         let tmp = URL(fileURLWithPath: output.path + ".tmp")
@@ -124,6 +134,27 @@ public enum BibleImporter {
                                                       folded == text ? nil : folded])
                 }
             }
+        }
+    }
+}
+
+/// CLI `bible-import` як функція: код виходу і stderr покриваються тестами.
+public enum ImportCommand {
+    public static func run(arguments: [String], stderr: (String) -> Void) -> Int32 {
+        guard arguments.count == 3 else {
+            stderr("Використання: bible-import <raw-dir> <out.sqlite>\n")
+            return 64
+        }
+        let raw = URL(fileURLWithPath: arguments[1])
+        let output = URL(fileURLWithPath: arguments[2])
+        do {
+            try FileManager.default.createDirectory(at: output.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try BibleImporter.run(rawDirectory: raw, output: output, expectedBooks: Book.all.count)
+            print("Готово: \(output.path)")
+            return 0
+        } catch {
+            stderr("Помилка: \(error)\n")
+            return 1
         }
     }
 }

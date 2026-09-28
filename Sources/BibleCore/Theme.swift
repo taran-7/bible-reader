@@ -206,3 +206,21 @@ public enum Theme {
         }
     }
 }
+
+/// Вигляд поля пошуку в тулбарі: його малює AppKit, тож SwiftUI-шар застосовує ці значення
+/// до `NSSearchField` напряму (tech debt #15, #18).
+public struct SearchFieldStyle: Equatable, Sendable {
+    public let fontSize: Double
+    public let text: ThemeColor
+    public let background: ThemeColor
+    public let colorScheme: ThemeColorScheme
+
+    /// `fontSize` — системний кегль, уже помножений на масштаб інтерфейсу.
+    public init(theme: ThemeTokens, fontSize: Double) {
+        self.fontSize = fontSize
+        text = theme.text
+        // Поле лежить на тулбарі кольору бічної панелі; фон — як у результатів пошуку, щоб контрастувати з ним.
+        background = theme.results
+        colorScheme = theme.colorScheme
+    }
+}

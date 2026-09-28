@@ -36,4 +36,12 @@ import Testing
     @Test func testNextAtEndIsNil() {
         #expect(navigator.next(from: Location(book: 66, chapter: 22)) == nil)
     }
+
+    // @trace FR-6
+    @Test func testPreviousIntoEmptyBookIsNil() {
+        // Зіпсована база: у попередньої книги 0 розділів — не «розділ 0» (tech debt #11).
+        let broken = Navigator { $0 == 1 ? 0 : 10 }
+        #expect(broken.previous(from: Location(book: 2, chapter: 1)) == nil)
+        #expect(broken.previous(from: Location(book: 2, chapter: 2)) == Location(book: 2, chapter: 1))
+    }
 }

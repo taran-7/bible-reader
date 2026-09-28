@@ -10,12 +10,12 @@ Result: PASS, 34 warning(s)
 |---|---|---|---|---|
 | FR-1 | yes | yes | 12 | - |
 | FR-2 | yes | yes | 6 | - |
-| FR-3 | yes | yes | 4 | - |
+| FR-3 | yes | yes | 10 | - |
 | FR-4 | yes | yes | 6 | - |
 | FR-5 | yes | yes | 8 | - |
-| FR-6 | yes | yes | 18 | - |
-| FR-7 | yes | yes | 14 | - |
-| FR-8 | yes | yes | 14 | - |
+| FR-6 | yes | yes | 24 | - |
+| FR-7 | yes | yes | 16 | - |
+| FR-8 | yes | yes | 16 | - |
 | FR-9 | yes | yes | 10 | - |
 | FR-10 | yes | yes | 6 | - |
 | FR-11 | yes | yes | 24 | - |
@@ -37,8 +37,8 @@ Result: PASS, 34 warning(s)
 | FR-27 | yes | yes | 22 | - |
 | FR-28 | yes | yes | 20 | - |
 | FR-29 | yes | yes | 8 | - |
-| FR-30 | yes | yes | 18 | - |
-| FR-31 | yes | yes | 12 | - |
+| FR-30 | yes | yes | 26 | - |
+| FR-31 | yes | yes | 14 | - |
 | FR-32 | yes | yes | 10 | - |
 | FR-36 | yes | yes | 22 | - |
 | FR-37 | yes | yes | 18 | - |
