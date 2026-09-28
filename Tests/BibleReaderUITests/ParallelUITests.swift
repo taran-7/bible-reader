@@ -56,10 +56,10 @@ final class ParallelUITests: XCTestCase {
         expectTitle("Psalms 22")
 
         // Поруч — Синодальний: біля Пс 22:1 KJV стоїть Пс 21:1–2.
-        let menu = app.descendants(matching: .any)["parallel"].firstMatch
-        XCTAssertTrue(menu.waitForExistence(timeout: 5))
-        menu.click()
-        clickMenuItem("Синодальний — русский")
+        // Через головне меню: кнопка тулбара у вузькому вікні CI ховається в переповнення.
+        app.menuBars.menuBarItems["Переклад"].click()
+        app.menuBars.menuItems["Поруч"].hover()
+        app.menuBars.menuItems["Синодальний"].click()
         // Рядок Пс 22:1 читається разом із паралельною колонкою: надпис і Пс 21:2.
         let verse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(verse.waitForExistence(timeout: 5))
