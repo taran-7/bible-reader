@@ -80,16 +80,8 @@ struct ChapterView: View {
             })
             .background(ThemeBackground())
             .focused($listFocused)
-            // Esc знімає виділення. Кнопка з клавішею Cancel, а не `onExitCommand`: той спрацьовує, лише коли
-            // фокус у списку. Поки праворуч відкрита панель, Esc належить їй.
-            .background {
-                if !selection.isEmpty, model.illustrations == nil, !drafts.isOpen {
-                    Button("Зняти виділення") { selection = [] }
-                        .keyboardShortcut(.cancelAction)
-                        .opacity(0)
-                        .accessibilityHidden(true)
-                }
-            }
+            // Esc — пункт меню «Правка → Зняти виділення»: працює за будь-якого фокусу (FR-17).
+            .onChange(of: model.clearSelectionRequest) { _, _ in selection = [] }
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)

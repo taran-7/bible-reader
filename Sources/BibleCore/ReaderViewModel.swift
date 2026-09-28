@@ -24,6 +24,15 @@ public final class ReaderViewModel {
     }
     /// Перший виділений вірш (з `ChapterView`): при перемиканні перекладу відкривається саме він (FR-27).
     public var anchorVerse: Int?
+    /// Esc у меню «Правка» (FR-17): лічильник, бо виділення живе в `ChapterView`.
+    public private(set) var clearSelectionRequest = 0
+
+    /// Зняти виділення віршів; має сенс, лише коли щось виділено і праворуч немає панелі, яку закриває Esc.
+    public var canClearSelection: Bool { anchorVerse != nil && illustrations == nil && comparison == nil }
+
+    public func clearSelection() {
+        clearSelectionRequest += 1
+    }
     /// Другий переклад поруч (FR-26); `nil` — паралельний перегляд вимкнено.
     public var parallelTranslation: Translation? {
         didSet { if parallelTranslation != oldValue { rebuildParallel() } }

@@ -24,7 +24,7 @@ Result: PASS, 40 warning(s)
 | FR-14 | yes | yes | 6 | - |
 | FR-15 | yes | yes | 24 | - |
 | FR-16 | yes | yes | 4 | - |
-| FR-17 | yes | yes | 10 | - |
+| FR-17 | yes | yes | 12 | - |
 | FR-18 | yes | yes | 20 | - |
 | FR-19 | yes | yes | 12 | - |
 | FR-20 | yes | yes | 8 | - |

@@ -46,6 +46,11 @@ struct BibleReaderApp: App {
                 Button(drafts.isOpen ? "Сховати чорнетки" : "Чорнетки") { drafts.isOpen.toggle() }
                     .keyboardShortcut("d", modifiers: [.command, .option])
             }
+            CommandGroup(after: .pasteboard) {
+                Button("Зняти виділення") { model.clearSelection() }
+                    .keyboardShortcut(.escape, modifiers: [])
+                    .disabled(!model.canClearSelection || drafts.isOpen || drafts.isPresenting)
+            }
             FindCommands()
             FontCommands(preferences: preferences, drafts: drafts)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
