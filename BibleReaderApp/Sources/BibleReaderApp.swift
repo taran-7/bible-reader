@@ -57,10 +57,6 @@ struct BibleReaderApp: App {
         }
     }
 
-    init() {
-        ThemeFonts.register()
-    }
-
     private static func makeUserData() -> UserData {
         switch userDatabase {
         case .success(let database): UserData(database: database)
