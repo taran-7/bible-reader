@@ -41,7 +41,7 @@ struct BibleReaderApp: App {
             FindCommands()
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
-            TranslationCommands(model: model)
+            TranslationCommands(model: model, preferences: preferences)
         }
 
         WindowGroup("Порівняти", id: "compare", for: CompareRequest.self) { $request in
@@ -101,6 +101,7 @@ struct FontCommands: Commands {
 /// Меню «Переклад»: перші дев'ять перекладів з маніфесту мають ⌘⌥1…9, решта — без скорочення.
 struct TranslationCommands: Commands {
     let model: ReaderViewModel
+    let preferences: PreferencesStore
 
     var body: some Commands {
         CommandMenu("Переклад") {
@@ -112,6 +113,18 @@ struct TranslationCommands: Commands {
                     toggle.keyboardShortcut(KeyEquivalent(key), modifiers: [.command, .option])
                 } else {
                     toggle
+                }
+            }
+            Divider()
+            // Другий переклад поруч (FR-26): і тут, бо кнопка тулбара у вузькому вікні ховається.
+            Menu("Поруч") {
+                Toggle("Вимкнено", isOn: Binding(
+                    get: { model.parallelTranslation == nil },
+                    set: { if $0 { preferences.preferences.parallelTranslation = nil } }))
+                ForEach(Translation.allCases.filter { $0 != model.translation }, id: \.self) { translation in
+                    Toggle(translation.title, isOn: Binding(
+                        get: { model.parallelTranslation == translation },
+                        set: { if $0 { preferences.preferences.parallelTranslation = translation } }))
                 }
             }
         }
