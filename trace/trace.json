@@ -38,6 +38,9 @@
     "FR-35": "MVP",
     "FR-36": "MVP",
     "FR-37": "MVP",
+    "FR-38": "MVP",
+    "FR-39": "MVP",
+    "FR-40": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "MVP",
@@ -920,9 +923,82 @@
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-38",
+      "specs": [
+        "openspec/specs/sermon-drafts/spec.md"
+      ],
+      "planned": false,
+      "tests": [
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleReaderUITests/DraftsUITests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleReaderUITests/DraftsUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-39",
+      "specs": [
+        "openspec/specs/sermon-drafts/spec.md"
+      ],
+      "planned": false,
+      "tests": [
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleReaderUITests/DraftsUITests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleReaderUITests/DraftsUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-40",
+      "specs": [
+        "openspec/specs/sermon-drafts/spec.md"
+      ],
+      "planned": false,
+      "tests": [
+        "Tests/BibleCoreTests/DraftTests.swift",
+        "Tests/BibleReaderUITests/DraftsUITests.swift",
+        "tests/BibleCoreTests/DraftTests.swift",
+        "tests/BibleReaderUITests/DraftsUITests.swift"
+      ],
+      "recordings": []
     }
   ],
-  "failures": [],
+  "failures": [
+    {
+      "check": "plan-ownership",
+      "msg": "FR-38 is not assigned in docs/mvp-capability-plan.md"
+    },
+    {
+      "check": "plan-ownership",
+      "msg": "FR-39 is not assigned in docs/mvp-capability-plan.md"
+    },
+    {
+      "check": "plan-ownership",
+      "msg": "FR-40 is not assigned in docs/mvp-capability-plan.md"
+    }
+  ],
   "warnings": [
     {
       "check": "recording-evidence",
@@ -1071,6 +1147,18 @@
     {
       "check": "recording-evidence",
       "msg": "FR-37 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-38 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-39 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-40 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }
