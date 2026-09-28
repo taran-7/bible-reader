@@ -29,7 +29,8 @@ struct ContentView: View {
                 .background(ThemeBackground())
         } else {
             NavigationSplitView {
-                BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
+                BookList(model: model, fontSize: preferences.preferences.bookListFontSize,
+                         verseFontSize: preferences.preferences.verseFontSize)
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
                 Group {

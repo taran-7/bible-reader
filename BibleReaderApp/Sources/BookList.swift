@@ -4,6 +4,8 @@ import SwiftUI
 struct BookList: View {
     let model: ReaderViewModel
     let fontSize: Double
+    /// Розмір шрифту віршів — для номерів у вікні розділів.
+    let verseFontSize: Double
     @Environment(\.theme) private var theme
     @Environment(UserData.self) private var userData
 
@@ -63,7 +65,7 @@ struct BookList: View {
                     .popover(isPresented: model.chapterPickerBinding(book: book.number, origin: .sidebar),
                              arrowEdge: .trailing) {
                         if let picker = model.chapterPicker {
-                            ChapterPickerView(model: model, picker: picker)
+                            ChapterPickerView(model: model, picker: picker, fontSize: verseFontSize)
                         }
                     }
                     .tag(book.number)
