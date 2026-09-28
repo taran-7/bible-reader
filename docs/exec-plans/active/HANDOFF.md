@@ -2,23 +2,19 @@
 
 > Для AI-агента: прочитай цей файл першим, коротко перекажи користувачу стан і скажи наступний крок. Після кожного завершеного кроку онови цей файл.
 
-Оновлено: 2026-09-26. Прогрес 27/27; ручну перевірку 7.6 винесено в tech debt #7.
+Оновлено: 2026-09-28. Уся черга плану, крім ілюстрацій, зроблена й змерджена (PR #10–#13).
 
 ## Стан
-- MVP (v1.0) завершено: [PR #1](https://github.com/taran-7/bible-reader/pull/1) змерджено в `main`.
-- OpenSpec change `bible-reader-mvp` заархівовано в `openspec/changes/archive/2026-09-25-bible-reader-mvp/`; вимоги в `openspec/specs/` (`bible-reading`, `bible-search`, `bible-text-import`, `scripture-reference`).
-- План MVP перенесено в `docs/exec-plans/completed/bible-reader-mvp.md`.
-- `swift test`: 57 тестів зелені. Xcode 27.0 і XcodeGen встановлено.
-- Продукт описано в PRD: [docs/product-specs/prd.md](../../product-specs/prd.md) (роадмап v1.1–v2.1).
-- Project Factory встановлено ([PR #2](https://github.com/taran-7/bible-reader/pull/2)); 14 відкритих питань закрито 2026-09-27 ([PR #3](https://github.com/taran-7/bible-reader/pull/3), [project-factory.md](../../project-factory.md#відкриті-питання-після-онбордингу-2026-09-26)). `qa:verify` Pass: [automated-verification-latest.md](../../qa/automated-verification-latest.md).
-- У PRD додано 6.18 «Теми оформлення» у v1.1: Світла, Темна, Скло (Liquid Glass), Пастельна, Манускрипт; палітри з перевіреним контрастом WCAG.
-- У PRD додано v1.4 «Ілюстрації» (6.17): кнопка «Пошук ілюстрацій» поруч із «Копіювати», реальні історії до віршів (до 7), лише англомовні протестантські/баптистські джерела. Пошук безкоштовний: локальний індекс (sitemap/RSS у SQLite FTS) + живий пошук на сайтах allowlist. Стартовий allowlist/blocklist: [illustration-sources.md](../../product-specs/illustration-sources.md), домени ще не перевірені.
+- Змерджено в `main`: v1.1 (шрифти, копіювання, теми), v1.2 пошук ([PR #11](https://github.com/taran-7/bible-reader/pull/11)), v1.3 закладки/підсвітки/нотатки ([PR #12](https://github.com/taran-7/bible-reader/pull/12)), доступність і запуск < 1 с, v1.5 «Порівняти», v2.0 паралельний перегляд і таблиця відповідностей KJV ↔ Синодальний, v2.1 модулі перекладів ([PR #13](https://github.com/taran-7/bible-reader/pull/13)).
+- Слайси заархівовано в `openspec/changes/archive/2026-09-28-*` (рев'ю — `review-findings.json` у кожному); план — [mvp-capability-plan.md](../../mvp-capability-plan.md).
+- `make test`: 186 тестів; `npm run qa:verify`: [automated-verification-latest.md](../../qa/automated-verification-latest.md). UI-тести ганяє CI (локально — з `QA_UI_TESTS=1` і розблокованим екраном).
+- PD-13: `check-trajectory` рахує `Slice:`-коміти лише з `HEAD` (див. [project-factory.md](../../project-factory.md)).
+- Як додати переклад: [translation-modules.md](../../translation-modules.md).
 
 ## Що далі (для агента)
-0. Після мержу PR #3: `make db`. Далі слайси `add-platform-checks` і `add-ui-tests` (XCUITest, FR-10/14, tech debt #7), потім `add-reading-comfort` (v1.1).
-2. Почати v1.1 «Зручність читання» (PRD 6.1–6.3: масштаб шрифтів, масштаб інтерфейсу, напівпрозора кнопка копіювання праворуч зверху на виділенні з написом «Скопійовано»): гілка `feature/02-<change>`, `/opsx:propose`.
-3. Перед реалізацією 6.17 обговорити: хто відбирає й переказує історії (кандидат Apple Foundation Models, macOS 26+), розмір і частоту оновлення індексу, адаптери сайтів; перевірити домени allowlist.
-4. Далі за планом курсу: харнес (`.claude/agents/reviewer.md`, `make check`) і README сабмішену (відео робить користувач).
+1. v2.2 «Ілюстрації» (FR-33–35) — останній слайс; перед реалізацією обговорити з власником: хто відбирає й переказує історії (кандидат Apple Foundation Models, macOS 26+), розмір і частоту оновлення індексу, адаптери сайтів; перевірити домени allowlist.
+2. Відкритий tech debt: [tech-debt-tracker.md](../tech-debt-tracker.md) (зокрема #20 права на Огієнка, #25 лише дві системи нумерації).
+3. Ручна перевірка людиною: VoiceOver-прохід, вигляд тем і паралельного перегляду на широкому/вузькому вікні.
 
 ## Корисне знати
 - База `bible.sqlite` не комітиться; генерується `make db` або pre-build скриптом Xcode.
