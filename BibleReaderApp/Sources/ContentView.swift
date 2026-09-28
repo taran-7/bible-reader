@@ -23,9 +23,15 @@ struct ContentView: View {
         #endif
     }
 
+    /// «Спробувати ще раз» лише коли база відкрилась, а не прочитався розділ (tech debt #11).
+    private var retryAction: (() -> Void)? {
+        guard model.canRetryLoad else { return nil }
+        return { [model] in model.retryLoad() }
+    }
+
     @ViewBuilder private var content: some View {
         if let error = model.loadError {
-            DatabaseErrorView(message: error, retry: model.canRetryLoad ? model.retryLoad : nil)
+            DatabaseErrorView(message: error, retry: retryAction)
                 .background(ThemeBackground())
         } else {
             NavigationSplitView {
