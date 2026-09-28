@@ -929,7 +929,7 @@
       "specs": [
         "openspec/specs/sermon-drafts/spec.md"
       ],
-      "planned": false,
+      "planned": true,
       "tests": [
         "Tests/BibleCoreTests/DraftTests.swift",
         "Tests/BibleCoreTests/DraftTests.swift",
@@ -959,7 +959,7 @@
       "specs": [
         "openspec/specs/sermon-drafts/spec.md"
       ],
-      "planned": false,
+      "planned": true,
       "tests": [
         "Tests/BibleCoreTests/DraftTests.swift",
         "Tests/BibleCoreTests/DraftTests.swift",
@@ -975,7 +975,7 @@
       "specs": [
         "openspec/specs/sermon-drafts/spec.md"
       ],
-      "planned": false,
+      "planned": true,
       "tests": [
         "Tests/BibleCoreTests/DraftTests.swift",
         "Tests/BibleReaderUITests/DraftsUITests.swift",
@@ -985,20 +985,7 @@
       "recordings": []
     }
   ],
-  "failures": [
-    {
-      "check": "plan-ownership",
-      "msg": "FR-38 is not assigned in docs/mvp-capability-plan.md"
-    },
-    {
-      "check": "plan-ownership",
-      "msg": "FR-39 is not assigned in docs/mvp-capability-plan.md"
-    },
-    {
-      "check": "plan-ownership",
-      "msg": "FR-40 is not assigned in docs/mvp-capability-plan.md"
-    }
-  ],
+  "failures": [],
   "warnings": [
     {
       "check": "recording-evidence",
