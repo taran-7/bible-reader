@@ -315,6 +315,18 @@ public final class ReaderViewModel {
         return focusedVerse
     }
 
+    /// Панель ілюстрацій праворуч від тексту (FR-33); `nil` — закрита. Новий запит замінює попередній.
+    public private(set) var illustrations: IllustrationRequest?
+
+    /// Відкриває панель ілюстрацій до виділених віршів; нема що шукати — панель не змінюється.
+    public func showIllustrations(for selectedVerses: Set<Int>) {
+        if let request = illustrationRequest(for: selectedVerses) { illustrations = request }
+    }
+
+    public func closeIllustrations() {
+        illustrations = nil
+    }
+
     /// Запит на ілюстрації (FR-33): посилання мовою екрана і текст тих самих віршів у KJV — пошук англійською.
     /// Вірш без відповідника в KJV (доповнення Септуагінти) пропускається; без жодного — `nil`.
     public func illustrationRequest(for selectedVerses: Set<Int>) -> IllustrationRequest? {

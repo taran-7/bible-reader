@@ -6,10 +6,11 @@ import SwiftUI
 @preconcurrency import Translation
 #endif
 
-/// Вікно «Ілюстрації» (FR-33): до 7 історій до виділених віршів, «Отримати ще», «Скопіювати» на картці.
-/// Нічого не зберігається: закрили вікно — історії зникли.
+/// Панель «Ілюстрації» праворуч від тексту (FR-33): до 7 історій до виділених віршів, «Отримати ще»,
+/// «Перекласти» і «Скопіювати» на картці. Нічого не зберігається: закрили панель — історії зникли.
 struct IllustrationsView: View {
     let request: IllustrationRequest
+    let close: () -> Void
     @State private var model = IllustrationsModel()
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
@@ -17,19 +18,25 @@ struct IllustrationsView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 16) {
-                Text("Ілюстрації до \(request.reference)")
-                    .font(.system(size: scale.systemFontSize * 1.4, weight: .semibold))
-                    .accessibilityIdentifier("illustrations-title")
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Ілюстрації до \(request.reference)")
+                        .font(.system(size: scale.systemFontSize * 1.4, weight: .semibold))
+                        .accessibilityIdentifier("illustrations-title")
+                    Spacer()
+                    Button("Закрити ілюстрації", systemImage: "xmark", action: close)
+                        .labelStyle(.iconOnly)
+                        .buttonStyle(.borderless)
+                        .keyboardShortcut(.cancelAction)
+                        .accessibilityIdentifier("illustrations-close")
+                }
                 ForEach(model.stories) { IllustrationCard(story: $0, targetLanguage: request.translationTarget) }
                 footer
             }
-            .padding(20)
-            .frame(maxWidth: 720, alignment: .leading)
-            .frame(maxWidth: .infinity)
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(ThemeBackground())
         .foregroundStyle(Color(theme.text))
-        .frame(minWidth: 480, minHeight: 400)
         .task { await model.start(request) }
     }
 

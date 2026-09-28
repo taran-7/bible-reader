@@ -131,9 +131,9 @@ struct ChapterView: View {
         openWindow(id: "compare", value: CompareRequest(book: model.location.book, chapter: model.location.chapter, verses: verses))
     }
 
+    /// Ілюстрації — панеллю праворуч у тому самому вікні.
     private func illustrations(_ verses: Set<Int>) {
-        guard let request = model.illustrationRequest(for: verses) else { return }
-        openWindow(id: "illustrations", value: request)
+        model.showIllustrations(for: verses)
     }
 
     private func copy(_ verses: Set<Int>) {

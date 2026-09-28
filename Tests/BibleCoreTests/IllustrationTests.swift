@@ -270,6 +270,20 @@ extension IllustrationTests {
 
 @MainActor @Suite struct IllustrationRequestTests {
     // @trace FR-33
+    @Test func testPanelOpensReplacesAndCloses() {
+        let model = ReaderViewModel { FakeRepository() }
+        #expect(model.illustrations == nil)
+        model.showIllustrations(for: [1])
+        #expect(model.illustrations?.reference == "Genesis 1:1")
+        model.showIllustrations(for: [2, 3])
+        #expect(model.illustrations?.reference == "Genesis 1:2-3")
+        model.showIllustrations(for: [])  // нема що шукати — панель лишається
+        #expect(model.illustrations?.reference == "Genesis 1:2-3")
+        model.closeIllustrations()
+        #expect(model.illustrations == nil)
+    }
+
+    // @trace FR-33
     @Test func testRequestUsesKJVTextAndLocalReference() {
         let model = ReaderViewModel { FakeRepository() }
         model.translation = .synodal
