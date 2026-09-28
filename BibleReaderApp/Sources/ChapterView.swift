@@ -47,8 +47,10 @@ struct ChapterView: View {
                         .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
                         .frame(maxWidth: .infinity)
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
-                        .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? SelectionButton.rowWidth(for: scale, compact: compactButtons) : 36)
+                        // Виділені вірші відступають від кнопок повністю, сусіди — сходинками ½ і ¼.
+                        .padding(.trailing, 36 + (SelectionButton.rowWidth(for: scale, compact: compactButtons) - 36)
+                                  * CopyButtonModel.shift(of: verse.verse, selection: selection))
+                        .animation(.easeInOut(duration: 0.2), value: selection)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
