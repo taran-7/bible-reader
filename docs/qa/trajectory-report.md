@@ -20,7 +20,7 @@ Result: PASS, 2 warning(s)
 | 2026-09-28-add-a11y-launch-checks | clean | 1 | yes | BibleCore |
 | 2026-09-28-add-illustrations | clean | 11 | yes | BibleCore |
 | 2026-09-28-add-parallel-view | clean | 1 | yes | BibleCore |
-| 2026-09-28-add-sermon-drafts | clean | 3 | yes | BibleCore |
+| 2026-09-28-add-sermon-drafts | clean | 4 | yes | BibleCore |
 | 2026-09-28-add-translation-modules | clean | 1 | yes | BibleCore |
 | 2026-09-28-add-user-notes | clean | 5 | yes | BibleCore |
 | 2026-09-28-add-verse-compare | clean | 1 | yes | BibleCore |
