@@ -91,8 +91,8 @@
     },
     {
       "slice": "2026-09-28-add-sermon-drafts",
-      "reviewEvidence": "missing",
-      "trailerCommits": 2,
+      "reviewEvidence": "clean",
+      "trailerCommits": 3,
       "libDomains": [
         "BibleCore"
       ],
@@ -200,10 +200,6 @@
   ],
   "failures": [],
   "warnings": [
-    {
-      "check": "review-evidence",
-      "msg": "2026-09-28-add-sermon-drafts: review-findings.json is missing (review must have run clean before archive)"
-    },
     {
       "check": "process",
       "msg": "2026-09-28-comfortable-reading: archived change is missing design.md and/or tasks.md"
