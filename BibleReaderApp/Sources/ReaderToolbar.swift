@@ -49,6 +49,9 @@ struct ReaderToolbar: ToolbarContent {
             }
         }
         ToolbarItem {
+            DraftsToolbarButton(scale: scale)
+        }
+        ToolbarItem {
             let chapter = model.canonicalChapter
             let marked = userData.isBookmarked(chapter)
             Button(marked ? "Прибрати закладку розділу" : "Закладка на розділ",
@@ -90,5 +93,20 @@ struct ReaderToolbar: ToolbarContent {
             .accessibilityIdentifier("translation")
             .controlSize(scale.controlSize)
         }
+    }
+}
+
+/// «Чорнетки» в тулбарі (FR-38): панель праворуч від тексту.
+struct DraftsToolbarButton: View {
+    let scale: InterfaceScale
+    @Environment(DraftStore.self) private var drafts
+
+    var body: some View {
+        Button("Чорнетки", systemImage: drafts.isOpen ? "square.and.pencil.circle.fill" : "square.and.pencil") {
+            drafts.isOpen.toggle()
+        }
+        .help("Чорнетки проповідей (⌥⌘D)")
+        .accessibilityIdentifier("drafts-toolbar")
+        .controlSize(scale.controlSize)
     }
 }

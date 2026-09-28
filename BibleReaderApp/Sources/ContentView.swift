@@ -5,6 +5,7 @@ struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
     @Environment(UserData.self) private var userData
+    @Environment(DraftStore.self) private var drafts
     /// Виділені вірші, для яких відкрито вибір перекладів «Порівняти».
     @State private var compareSelection: CompareSelection?
 
@@ -48,6 +49,13 @@ struct ContentView: View {
                         CompareView(comparison: comparison, fontSize: preferences.preferences.verseFontSize,
                                     close: model.closeComparison,
                                     chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
+                    } else if drafts.isOpen {
+                        // Текст ліворуч, чорнетка праворуч — та сама межа, що й для ілюстрацій.
+                        IllustrationsSplit {
+                            chapter
+                        } illustrations: {
+                            DraftsPanel(store: drafts, model: model)
+                        }
                     } else if let request = model.illustrations {
                         // Текст ліворуч вузько (35 %), ілюстрації праворуч ширше (65 %); межу можна тягнути.
                         IllustrationsSplit {
@@ -66,6 +74,14 @@ struct ContentView: View {
                 .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
+            // Праворуч одна панель: чорнетки закривають ілюстрації і навпаки.
+            .onChange(of: drafts.isOpen) { _, open in if open { model.closeIllustrations() } }
+            .onChange(of: model.illustrations) { _, request in if request != nil { drafts.isOpen = false } }
+            .overlay {
+                if drafts.isPresenting, drafts.active != nil {
+                    SermonView(store: drafts, model: model)
+                }
+            }
             .sheet(item: $compareSelection) { selection in
                 CompareSetup(current: model.translation, preferences: preferences) { chosen in
                     model.showComparison(of: selection.verses, with: chosen)

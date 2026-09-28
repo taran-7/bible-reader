@@ -16,6 +16,8 @@ struct BibleReaderApp: App {
         return try UserDatabase(path: UserDatabase.defaultURL(profile: profile))
     }
     @State private var userData = BibleReaderApp.makeUserData()
+    /// Чорнетки проповідей у тій самій базі користувача (FR-38).
+    @State private var drafts = DraftStore(database: try? BibleReaderApp.userDatabase.get())
     @State private var model = ReaderViewModel(positionStore: try? BibleReaderApp.userDatabase.get()) {
         #if DEBUG
         let environment = ProcessInfo.processInfo.environment // BIBLE_READER_DB для UI-тестів
@@ -33,12 +35,17 @@ struct BibleReaderApp: App {
         WindowGroup {
             ContentView(model: model, preferences: preferences)
                 .environment(userData)
+                .environment(drafts)
                 .frame(minWidth: 800, minHeight: 500)
                 .onAppear { TranslationKeyMonitor.install(model: model) }
         }
         .commands {
             ExportCommands(userData: userData, model: model)
             BookmarkCommands(userData: userData, model: model)
+            CommandGroup(after: .sidebar) {
+                Button(drafts.isOpen ? "Сховати чорнетки" : "Чорнетки") { drafts.isOpen.toggle() }
+                    .keyboardShortcut("d", modifiers: [.command, .option])
+            }
             FindCommands()
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
@@ -160,15 +167,7 @@ struct ExportCommands: Commands {
     }
 
     private func save(name: String, type: UTType, contents: () throws -> Data) {
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = name
-        panel.allowedContentTypes = [type]
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        do {
-            try contents().write(to: url, options: .atomic)
-        } catch {
-            NSAlert(error: error).runModal()
-        }
+        FileExport.save(name: name, type: type, contents: contents)
     }
 }
 

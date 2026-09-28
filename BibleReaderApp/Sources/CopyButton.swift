@@ -8,15 +8,15 @@ struct SelectionButton: View {
     static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 32 : 124) * scale.factor }
     static let spacing: CGFloat = 4
 
-    /// Праве поле рядка під три кнопки.
-    static func rowWidth(for scale: InterfaceScale, compact: Bool = false) -> CGFloat {
-        3 * width(for: scale, compact: compact) + 2 * spacing + 12
+    /// Праве поле рядка під `count` кнопок (три; четверта — «В чорнетку», коли відкриті чорнетки).
+    static func rowWidth(for scale: InterfaceScale, compact: Bool = false, count: Int = 3) -> CGFloat {
+        CGFloat(count) * width(for: scale, compact: compact) + CGFloat(count - 1) * spacing + 12
     }
 
     /// Написи лише коли текстові вірша лишається хоча б 360 pt; інакше вірш стискається у вузьку високу
     /// колонку, і кнопки над першим віршем виділення виходять за край при прокручуванні.
-    static func isCompact(listWidth: CGFloat, scale: InterfaceScale) -> Bool {
-        listWidth - rowWidth(for: scale) < 360 * scale.factor
+    static func isCompact(listWidth: CGFloat, scale: InterfaceScale, count: Int = 3) -> Bool {
+        listWidth - rowWidth(for: scale, count: count) < 360 * scale.factor
     }
 
     let title: String

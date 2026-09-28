@@ -164,6 +164,15 @@ public final class UserDatabase: Sendable {
                 CREATE TABLE state (key TEXT PRIMARY KEY, value BLOB NOT NULL);
                 """)
         }
+        // Чорнетки проповідей (FR-38).
+        migrator.registerMigration("v2") { db in
+            try db.execute(sql: """
+                CREATE TABLE draft (
+                  id TEXT PRIMARY KEY, title TEXT NOT NULL, text TEXT NOT NULL,
+                  created REAL NOT NULL, updated REAL NOT NULL
+                );
+                """)
+        }
         return migrator
     }
 }
