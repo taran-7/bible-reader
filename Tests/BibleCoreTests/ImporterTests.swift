@@ -15,6 +15,51 @@ import Testing
         #expect(try TestSupport.string("SELECT text FROM verses WHERE translation = 'synodal' AND book = 1 AND chapter = 1 AND verse = 1", in: out) == "В начале сотворил Бог небо и землю.")
     }
 
+    // @trace FR-3
+    @Test func testTruncatedSourceFailsWithoutOutput() throws {
+        let dir = try TestSupport.tempDirectory()
+        try TestSupport.writeFixture(to: dir)  // по 2 книги в кожному файлі
+        let out = dir.appendingPathComponent("bible.sqlite")
+
+        #expect(throws: ImportError.incomplete(Translation.kjv.sourceFileName, books: 2, expected: 66)) {
+            try BibleImporter.run(rawDirectory: dir, output: out, expectedBooks: 66)
+        }
+        #expect(!FileManager.default.fileExists(atPath: out.path))
+    }
+
+    // @trace FR-3
+    @Test func testCommandUsageErrorExits64() {
+        var stderr = ""
+        let code = ImportCommand.run(arguments: ["bible-import"], stderr: { stderr += $0 })
+        #expect(code == 64)
+        #expect(stderr.hasPrefix("Використання:"))
+    }
+
+    // @trace FR-3
+    @Test func testCommandImportsFullCanon() throws {
+        let dir = try TestSupport.tempDirectory()
+        let canon = "[" + (1...66).map { #"{"chapters":[["Verse \#($0)."]]}"# }.joined(separator: ",") + "]"
+        try TestSupport.writeFixture(to: dir, kjv: canon, synodal: canon, ohienko: canon, bkr: canon)
+        let out = dir.appendingPathComponent("bible.sqlite")
+        var stderr = ""
+        #expect(ImportCommand.run(arguments: ["bible-import", dir.path, out.path], stderr: { stderr += $0 }) == 0)
+        #expect(stderr.isEmpty)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 66 * 4)
+    }
+
+    // @trace FR-3
+    @Test func testCommandImportErrorExits1WithMessage() throws {
+        let dir = try TestSupport.tempDirectory()
+        try TestSupport.writeFixture(to: dir)
+        let out = dir.appendingPathComponent("db/bible.sqlite")
+        var stderr = ""
+        let code = ImportCommand.run(arguments: ["bible-import", dir.path, out.path], stderr: { stderr += $0 })
+        #expect(code == 1)
+        #expect(stderr.contains("Помилка:"))
+        #expect(stderr.contains(Translation.kjv.sourceFileName))
+        #expect(!FileManager.default.fileExists(atPath: out.path))
+    }
+
     // @trace FR-1
     @Test func testStripsMarkup() throws {
         let dir = try TestSupport.tempDirectory()

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import BibleCore
 
@@ -109,5 +110,61 @@ extension ParallelTests {
         #expect(model.localReference(book: 19, chapter: 23, verse: nil).verseStart == nil)
         let empty = ReaderViewModel { FakeRepository() }
         #expect(empty.canonicalChapter.chapter == 1)
+    }
+}
+
+/// Нова система нумерації з маніфесту (tech debt #25): таблиця до KJV, між системами — через KJV.
+@Suite struct CustomVersificationTests {
+    static let vulgate: Translation.Numbering = "vulgate"
+    // Умовна «Вульгата»: Пс 10 KJV = Пс 9:22…, Мал 4 KJV = Мал 3:19….
+    let table = VersificationTable(segments: [
+        .init(book: 19, chapter: 10, from: 1, to: 18, localChapter: 9, localVerse: 22),
+        .init(book: 39, chapter: 4, from: 1, to: 6, localChapter: 3, localVerse: 19),
+    ])
+    var v: Versification {
+        Versification(kjvCounts: [19: [9: 20, 10: 18, 23: 6], 39: [3: 18, 4: 6]], synodalCounts: [19: [9: 39, 22: 6]],
+                      custom: [Self.vulgate: table])
+    }
+    func key(_ b: Int, _ c: Int, _ vs: Int) -> VerseKey { VerseKey(book: b, chapter: c, verse: vs) }
+
+    // @trace FR-30
+    @Test func testCustomTableMapsToAndFromKJV() {
+        #expect(v.map(key(19, 10, 1), fromNumbering: .kjv, to: Self.vulgate) == key(19, 9, 22))
+        #expect(v.map(key(39, 3, 24), fromNumbering: Self.vulgate, to: .kjv) == key(39, 4, 6))
+        // Вірші поза сегментами — той самий номер.
+        #expect(v.map(key(19, 23, 1), fromNumbering: .kjv, to: Self.vulgate) == key(19, 23, 1))
+        #expect(v.allKJV(from: Self.vulgate, key(19, 9, 22)) == [key(19, 10, 1)])
+        #expect(v.allKJV(from: .kjv, key(1, 1, 1)) == [key(1, 1, 1)])
+    }
+
+    // @trace FR-30
+    @Test func testTwoNonKJVSystemsGoThroughKJV() {
+        // Вульгата Пс 9:22 → KJV Пс 10:1 → Синодальний Пс 9:22.
+        #expect(v.map(key(19, 9, 22), fromNumbering: Self.vulgate, to: .synodal) == key(19, 9, 22))
+        #expect(v.map(key(19, 22, 1), fromNumbering: .synodal, to: Self.vulgate) == key(19, 23, 1))
+        // Невідома система або вірш без відповідника — nil, а не падіння.
+        #expect(v.map(key(19, 10, 1), fromNumbering: .kjv, to: "lxx") == nil)
+        #expect(v.map(key(99, 1, 1), fromNumbering: Self.vulgate, to: .synodal) == nil)
+    }
+}
+
+extension TranslationModuleTests {
+    static let vulgateModule = """
+    [{"code": "vg", "title": "Vulgata", "language": "en", "languageTitle": "Latina", "numbering": "vulgate", "file": "la_vg.json",
+      "versification": {"segments": [{"book": 19, "chapter": 10, "from": 1, "to": 18, "localChapter": 9, "localVerse": 22}]}},
+     {"code": "vg2", "title": "Vulgata 2", "language": "en", "languageTitle": "Latina", "numbering": "vulgate", "file": "la_vg2.json"}]
+    """
+
+    // @trace FR-30
+    @Test func testNewNumberingNeedsTableInManifest() throws {
+        let modules = try TranslationCatalog.load(from: Data(Self.vulgateModule.utf8))
+        #expect(modules.map(\.numbering) == ["vulgate", "vulgate"])
+        #expect(modules[0].versificationTable?.segments.first?.merge == false)
+        #expect(!modules[0].sharesKJVNumbering)
+        let bare = #"[{"code": "x", "title": "X", "language": "en", "languageTitle": "E", "numbering": "lxx", "file": "x.json"}]"#
+        #expect(throws: TranslationCatalog.Error.missingVersification("x")) {
+            try TranslationCatalog.load(from: Data(bare.utf8))
+        }
+        #expect(!"\(TranslationCatalog.Error.missingVersification("x"))".isEmpty)
     }
 }

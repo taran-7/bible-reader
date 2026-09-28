@@ -96,6 +96,16 @@ extension TranslationModuleTests {
     }
 
     // @trace FR-30
+    @Test func testShortcutByPhysicalKeyIgnoresLayout() {
+        // Клавіші 1 і 9 цифрового ряду — будь-яка розкладка (чеська дає «+» і «í»).
+        #expect(TranslationShortcut.index(forKeyCode: 18) == 0)
+        #expect(TranslationShortcut.index(forKeyCode: 21) == 3)
+        #expect(TranslationShortcut.index(forKeyCode: 25) == 8)
+        #expect(TranslationShortcut.index(forKeyCode: 29) == nil)  // 0
+        #expect(TranslationShortcut.index(forKeyCode: 0) == nil)   // A
+    }
+
+    // @trace FR-30
     @Test func testRequiredBuiltInCodesInBundledManifest() throws {
         let codes = try TranslationCatalog.load(from: TranslationCatalog.bundledManifest).map(\.rawValue)
         #expect(Set(["kjv", "bkr", "ohienko", "synodal"]).isSubset(of: codes))

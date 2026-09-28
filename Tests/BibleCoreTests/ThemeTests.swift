@@ -140,3 +140,18 @@ import Testing
         #expect(try JSONDecoder().decode(ReadingPreferences.self, from: old).theme == .system)
     }
 }
+
+extension ThemeTests {
+    // @trace FR-31
+    @Test func testSearchFieldFollowsThemeAndScale() {
+        for id in ThemeID.allCases {
+            let theme = Theme.tokens(for: id)
+            let style = SearchFieldStyle(theme: theme, fontSize: InterfaceScale.extraLarge.fontSize(base: 13))
+            #expect(style.text == theme.text)
+            #expect(style.colorScheme == theme.colorScheme)
+            // Текст у полі читається на його фоні (AA для звичайного тексту).
+            #expect(style.text.contrast(with: style.background) >= 4.5, "\(id)")
+        }
+        #expect(SearchFieldStyle(theme: Theme.tokens(for: .light), fontSize: InterfaceScale.large.fontSize(base: 13)).fontSize > 13)
+    }
+}

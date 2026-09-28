@@ -29,7 +29,7 @@ public final class ReaderViewModel {
     }
     /// Рядки паралельного перегляду: вірш основного перекладу і відповідні вірші другого.
     public private(set) var parallelRows: [ParallelRow] = []
-    /// Таблиця відповідностей KJV ↔ Синодальний; будується при першій потребі з реальної бази.
+    /// Таблиці відповідностей нумерацій (KJV — вузол); будуються при першій потребі з реальної бази.
     @ObservationIgnored private lazy var versification: Versification? =
         (repository as? SQLiteBibleRepository).flatMap { try? Versification.load(from: $0) }
     @ObservationIgnored private var keepLocationOnSwitch = false
@@ -137,15 +137,22 @@ public final class ReaderViewModel {
         positionStore.set(data, forKey: Self.positionKey)
     }
 
-    public var canGoPrevious: Bool { navigator.previous(from: location) != nil }
-    public var canGoNext: Bool { navigator.next(from: location) != nil }
+    /// Сусідні розділи рахуються при завантаженні розділу, а не на кожен рендер тулбара.
+    public private(set) var canGoPrevious = false
+    public private(set) var canGoNext = false
 
+    /// ◀ ▶ закривають результати пошуку, як і вибір розділу.
     public func goPrevious() {
-        if let target = navigator.previous(from: location) { open(target) }
+        if let target = navigator.previous(from: location) { closeSearch(); open(target) }
     }
 
     public func goNext() {
-        if let target = navigator.next(from: location) { open(target) }
+        if let target = navigator.next(from: location) { closeSearch(); open(target) }
+    }
+
+    private func closeSearch() {
+        results = nil
+        searchError = nil
     }
 
     public func open(_ target: Location, focus verse: Int? = nil) {
@@ -176,9 +183,15 @@ public final class ReaderViewModel {
     public func pickChapter(_ chapter: Int) {
         guard let picker = chapterPicker else { return }
         chapterPicker = nil
-        results = nil
-        searchError = nil
+        closeSearch()
         open(Location(book: picker.book, chapter: chapter))
+    }
+
+    /// База відкрита, а зламалося лише читання: «Спробувати ще раз» має сенс.
+    public var canRetryLoad: Bool { repository != nil && loadError != nil }
+
+    public func retryLoad() {
+        reload()
     }
 
     public func dismissChapterPicker() {
@@ -203,7 +216,7 @@ public final class ReaderViewModel {
     /// Усі ключі KJV вірша поточного розділу: злитий вірш Синодального показує позначки всіх своїх частин.
     public func canonicalKeys(_ verse: Int) -> [VerseKey] {
         let key = VerseKey(book: location.book, chapter: location.chapter, verse: verse)
-        guard !translation.sharesKJVNumbering, let all = versification?.allKJV(fromSynodal: key), !all.isEmpty
+        guard !translation.sharesKJVNumbering, let all = versification?.allKJV(from: translation.numbering, key), !all.isEmpty
         else { return [canonicalKey(verse)] }
         return all
     }
@@ -331,7 +344,7 @@ public final class ReaderViewModel {
     }
 
     private func mapped(_ key: VerseKey, from source: Translation, to target: Translation) -> VerseKey? {
-        if source.sharesKJVNumbering == target.sharesKJVNumbering { return key }
+        if source.numbering == target.numbering { return key }
         return versification?.map(key, from: source, to: target)
     }
 
@@ -374,6 +387,11 @@ public final class ReaderViewModel {
                 location = Location(book: location.book, chapter: chapterCount)
             }
             verses = try repository.verses(book: location.book, chapter: location.chapter, translation: translation)
+            // Разова помилка читання не лишає екран помилки назавжди (tech debt #11).
+            loadError = nil
+            let navigator = navigator
+            canGoPrevious = navigator.previous(from: location) != nil
+            canGoNext = navigator.next(from: location) != nil
         } catch {
             loadError = "\(error)"
         }

@@ -4,7 +4,7 @@
 //   1. block committing real env files / obvious secrets
 //   2. swift build when Swift sources are staged (Swift adaptation)
 //   4. traceability validator (fast, pure file parsing)
-import { execSync, spawnSync } from "node:child_process";
+import { execFileSync, execSync, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 
 // Fail-open process-health telemetry (reflection design, mechanism 1): append
@@ -46,7 +46,8 @@ for (const file of staged) {
   if (/\.(png|webm|jpg|jpeg|gif|pdf|ico|woff2?)$/.test(file)) continue;
   let content = "";
   try {
-    content = capture(`git show :"${file}"`);
+    // argv, not a shell string: a file named `$(cmd)` must not execute (tech debt #8).
+    content = execFileSync("git", ["show", `:${file}`], { encoding: "utf8" }).trim();
   } catch {
     continue;
   }

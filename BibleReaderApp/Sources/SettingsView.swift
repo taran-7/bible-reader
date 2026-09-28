@@ -21,6 +21,9 @@ struct SettingsView: View {
             Button("Скинути до стандартних") { preferences.reset() }
         }
         .formStyle(.grouped)
+        // Фон форми — тема, а не системний сірий (tech debt #18).
+        .scrollContentBackground(.hidden)
+        .background(ThemeBackground())
         .frame(width: 420)
         .navigationTitle("Налаштування")
     }

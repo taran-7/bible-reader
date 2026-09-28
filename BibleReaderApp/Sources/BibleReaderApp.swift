@@ -34,6 +34,7 @@ struct BibleReaderApp: App {
             ContentView(model: model, preferences: preferences)
                 .environment(userData)
                 .frame(minWidth: 800, minHeight: 500)
+                .onAppear { TranslationKeyMonitor.install(model: model) }
         }
         .commands {
             ExportCommands(userData: userData, model: model)
@@ -90,6 +91,25 @@ struct FontCommands: Commands {
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.areFontsDefault)
             Divider()
+        }
+    }
+}
+
+/// ⌘⌥1…9 за фізичною клавішею цифрового ряду: `keyboardShortcut` меню порівнює символ,
+/// а на чеській розкладці цифровий ряд без Shift дає `+ ě š č` (tech debt #23).
+/// Локальний монітор бачить подію раніше за меню, тож переклад не перемикається двічі.
+@MainActor enum TranslationKeyMonitor {
+    private static var token: Any?
+
+    static func install(model: ReaderViewModel) {
+        guard token == nil else { return }
+        token = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command, .option],
+                  let index = TranslationShortcut.index(forKeyCode: event.keyCode),
+                  index < Translation.allCases.count
+            else { return event }
+            model.translation = Translation.allCases[index]
+            return nil
         }
     }
 }

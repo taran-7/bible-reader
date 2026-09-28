@@ -5,8 +5,8 @@ archived slice took: review evidence, `Slice:` trailers, and module scope.
 It does NOT verify test-first ordering or test integrity (not derivable from
 one-commit-per-slice history) — those are graded by the trajectory-eval workflow.
 
-Scope: 15 archived slice(s).
-Result: PASS, 1 warning(s)
+Scope: 16 archived slice(s).
+Result: PASS, 2 warning(s)
 
 | Slice | Review evidence | Trailer commits | design+tasks | lib domains touched |
 |---|---|---|---|---|
@@ -23,12 +23,13 @@ Result: PASS, 1 warning(s)
 | 2026-09-28-add-user-notes | clean | 5 | yes | BibleCore |
 | 2026-09-28-add-verse-compare | clean | 1 | yes | BibleCore |
 | 2026-09-28-chapter-picker-popover | clean | 5 | yes | BibleCore |
+| 2026-09-28-close-tech-debt-batch | **missing** | 5 | yes | BibleCore, bible-import |
 | 2026-09-28-improve-search | clean | 2 | yes | BibleCore, CSnowball |
 | 2026-09-28-tweak-reading-ui | clean | 3 | yes | BibleCore |
 
 ## Cross-slice module overlap
 
-- `lib/BibleCore/` touched by: 2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui
+- `lib/BibleCore/` touched by: 2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui
 
 ## Failures
 
@@ -36,4 +37,5 @@ None.
 
 ## Warnings
 
-- **in-scope**: lib/BibleCore/ modified by 14 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift
+- **review-evidence**: 2026-09-28-close-tech-debt-batch: review-findings.json is missing (review must have run clean before archive)
+- **in-scope**: lib/BibleCore/ modified by 15 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift
