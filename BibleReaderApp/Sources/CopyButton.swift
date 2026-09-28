@@ -46,3 +46,32 @@ struct CopyButton: View {
         }
     }
 }
+
+/// Кнопка «Порівняти» поруч із копіюванням (FR-36): іконка з підказкою, щоб праве поле рядка лишалось вузьким.
+struct CompareButton: View {
+    static func width(for scale: InterfaceScale) -> CGFloat { 32 * scale.factor }
+
+    let action: () -> Void
+    @State private var isHovered = false
+    @Environment(\.theme) private var theme
+    @Environment(\.interfaceScale) private var scale
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "rectangle.split.3x1")
+                .font(.system(size: scale.systemFontSize))
+                .foregroundStyle(Color(theme.accent))
+                .frame(width: CompareButton.width(for: scale) - 12)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(
+                    Color(theme.copyButton).opacity(isHovered ? 1 : 0.6),
+                    in: RoundedRectangle(cornerRadius: 6))
+        }
+        .buttonStyle(.borderless)
+        .onHover { isHovered = $0 }
+        .help("Порівняти в перекладах")
+        .accessibilityLabel("Порівняти в перекладах")
+        .accessibilityIdentifier("compare-button")
+    }
+}

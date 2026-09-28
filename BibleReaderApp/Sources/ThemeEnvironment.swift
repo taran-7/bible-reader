@@ -31,10 +31,15 @@ enum ThemeFonts {
     static let garamond = "EBGaramond-Regular"
     private static let log = Logger(subsystem: "dev.taraniuk.BibleReader", category: "fonts")
 
-    static var garamondAvailable: Bool { NSFont(name: garamond, size: 12) != nil }
+    /// Реєструє шрифти при першому зверненні: вони потрібні лише темі «Манускрипт», а реєстрація
+    /// на старті додавала часу запуску (NFR-3).
+    static let garamondAvailable: Bool = {
+        register()
+        return NSFont(name: garamond, size: 12) != nil
+    }()
 
     /// Реєструє вшиті шрифти (`Resources/Fonts`) для процесу додатка; помилки йдуть у журнал.
-    static func register() {
+    private static func register() {
         guard let folder = Bundle.main.url(forResource: "Fonts", withExtension: nil),
               let files = try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)
         else {

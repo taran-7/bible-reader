@@ -191,7 +191,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "artifact": "Tests/BibleCoreTests/ParallelTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -207,16 +207,16 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ParallelTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-27": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ParallelTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-28": [
@@ -239,8 +239,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-31": [
@@ -287,8 +287,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/CompareTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-1": [
@@ -311,7 +311,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/SearchTests.swift",
+        "artifact": "Tests/BibleCoreTests/LaunchClockTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -319,8 +319,8 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/ThemeTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "NFR-5": [
