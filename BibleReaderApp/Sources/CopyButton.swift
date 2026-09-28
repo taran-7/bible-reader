@@ -1,43 +1,73 @@
 import BibleCore
 import SwiftUI
 
-/// Напівпрозора кнопка копіювання над першим виділеним віршем (FR-17).
-/// Широка кнопка з написом у правому полі рядка; текст вірша під неї не заходить.
-struct CopyButton: View {
-    /// Ширина кнопки за масштабом інтерфейсу; `ChapterView` лишає рядку з кнопкою праве поле такої ширини.
-    static func width(for scale: InterfaceScale) -> CGFloat { 124 * scale.factor }
+/// Кнопка на виділенні: іконка з написом, однакова ширина для «Ілюстрації», «Порівняти», «Копіювати»,
+/// напівпрозора підкладка, текст вірша під неї не заходить (FR-17, FR-33, FR-36).
+struct SelectionButton: View {
+    /// Ширина кожної кнопки за масштабом інтерфейсу; `compact` — лише іконка (вузька колонка тексту).
+    static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 32 : 124) * scale.factor }
+    static let spacing: CGFloat = 4
 
+    /// Праве поле рядка під три кнопки.
+    static func rowWidth(for scale: InterfaceScale, compact: Bool = false) -> CGFloat {
+        3 * width(for: scale, compact: compact) + 2 * spacing + 12
+    }
+
+    /// Написи лише коли текстові вірша лишається хоча б 360 pt; інакше вірш стискається у вузьку високу
+    /// колонку, і кнопки над першим віршем виділення виходять за край при прокручуванні.
+    static func isCompact(listWidth: CGFloat, scale: InterfaceScale) -> Bool {
+        listWidth - rowWidth(for: scale) < 360 * scale.factor
+    }
+
+    let title: String
+    let systemImage: String
+    let help: String
+    let identifier: String
     let action: () -> Void
-    @State private var copies = 0
-    @State private var showCopied = false
     @State private var isHovered = false
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
+    @Environment(\.compactSelectionButtons) private var compact
 
     var body: some View {
-        Button {
-            action()
-            showCopied = true
-            copies += 1
-        } label: {
-            // Фіксована ширина: «Копіювати» і «Скопійовано» займають те саме місце в правому полі рядка.
-            Label(showCopied ? "Скопійовано" : "Копіювати", systemImage: showCopied ? "checkmark" : "doc.on.doc")
-                .labelStyle(.titleAndIcon)
-                .frame(width: CopyButton.width(for: scale) - 12)
+        Button(action: action) {
+            Group {
+                if compact {
+                    Label(title, systemImage: systemImage).labelStyle(.iconOnly)
+                } else {
+                    Label(title, systemImage: systemImage).labelStyle(.titleAndIcon)
+                }
+            }
+                .lineLimit(1)
+                .frame(width: SelectionButton.width(for: scale, compact: compact) - 12)
                 .font(.system(size: scale.systemFontSize))
                 .foregroundStyle(Color(theme.accent))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 3)
-                // Напівпрозора лише підкладка: іконка лишається контрастною (FR-32).
-                .background(
-                    Color(theme.copyButton).opacity(isHovered || showCopied ? 1 : 0.6),
-                    in: RoundedRectangle(cornerRadius: 6))
+                // Напівпрозора лише підкладка: іконка й текст лишаються контрастними (FR-32).
+                .background(Color(theme.copyButton).opacity(isHovered ? 1 : 0.6), in: RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.borderless)
         .onHover { isHovered = $0 }
-        .help("Копіювати цитату")
-        .accessibilityLabel(showCopied ? "Скопійовано" : "Копіювати цитату")
-        .accessibilityIdentifier("copy-button")
+        .help(help)
+        .accessibilityLabel(help)
+        .accessibilityIdentifier(identifier)
+    }
+}
+
+/// «Копіювати» → на ~1,5 с «Скопійовано» на тому самому місці (FR-17).
+struct CopyButton: View {
+    let action: () -> Void
+    @State private var copies = 0
+    @State private var showCopied = false
+
+    var body: some View {
+        SelectionButton(title: showCopied ? "Скопійовано" : "Копіювати", systemImage: showCopied ? "checkmark" : "doc.on.doc",
+                        help: showCopied ? "Скопійовано" : "Копіювати цитату", identifier: "copy-button") {
+            action()
+            showCopied = true
+            copies += 1
+        }
         // Повторний клік перезапускає відлік; зникнення view скасовує його.
         .task(id: copies) {
             guard copies > 0 else { return }
@@ -47,31 +77,17 @@ struct CopyButton: View {
     }
 }
 
-/// Кнопка «Порівняти» поруч із копіюванням (FR-36): іконка з підказкою, щоб праве поле рядка лишалось вузьким.
+/// «Порівняти» (FR-36).
 struct CompareButton: View {
-    static func width(for scale: InterfaceScale) -> CGFloat { 32 * scale.factor }
-
     let action: () -> Void
-    @State private var isHovered = false
-    @Environment(\.theme) private var theme
-    @Environment(\.interfaceScale) private var scale
 
     var body: some View {
-        Button(action: action) {
-            Image(systemName: "rectangle.split.3x1")
-                .font(.system(size: scale.systemFontSize))
-                .foregroundStyle(Color(theme.accent))
-                .frame(width: CompareButton.width(for: scale) - 12)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(
-                    Color(theme.copyButton).opacity(isHovered ? 1 : 0.6),
-                    in: RoundedRectangle(cornerRadius: 6))
-        }
-        .buttonStyle(.borderless)
-        .onHover { isHovered = $0 }
-        .help("Порівняти в перекладах")
-        .accessibilityLabel("Порівняти в перекладах")
-        .accessibilityIdentifier("compare-button")
+        SelectionButton(title: "Порівняти", systemImage: "rectangle.split.3x1", help: "Порівняти в перекладах",
+                        identifier: "compare-button", action: action)
     }
+}
+
+extension EnvironmentValues {
+    /// Кнопки на виділенні лише іконками (вузька колонка тексту); підказка лишається.
+    @Entry var compactSelectionButtons = false
 }

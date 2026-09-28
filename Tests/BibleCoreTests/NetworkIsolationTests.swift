@@ -2,10 +2,10 @@ import Foundation
 import Testing
 @testable import BibleCore
 
-/// NFR-2: додаток офлайн — мережеві API і адреси заборонені в коді, окрім модуля ілюстрацій (v1.4).
+/// NFR-2: додаток офлайн — мережеві API і адреси заборонені в коді, окрім модуля ілюстрацій (FR-33…FR-35).
 @Suite struct NetworkIsolationTests {
-    /// Файли (шлях від кореня репозиторію), яким мережа дозволена; поповнить слайс `add-illustrations`.
-    static let allowedFiles: Set<String> = []
+    /// Файли (шлях від кореня репозиторію), яким мережа дозволена: єдиний мережевий файл ілюстрацій.
+    static let allowedFiles: Set<String> = ["Sources/BibleCore/IllustrationNetwork.swift"]
 
     // @trace NFR-2
     @Test func testFindsNetworkUsage() throws {

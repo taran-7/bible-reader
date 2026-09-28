@@ -315,6 +315,37 @@ public final class ReaderViewModel {
         return focusedVerse
     }
 
+    /// Панель ілюстрацій праворуч від тексту (FR-33); `nil` — закрита. Новий запит замінює попередній.
+    public private(set) var illustrations: IllustrationRequest?
+
+    /// Відкриває панель ілюстрацій до виділених віршів; нема що шукати — панель не змінюється.
+    public func showIllustrations(for selectedVerses: Set<Int>) {
+        if let request = illustrationRequest(for: selectedVerses) { illustrations = request }
+    }
+
+    public func closeIllustrations() {
+        illustrations = nil
+    }
+
+    /// Запит на ілюстрації (FR-33): посилання мовою екрана і текст тих самих віршів у KJV — пошук англійською.
+    /// Вірш без відповідника в KJV (доповнення Септуагінти) пропускається; без жодного — `nil`.
+    public func illustrationRequest(for selectedVerses: Set<Int>) -> IllustrationRequest? {
+        let chosen = verses.filter { selectedVerses.contains($0.verse) }
+        guard let repository, !chosen.isEmpty else { return nil }
+        let keys = chosen.flatMap { canonicalKeys($0.verse) }
+        var texts: [String] = []
+        for chapter in Set(keys.map(\.chapter)).sorted() {
+            let wanted = Set(keys.filter { $0.chapter == chapter }.map(\.verse))
+            guard let kjv = try? repository.verses(book: location.book, chapter: chapter, translation: .kjv) else { continue }
+            texts += kjv.filter { wanted.contains($0.verse) }.map(\.text)
+        }
+        guard !texts.isEmpty else { return nil }
+        // `location` завжди в межах канону (його обрізають `open` і `reload`).
+        let book = Book.all[location.book - 1].name(in: translation)
+        let reference = "\(book) \(location.chapter):\(Quote.verseList(chosen.map(\.verse)))"
+        return IllustrationRequest(reference: reference, kjvText: texts, language: translation.language.code)
+    }
+
     public func quote(for selectedVerses: Set<Int>) -> String? {
         Quote.format(verses.filter { selectedVerses.contains($0.verse) })
     }

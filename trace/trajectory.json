@@ -72,6 +72,15 @@
       "processComplete": true
     },
     {
+      "slice": "2026-09-28-add-illustrations",
+      "reviewEvidence": "missing",
+      "trailerCommits": 11,
+      "libDomains": [
+        "BibleCore"
+      ],
+      "processComplete": true
+    },
+    {
       "slice": "2026-09-28-add-parallel-view",
       "reviewEvidence": "clean",
       "trailerCommits": 1,
@@ -119,7 +128,7 @@
     {
       "slice": "2026-09-28-close-tech-debt-batch",
       "reviewEvidence": "missing",
-      "trailerCommits": 5,
+      "trailerCommits": 6,
       "libDomains": [
         "BibleCore",
         "bible-import"
@@ -157,6 +166,7 @@
         "2026-09-27-add-translations",
         "2026-09-27-add-ui-tests",
         "2026-09-28-add-a11y-launch-checks",
+        "2026-09-28-add-illustrations",
         "2026-09-28-add-parallel-view",
         "2026-09-28-add-translation-modules",
         "2026-09-28-add-user-notes",
@@ -172,11 +182,15 @@
   "warnings": [
     {
       "check": "review-evidence",
+      "msg": "2026-09-28-add-illustrations: review-findings.json is missing (review must have run clean before archive)"
+    },
+    {
+      "check": "review-evidence",
       "msg": "2026-09-28-close-tech-debt-batch: review-findings.json is missing (review must have run clean before archive)"
     },
     {
       "check": "in-scope",
-      "msg": "lib/BibleCore/ modified by 15 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift"
+      "msg": "lib/BibleCore/ modified by 16 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-illustrations, 2026-09-28-add-parallel-view, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift"
     }
   ]
 }

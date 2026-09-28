@@ -7,6 +7,8 @@ struct ChapterView: View {
     let model: ReaderViewModel
     let fontSize: Double
     @State private var selection = Set<Int>()
+    /// Ширина колонки тексту: у вузькій кнопки на виділенні — лише іконки.
+    @State private var listWidth: CGFloat = 1000
     /// Вірш, нотатку до якого редагують.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
@@ -25,6 +27,7 @@ struct ChapterView: View {
         // Дані користувача в нумерації KJV: у Синодальному позначки стають на той самий зміст.
         let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
         let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
+        let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale)
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
@@ -41,11 +44,12 @@ struct ChapterView: View {
                     }
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? CopyButton.width(for: scale) + CompareButton.width(for: scale) + 12 : 36)
+                                  ? SelectionButton.rowWidth(for: scale, compact: compactButtons) : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
-                                HStack(spacing: 4) {
+                                HStack(spacing: SelectionButton.spacing) {
+                                    IllustrationsButton { [verses = selection] in illustrations(verses) }
                                     CompareButton { [verses = selection] in compare(verses) }
                                     CopyButton { [verses = selection] in copy(verses) }
                                 }
@@ -58,12 +62,18 @@ struct ChapterView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .environment(\.compactSelectionButtons, compactButtons)
+            .background(GeometryReader { geometry in
+                Color.clear.onAppear { listWidth = geometry.size.width }
+                    .onChange(of: geometry.size.width) { _, width in listWidth = width }
+            })
             .background(ThemeBackground())
             .focused($listFocused)
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)
                 Button("Порівняти в перекладах") { compare(verses) }.disabled(verses.isEmpty)
+                Button("Пошук ілюстрацій") { illustrations(verses) }.disabled(verses.isEmpty)
                 if let first = verses.min() {
                     Divider()
                     let canonical = key(first)
@@ -126,6 +136,11 @@ struct ChapterView: View {
     private func compare(_ verses: Set<Int>) {
         guard !verses.isEmpty else { return }
         openWindow(id: "compare", value: CompareRequest(book: model.location.book, chapter: model.location.chapter, verses: verses))
+    }
+
+    /// Ілюстрації — панеллю праворуч у тому самому вікні.
+    private func illustrations(_ verses: Set<Int>) {
+        model.showIllustrations(for: verses)
     }
 
     private func copy(_ verses: Set<Int>) {

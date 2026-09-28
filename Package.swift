@@ -16,7 +16,9 @@ let package = Package(
         .target(name: "CSnowball", exclude: ["COPYING"]),
         .target(name: "BibleCore", dependencies: ["CSnowball", .product(name: "GRDB", package: "GRDB.swift")],
                 // Каталог перекладів (FR-30): модуль додається рядком маніфесту.
-                resources: [.copy("Resources/translations.json")]),
+                resources: [.copy("Resources/translations.json"),
+                            // Allowlist/blocklist і адаптери ілюстрацій (FR-34): один файл, без змін коду.
+                            .copy("Resources/illustration-sources.json")]),
         .executableTarget(name: "bible-import", dependencies: ["BibleCore"]),
         .testTarget(name: "BibleCoreTests", dependencies: ["BibleCore"]),
     ]

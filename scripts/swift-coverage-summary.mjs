@@ -33,3 +33,23 @@ const total = {
 mkdirSync("coverage", { recursive: true });
 writeFileSync("coverage/coverage-summary.json", `${JSON.stringify({ total }, null, 2)}\n`);
 console.log(`coverage: lines ${total.lines.pct}% · regions ${total.statements.pct}% · functions ${total.functions.pct}% · branches ${total.branches.pct ?? "n/a"}% (${files.length} files)`);
+// Файли з непокритими функціями — щоб падіння ratchet у CI було видно без локального прогону.
+for (const f of files) {
+  const fn = f.summary.functions;
+  if (fn.covered < fn.count) {
+    console.log(`  uncovered: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} — functions ${fn.covered}/${fn.count}, lines ${f.summary.lines.covered}/${f.summary.lines.count}`);
+  }
+}
+const ours = new Set(files.map((f) => f.filename));
+for (const fn of report.data.flatMap((d) => d.functions ?? [])) {
+  if (fn.count === 0 && fn.filenames.some((name) => ours.has(name))) {
+    let name = fn.name;
+    try { name = execFileSync("xcrun", ["swift-demangle", "-compact", fn.name], { encoding: "utf8" }).trim(); } catch {}
+    console.log(`    never called: ${fn.filenames[0].replace(/^.*\/Sources\//, "Sources/")}:${fn.regions?.[0]?.[0] ?? "?"} ${name}`);
+  }
+}
+// Непокриті регіони (гілки всередині функцій): файл і рядки початку.
+for (const f of files) {
+  const lines = f.segments.filter((s) => s[3] && s[4] && s[2] === 0 && !s[5]).map((s) => s[0]);
+  if (lines.length) console.log(`    uncovered regions: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} lines ${[...new Set(lines)].join(", ")}`);
+}

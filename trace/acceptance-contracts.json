@@ -63,7 +63,7 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": "Tests/BibleCoreTests/ReferenceParseTests.swift",
+        "artifact": "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "status": "artifact-ok"
       }
     ],
@@ -263,24 +263,24 @@
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/IllustrationTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-34": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/IllustrationTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-35": [
       {
         "method": "local-verifiable",
         "mechanism": "npm:test:run",
-        "artifact": null,
-        "status": "future-pending"
+        "artifact": "Tests/BibleCoreTests/IllustrationTests.swift",
+        "status": "artifact-ok"
       }
     ],
     "FR-36": [

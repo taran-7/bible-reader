@@ -42,6 +42,14 @@ struct ContentView: View {
                 Group {
                     if model.searchError != nil || model.results != nil {
                         SearchResultsView(model: model)
+                    } else if let request = model.illustrations {
+                        // Текст ліворуч вузько (35 %), ілюстрації праворуч ширше (65 %); межу можна тягнути.
+                        IllustrationsSplit {
+                            ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
+                        } illustrations: {
+                            IllustrationsView(request: request, close: model.closeIllustrations)
+                                .id(request)
+                        }
                     } else {
                         ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
                     }
@@ -179,5 +187,38 @@ struct SearchFieldStyler: NSViewRepresentable {
 extension NSColor {
     convenience init(_ color: ThemeColor) {
         self.init(srgbRed: color.red, green: color.green, blue: color.blue, alpha: 1)
+    }
+}
+
+/// Текст розділу і панель ілюстрацій поруч: частка тексту за замовчуванням 35 %, роздільник тягнеться
+/// і запам'ятовується (`HSplitView` не задає початкову частку).
+struct IllustrationsSplit<Text: View, Illustrations: View>: View {
+    @ViewBuilder let text: Text
+    @ViewBuilder let illustrations: Illustrations
+    @AppStorage("illustrationsTextFraction") private var fraction = 0.35
+    @State private var dragStart: Double?
+
+    var body: some View {
+        GeometryReader { geometry in
+            let width = geometry.size.width
+            HStack(spacing: 0) {
+                text.frame(width: width * fraction)
+                Rectangle()
+                    .fill(Color(nsColor: .separatorColor))
+                    .frame(width: 1)
+                    .padding(.horizontal, 3)
+                    .contentShape(Rectangle())
+                    .onHover { inside in if inside { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
+                    .gesture(DragGesture(minimumDistance: 1)
+                        .onChanged { drag in
+                            let start = dragStart ?? fraction
+                            dragStart = start
+                            fraction = min(max(start + drag.translation.width / width, 0.2), 0.7)
+                        }
+                        .onEnded { _ in dragStart = nil })
+                    .accessibilityHidden(true)
+                illustrations.frame(maxWidth: .infinity)
+            }
+        }
     }
 }
