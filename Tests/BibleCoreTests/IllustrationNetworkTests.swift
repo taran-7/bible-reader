@@ -72,7 +72,10 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     // @trace FR-33
     @Test func testLinkForStory() {
         let story = Illustration(title: "T", text: "B", source: "https://www.imb.org/x", siteName: "IMB")
-        #expect(IllustrationNetwork.link(for: story)?.host == "www.imb.org")
+        let sources = IllustrationSources(allow: ["imb.org"], block: [], wordpress: [])
+        #expect(IllustrationNetwork.link(for: story, sources: sources)?.host == "www.imb.org")
+        let foreign = Illustration(title: "T", text: "B", source: "https://evil.example/x", siteName: "IMB")
+        #expect(IllustrationNetwork.link(for: foreign, sources: sources) == nil)
         #expect(IllustrationNetwork.braveKeyPage.host == "brave.com")
     }
 }

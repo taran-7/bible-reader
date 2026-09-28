@@ -112,7 +112,7 @@ struct IllustrationCard: View {
                 Text(translationError).font(.system(size: scale.systemFontSize * 0.9)).foregroundStyle(.orange)
             }
             HStack {
-                if let url = IllustrationNetwork.link(for: story) {
+                if let sources = try? IllustrationSources.bundled, let url = IllustrationNetwork.link(for: story, sources: sources) {
                     Link(story.isExcerpt ? "Читати на сайті" : "Джерело", destination: url)
                 }
                 Spacer()
@@ -291,15 +291,22 @@ enum BraveKey {
         return key
     }
 
-    /// Порожній рядок видаляє ключ.
-    static func save(_ key: String) {
+    /// Порожній рядок видаляє ключ. `false` — Keychain не прийняв запис.
+    @discardableResult
+    static func save(_ key: String) -> Bool {
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
-        SecItemDelete(base as CFDictionary)
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return }
+        guard !trimmed.isEmpty else {
+            let status = SecItemDelete(base as CFDictionary)
+            return status == errSecSuccess || status == errSecItemNotFound
+        }
+        let data = Data(trimmed.utf8)
+        if SecItemUpdate(base as CFDictionary, [kSecValueData as String: data] as CFDictionary) == errSecSuccess { return true }
         var item = base
-        item[kSecValueData as String] = Data(trimmed.utf8)
-        SecItemAdd(item as CFDictionary, nil)
+        item[kSecValueData as String] = data
+        // Лише на цьому Mac і лише коли він розблокований: ключ не синхронізується й не мігрує.
+        item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
     }
 }
 

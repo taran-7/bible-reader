@@ -10,10 +10,10 @@ public enum CopyButtonModel {
     /// Наскільки рядок відсувається від кнопок (0…1 від повного відступу): виділені вірші — повністю,
     /// сусіди — сходинками ½ і ¼, щоб перехід до решти тексту був плавним (запит власника 2026-09-28).
     public static func shift(of verse: Int, selection: Set<Int>) -> Double {
-        guard let first = selection.min(), let last = selection.max() else { return 0 }
-        if selection.contains(verse) { return 1 }
-        let distance = verse < first ? first - verse : verse > last ? verse - last : 1
+        // Відстань до найближчого виділеного: у проміжку {1, 10} вірші 5–6 теж стоять на місці.
+        guard let distance = selection.map({ abs($0 - verse) }).min() else { return 0 }
         switch distance {
+        case 0: return 1
         case 1: return 0.5
         case 2: return 0.25
         default: return 0

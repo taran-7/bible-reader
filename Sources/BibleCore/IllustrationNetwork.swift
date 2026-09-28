@@ -8,8 +8,12 @@ public struct IllustrationNetwork: IllustrationHTTP {
 
     /// `configuration` — для тестів (підставний `URLProtocol`), у додатку — ефемерна сесія без кешу й cookies.
     public init(timeout: TimeInterval = 15, configuration: URLSessionConfiguration = .ephemeral) {
+        // Копія: переданий об'єкт (спільний у тестах) не змінюється.
+        let configuration = configuration.copy() as! URLSessionConfiguration
         configuration.timeoutIntervalForRequest = timeout
-        configuration.httpAdditionalHeaders = ["User-Agent": Self.userAgent]
+        var headers = configuration.httpAdditionalHeaders ?? [:]
+        headers["User-Agent"] = Self.userAgent
+        configuration.httpAdditionalHeaders = headers
         session = URLSession(configuration: configuration)
     }
 
@@ -24,8 +28,8 @@ public struct IllustrationNetwork: IllustrationHTTP {
         for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
         do {
             let (data, response) = try await session.data(for: request)
-            // Запит https — відповідь завжди HTTP.
-            return ((response as! HTTPURLResponse).statusCode, data)
+            // Запит https — відповідь HTTP; інакше код 0, і адаптер вважає відповідь невдалою.
+            return ((response as? HTTPURLResponse)?.statusCode ?? 0, data)
         } catch let error as URLError where Self.offlineCodes.contains(error.code) {
             throw IllustrationError.offline
         } catch {
@@ -33,9 +37,9 @@ public struct IllustrationNetwork: IllustrationHTTP {
         }
     }
 
-    /// Посилання картки для відкриття в браузері (лише https з allowlist — інакше історії б не було).
-    public static func link(for story: Illustration) -> URL? {
-        URL(string: story.source)
+    /// Посилання картки для відкриття в браузері: ще раз через allowlist, а не лише на слово адаптера.
+    public static func link(for story: Illustration, sources: IllustrationSources) -> URL? {
+        sources.isAllowed(story.source) ? URL(string: story.source) : nil
     }
 
     /// Сторінка, де користувач бере безкоштовний ключ Brave Search API (посилання в Settings).
@@ -45,4 +49,18 @@ public struct IllustrationNetwork: IllustrationHTTP {
         .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff,
         .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed, .timedOut,
     ]
+}
+
+extension IllustrationSources {
+    /// Схема і хост адреси (нижній регістр, без `www.`); `nil` — не абсолютна адреса.
+    /// Адреса з userinfo (`https://trusted.org:x@evil.example/`) відкидається: браузер відкрив би інший хост,
+    /// ніж той, що пройшов allowlist (security review 2026-09-28). Тут, бо `URLComponents` — лише в мережевому файлі (NFR-2).
+    static func parse(_ address: String) -> (scheme: String, host: String)? {
+        guard !address.contains("\\"), let components = URLComponents(string: address),
+              components.user == nil, components.password == nil,
+              let scheme = components.scheme, let host = components.host, !host.isEmpty else { return nil }
+        return (scheme.lowercased(), bare(host))
+    }
+
+    static func host(of address: String) -> String? { parse(address)?.host }
 }

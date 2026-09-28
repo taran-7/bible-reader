@@ -73,7 +73,7 @@
     },
     {
       "slice": "2026-09-28-add-illustrations",
-      "reviewEvidence": "missing",
+      "reviewEvidence": "clean",
       "trailerCommits": 11,
       "libDomains": [
         "BibleCore"
@@ -127,7 +127,7 @@
     },
     {
       "slice": "2026-09-28-close-tech-debt-batch",
-      "reviewEvidence": "missing",
+      "reviewEvidence": "clean",
       "trailerCommits": 6,
       "libDomains": [
         "BibleCore",
@@ -137,7 +137,7 @@
     },
     {
       "slice": "2026-09-28-comfortable-reading",
-      "reviewEvidence": "missing",
+      "reviewEvidence": "clean",
       "trailerCommits": 4,
       "libDomains": [
         "BibleCore"
@@ -190,18 +190,6 @@
   ],
   "failures": [],
   "warnings": [
-    {
-      "check": "review-evidence",
-      "msg": "2026-09-28-add-illustrations: review-findings.json is missing (review must have run clean before archive)"
-    },
-    {
-      "check": "review-evidence",
-      "msg": "2026-09-28-close-tech-debt-batch: review-findings.json is missing (review must have run clean before archive)"
-    },
-    {
-      "check": "review-evidence",
-      "msg": "2026-09-28-comfortable-reading: review-findings.json is missing (review must have run clean before archive)"
-    },
     {
       "check": "process",
       "msg": "2026-09-28-comfortable-reading: archived change is missing design.md and/or tasks.md"

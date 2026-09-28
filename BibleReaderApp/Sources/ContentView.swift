@@ -222,18 +222,29 @@ struct IllustrationsSplit<Text: View, Illustrations: View>: View {
     @ViewBuilder let illustrations: Illustrations
     @AppStorage("illustrationsTextFraction") private var fraction = 0.35
     @State private var dragStart: Double?
+    @State private var cursorPushed = false
+
+
+    private func setResizeCursor(_ on: Bool) {
+        guard on != cursorPushed else { return }
+        if on { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() }
+        cursorPushed = on
+    }
 
     var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
             HStack(spacing: 0) {
-                text.frame(width: width * fraction)
+                // Значення з defaults могло бути зіпсоване — ті самі межі, що й при перетягуванні.
+                text.frame(width: width * min(max(fraction, 0.2), 0.7))
                 Rectangle()
                     .fill(Color(nsColor: .separatorColor))
                     .frame(width: 1)
                     .padding(.horizontal, 3)
                     .contentShape(Rectangle())
-                    .onHover { inside in if inside { NSCursor.resizeLeftRight.push() } else { NSCursor.pop() } }
+                    .onHover { inside in setResizeCursor(inside) }
+                    // Панель закрили Esc, поки курсор над межею: без цього «↔» лишився б.
+                    .onDisappear { setResizeCursor(false) }
                     .gesture(DragGesture(minimumDistance: 1)
                         .onChanged { drag in
                             let start = dragStart ?? fraction

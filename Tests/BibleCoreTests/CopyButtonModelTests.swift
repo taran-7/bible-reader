@@ -24,5 +24,6 @@ import Testing
         #expect([3, 4, 5, 6, 7, 8, 9, 10, 11].map { CopyButtonModel.shift(of: $0, selection: selection) }
                 == [0.25, 0.5, 1, 1, 0.5, 1, 0.5, 0.25, 0])
         #expect(CopyButtonModel.shift(of: 1, selection: []) == 0)
+        #expect((2...9).map { CopyButtonModel.shift(of: $0, selection: [1, 10]) } == [0.5, 0.25, 0, 0, 0, 0, 0.25, 0.5])
     }
 }

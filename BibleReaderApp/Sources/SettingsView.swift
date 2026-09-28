@@ -4,6 +4,9 @@ import SwiftUI
 struct SettingsView: View {
     @Bindable var preferences: PreferencesStore
     @State private var braveKey = BraveKey.load() ?? ""
+    /// Що справді лежить у Keychain, а не що набрано в полі.
+    @State private var keySaved = BraveKey.load() != nil
+    @State private var keyError = false
 
     var body: some View {
         Form {
@@ -23,11 +26,13 @@ struct SettingsView: View {
             Section {
                 SecureField("Ключ Brave Search API", text: $braveKey)
                     .accessibilityIdentifier("brave-key")
-                    .onSubmit { BraveKey.save(braveKey) }
-                    .onChange(of: braveKey) { _, key in BraveKey.save(key) }
+                    .onSubmit(saveKey)
+                    .onDisappear(perform: saveKey)
                 HStack {
                     // Правильність ключа видно лише під час пошуку: тут — лише що він збережений.
-                    if braveKey.trimmingCharacters(in: .whitespaces).isEmpty {
+                    if keyError {
+                        Label("Не вдалося зберегти ключ", systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
+                    } else if !keySaved {
                         Label("Ключа немає", systemImage: "key").foregroundStyle(.secondary)
                     } else {
                         Label("Ключ збережено", systemImage: "checkmark.circle.fill").foregroundStyle(.green)
@@ -40,7 +45,7 @@ struct SettingsView: View {
             } header: {
                 Text("Ілюстрації")
             } footer: {
-                Text("Без ключа історії шукаються на Christianity Today, IMB і у Вікіпедії. З ключем — ще на всіх сайтах списку через Brave Search (безкоштовний план). Ключ зберігається в Keychain.")
+                Text("Без ключа історії шукаються на Christianity Today, IMB і у Вікіпедії. З ключем — ще на всіх сайтах списку через Brave Search (безкоштовний план). Ключ зберігається в Keychain (Return — зберегти). На ці сайти надсилаються лише до трьох англійських ключових слів із виділених віршів, після кліку «Ілюстрації».")
             }
         }
         .formStyle(.grouped)
@@ -49,5 +54,10 @@ struct SettingsView: View {
         .background(ThemeBackground())
         .frame(width: 420)
         .navigationTitle("Налаштування")
+    }
+
+    private func saveKey() {
+        keyError = !BraveKey.save(braveKey)
+        keySaved = BraveKey.load() != nil
     }
 }

@@ -19,8 +19,8 @@ public final class ReaderViewModel {
     public private(set) var books: [Book] = []
     public private(set) var chapterCount = 0
     public private(set) var verses: [Verse] = [] {
-        // Інший розділ чи переклад — порівняння попереднього вже не про те, що на екрані.
-        didSet { rebuildParallel(); comparison = nil }
+        // Інший розділ чи переклад — порівняння й ілюстрації попереднього вже не про те, що на екрані.
+        didSet { rebuildParallel(); comparison = nil; illustrations = nil }
     }
     /// Перший виділений вірш (з `ChapterView`): при перемиканні перекладу відкривається саме він (FR-27).
     public var anchorVerse: Int?

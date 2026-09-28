@@ -130,6 +130,10 @@ extension IllustrationTests {
         #expect(!sources.isAllowed("https://www.catholic.com/a"))
         #expect(!sources.isAllowed("example.org/a"))
         #expect(!sources.isAllowed("https:///a"))
+        // userinfo: браузер відкрив би evil.example, а не довірений хост (security review).
+        #expect(!sources.isAllowed("https://example.org:x@evil.example/phish"))
+        #expect(!sources.isAllowed("https://example.org@evil.example/phish"))
+        #expect(!sources.isAllowed("https://evil.example\\@example.org/"))
     }
 
     // @trace FR-34
@@ -237,6 +241,10 @@ extension IllustrationTests {
         let with = IllustrationSearch.providers(sources: F.sources, braveKey: "k")
         let brave = try? #require(with.last as? BraveAdapter)
         #expect(brave?.sites == ["example.org"])  // Вікіпедію Brave не шукає
+        // 12 сайтів — три запити по ≤5 `site:`: ліміт Brave 400 знаків / 50 слів.
+        let many = IllustrationSources(allow: (1...12).map { "s\($0).org" }, block: [], wordpress: [])
+        let groups = IllustrationSearch.providers(sources: many, braveKey: "k").compactMap { ($0 as? BraveAdapter)?.sites.count }
+        #expect(groups == [5, 5, 2])
     }
 }
 

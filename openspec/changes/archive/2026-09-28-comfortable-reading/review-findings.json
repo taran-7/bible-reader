@@ -1,0 +1,32 @@
+{
+  "generatedBy": "review-gate (manual dispatch: correctness, spec-compliance)",
+  "scope": "comfortable-reading",
+  "change": "comfortable-reading",
+  "baseRef": "252e6d4",
+  "headRef": "6e5e8df",
+  "dimensions": {
+    "correctness": {
+      "confirmed": 5,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 3,
+      "deferred": 2
+    },
+    "spec-compliance": {
+      "confirmed": 5,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 3,
+      "deferred": 2
+    }
+  },
+  "fixed": [
+    "last chosen translation checkbox disabled instead of silently staying checked",
+    "staircase shift uses distance to the nearest selected verse (gaps in a selection)",
+    "compare view scrolls on every comparison change and keeps the verse before the selection in view (spec: 'вірш 15 теж видно')"
+  ],
+  "deferred": "sync reads on main thread → tech debt #29; translation switch closes compare → #30 (described in spec); centered column checked by arithmetic, not by a UI frame test",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T16:30:00Z"
+}

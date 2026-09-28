@@ -98,7 +98,7 @@ struct FontCommands: Commands {
     static func install(model: ReaderViewModel) {
         guard token == nil else { return }
         token = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command, .option],
+            guard event.modifierFlags.intersection([.command, .option, .control, .shift]) == [.command, .option],
                   let index = TranslationShortcut.index(forKeyCode: event.keyCode),
                   index < Translation.allCases.count
             else { return event }
