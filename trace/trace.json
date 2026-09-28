@@ -781,6 +781,9 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/IllustrationNetworkTests.swift",
+        "Tests/BibleCoreTests/IllustrationNetworkTests.swift",
+        "Tests/BibleCoreTests/IllustrationNetworkTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
@@ -791,6 +794,9 @@
         "Tests/BibleCoreTests/IllustrationTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
+        "tests/BibleCoreTests/IllustrationNetworkTests.swift",
+        "tests/BibleCoreTests/IllustrationNetworkTests.swift",
+        "tests/BibleCoreTests/IllustrationNetworkTests.swift",
         "tests/BibleCoreTests/IllustrationTests.swift",
         "tests/BibleCoreTests/IllustrationTests.swift",
         "tests/BibleCoreTests/IllustrationTests.swift",
@@ -831,7 +837,9 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/IllustrationNetworkTests.swift",
         "Tests/BibleCoreTests/IllustrationTests.swift",
+        "tests/BibleCoreTests/IllustrationNetworkTests.swift",
         "tests/BibleCoreTests/IllustrationTests.swift"
       ],
       "recordings": []

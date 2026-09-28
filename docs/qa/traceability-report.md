@@ -40,9 +40,9 @@ Result: PASS, 37 warning(s)
 | FR-30 | yes | yes | 26 | - |
 | FR-31 | yes | yes | 14 | - |
 | FR-32 | yes | yes | 10 | - |
-| FR-33 | yes | yes | 20 | - |
+| FR-33 | yes | yes | 26 | - |
 | FR-34 | yes | yes | 10 | - |
-| FR-35 | yes | yes | 2 | - |
+| FR-35 | yes | yes | 4 | - |
 | FR-36 | yes | yes | 22 | - |
 | FR-37 | yes | yes | 18 | - |
 
