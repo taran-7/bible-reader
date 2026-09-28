@@ -38,19 +38,23 @@ struct BibleReaderApp: App {
         .commands {
             ExportCommands(userData: userData, model: model)
             BookmarkCommands(userData: userData, model: model)
+            FindCommands()
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
-            TranslationCommands(model: model)
+            TranslationCommands(model: model, preferences: preferences)
+        }
+
+        WindowGroup("Порівняти", id: "compare", for: CompareRequest.self) { $request in
+            if let request {
+                CompareView(request: request, model: model, preferences: preferences)
+                    .modifier(ThemedScene(preferences: preferences))
+            }
         }
 
         Settings {
             SettingsView(preferences: preferences)
                 .modifier(ThemedScene(preferences: preferences))
         }
-    }
-
-    init() {
-        ThemeFonts.register()
     }
 
     private static func makeUserData() -> UserData {
@@ -90,17 +94,34 @@ struct FontCommands: Commands {
     }
 }
 
-/// Меню «Переклад» з ⌘⌥1…4.
+/// Меню «Переклад»: перші дев'ять перекладів з маніфесту мають ⌘⌥1…9, решта — без скорочення.
 struct TranslationCommands: Commands {
     let model: ReaderViewModel
+    let preferences: PreferencesStore
 
     var body: some Commands {
         CommandMenu("Переклад") {
             ForEach(Array(Translation.allCases.enumerated()), id: \.element) { index, translation in
-                Toggle(translation.menuTitle, isOn: Binding(
+                let toggle = Toggle(translation.menuTitle, isOn: Binding(
                     get: { model.translation == translation },
                     set: { if $0 { model.translation = translation } }))
-                    .keyboardShortcut(KeyEquivalent(Character("\(index + 1)")), modifiers: [.command, .option])
+                if let key = TranslationShortcut.digit(forIndex: index) {
+                    toggle.keyboardShortcut(KeyEquivalent(key), modifiers: [.command, .option])
+                } else {
+                    toggle
+                }
+            }
+            Divider()
+            // Другий переклад поруч (FR-26): і тут, бо кнопка тулбара у вузькому вікні ховається.
+            Menu("Поруч") {
+                Toggle("Вимкнено", isOn: Binding(
+                    get: { model.parallelTranslation == nil },
+                    set: { if $0 { preferences.preferences.parallelTranslation = nil } }))
+                ForEach(Translation.allCases.filter { $0 != model.translation }, id: \.self) { translation in
+                    Toggle(translation.title, isOn: Binding(
+                        get: { model.parallelTranslation == translation },
+                        set: { if $0 { preferences.preferences.parallelTranslation = translation } }))
+                }
             }
         }
     }
@@ -144,11 +165,25 @@ struct BookmarkCommands: Commands {
 
     var body: some Commands {
         CommandMenu("Закладки") {
-            let chapter = Bookmark.Target(book: model.location.book, chapter: model.location.chapter, verse: nil)
+            let chapter = model.canonicalChapter
             Button(userData.isBookmarked(chapter) ? "Прибрати закладку розділу" : "Закладка на розділ") {
                 userData.toggleBookmark(chapter)
             }
             .keyboardShortcut("d", modifiers: .command)
+        }
+    }
+}
+
+/// ⌘F переводить фокус у поле пошуку (NFR-4: робота з клавіатури).
+struct FindCommands: Commands {
+    var body: some Commands {
+        // Замість системного «Знайти…» (панель пошуку в тексті), щоб не було двох ⌘F.
+        CommandGroup(replacing: .textEditing) {
+            Button("Знайти") {
+                let item = NSApp.keyWindow?.toolbar?.items.lazy.compactMap { $0 as? NSSearchToolbarItem }.first
+                item?.beginSearchInteraction()
+            }
+            .keyboardShortcut("f", modifiers: .command)
         }
     }
 }

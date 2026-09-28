@@ -35,21 +35,24 @@ public struct Book: Hashable, Identifiable, Sendable {
     public var czechName: String { Book.czech[number - 1].name }
     public var czechAbbreviation: String { Book.czech[number - 1].abbreviation }
 
+    /// Назва мовою перекладу; модуль із власними назвами книг має пріоритет.
     public func name(in translation: Translation) -> String {
+        if let books = translation.books { return books[number - 1].name }
         switch translation.language {
-        case .english: englishName
-        case .russian: russianName
-        case .ukrainian: ukrainianName
-        case .czech: czechName
+        case .english, .other: return englishName
+        case .russian: return russianName
+        case .ukrainian: return ukrainianName
+        case .czech: return czechName
         }
     }
 
     public func abbreviation(in translation: Translation) -> String {
+        if let books = translation.books { return books[number - 1].abbreviation }
         switch translation.language {
-        case .english: englishAbbreviation
-        case .russian: russianAbbreviation
-        case .ukrainian: ukrainianAbbreviation
-        case .czech: czechAbbreviation
+        case .english, .other: return englishAbbreviation
+        case .russian: return russianAbbreviation
+        case .ukrainian: return ukrainianAbbreviation
+        case .czech: return czechAbbreviation
         }
     }
 
@@ -57,6 +60,14 @@ public struct Book: Hashable, Identifiable, Sendable {
     var spellings: [String] {
         [englishName, englishAbbreviation, russianName, russianAbbreviation,
          ukrainianName, ukrainianAbbreviation, czechName, czechAbbreviation] + aliases
+            + Book.moduleSpellings[number - 1]
+    }
+
+    /// Назви книг із модулів нових мов; рахуються один раз.
+    private static let moduleSpellings = spellings(from: Translation.allCases)
+
+    static func spellings(from translations: [Translation]) -> [[String]] {
+        (0..<66).map { index in translations.compactMap { $0.books?[index] }.flatMap { [$0.name, $0.abbreviation] } }
     }
 
     public static let all: [Book] = [

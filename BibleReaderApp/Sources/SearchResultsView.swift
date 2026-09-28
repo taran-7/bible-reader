@@ -77,7 +77,8 @@ struct SearchResultsView: View {
                             model.openNote(note.key)
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
-                                Label(note.key.reference.format(in: model.translation), systemImage: "note.text")
+                                Label(model.localReference(book: note.key.book, chapter: note.key.chapter, verse: note.key.verse)
+                                          .format(in: model.translation), systemImage: "note.text")
                                     .font(.system(size: scale.systemFontSize * 1.1, weight: .semibold))
                                     .foregroundStyle(Color(theme.accent))
                                 Text(note.text).lineLimit(3).foregroundStyle(Color(theme.text))

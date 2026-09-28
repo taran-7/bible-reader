@@ -19,9 +19,10 @@ public enum BibleImporter {
         let chapters: [[String]]
     }
 
-    public static func run(rawDirectory: URL, output: URL) throws {
+    /// `translations` — модулі з маніфесту (FR-30); за замовчуванням вшитий каталог.
+    public static func run(rawDirectory: URL, output: URL, translations: [Translation] = Translation.allCases) throws {
         // Спочатку читаємо всі джерела, щоб не створювати базу при помилці вхідних даних.
-        let sources = try Translation.allCases.map { ($0, try load($0, from: rawDirectory)) }
+        let sources = try translations.map { ($0, try load($0, from: rawDirectory)) }
 
         let fm = FileManager.default
         let tmp = URL(fileURLWithPath: output.path + ".tmp")
@@ -34,7 +35,7 @@ public enum BibleImporter {
                     try insert(books, translation: translation, into: db)
                 }
                 try db.execute(sql: "INSERT INTO verses_fts(verses_fts) VALUES('rebuild')")
-                try indexStems(db)
+                try indexStems(db, translations: translations)
             }
             try queue.close()
             if fm.fileExists(atPath: output.path) {
@@ -99,9 +100,9 @@ public enum BibleImporter {
     }
 
     /// Заповнює `verses_stem_fts` основами слів кожного вірша стемером мови перекладу.
-    private static func indexStems(_ db: Database) throws {
+    private static func indexStems(_ db: Database, translations: [Translation]) throws {
         let insert = try db.makeStatement(sql: "INSERT INTO verses_stem_fts(rowid, stems) VALUES (?, ?)")
-        for translation in Translation.allCases {
+        for translation in translations {
             let stemmer = Stemmer(language: translation.language)
             let rows = try Row.fetchCursor(db, sql: "SELECT rowid, text FROM verses WHERE translation = ?", arguments: [translation.rawValue])
             while let row = try rows.next() {

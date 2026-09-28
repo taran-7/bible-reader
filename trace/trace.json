@@ -26,21 +26,21 @@
     "FR-23": "MVP",
     "FR-24": "MVP",
     "FR-25": "MVP",
-    "FR-26": "Future",
-    "FR-27": "Future",
+    "FR-26": "MVP",
+    "FR-27": "MVP",
     "FR-28": "MVP",
     "FR-29": "MVP",
-    "FR-30": "Future",
+    "FR-30": "MVP",
     "FR-31": "MVP",
     "FR-32": "MVP",
     "FR-33": "Future",
     "FR-34": "Future",
     "FR-35": "Future",
-    "FR-36": "Future",
+    "FR-36": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
-    "NFR-3": "Future",
-    "NFR-4": "Future",
+    "NFR-3": "MVP",
+    "NFR-4": "MVP",
     "NFR-5": "MVP"
   },
   "links": [
@@ -527,6 +527,7 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/ParallelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleCoreTests/UserDataTests.swift",
         "Tests/BibleCoreTests/UserDataTests.swift",
@@ -535,6 +536,7 @@
         "Tests/BibleCoreTests/UserDataTests.swift",
         "Tests/BibleCoreTests/UserDataTests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/UserDataTests.swift",
         "tests/BibleCoreTests/UserDataTests.swift",
@@ -563,6 +565,60 @@
         "tests/BibleCoreTests/UserDataTests.swift",
         "tests/BibleCoreTests/UserDataTests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-26",
+      "specs": [
+        "openspec/specs/parallel-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleReaderUITests/ParallelUITests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleReaderUITests/ParallelUITests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-27",
+      "specs": [
+        "openspec/specs/parallel-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleCoreTests/VersificationTests.swift",
+        "Tests/BibleReaderUITests/ParallelUITests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleCoreTests/VersificationTests.swift",
+        "tests/BibleReaderUITests/ParallelUITests.swift"
       ],
       "recordings": []
     },
@@ -619,6 +675,34 @@
       "recordings": []
     },
     {
+      "id": "FR-30",
+      "specs": [
+        "openspec/specs/translation-modules/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "Tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift",
+        "tests/BibleCoreTests/TranslationModuleTests.swift"
+      ],
+      "recordings": []
+    },
+    {
       "id": "FR-31",
       "specs": [
         "openspec/specs/bible-reading/spec.md"
@@ -657,6 +741,38 @@
         "tests/BibleCoreTests/ThemeTests.swift",
         "tests/BibleCoreTests/ThemeTests.swift",
         "tests/BibleCoreTests/ThemeTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-36",
+      "specs": [
+        "openspec/specs/verse-compare/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleCoreTests/CompareTests.swift",
+        "Tests/BibleReaderUITests/CompareUITests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
+        "tests/BibleReaderUITests/CompareUITests.swift"
       ],
       "recordings": []
     }
@@ -765,6 +881,14 @@
     },
     {
       "check": "recording-evidence",
+      "msg": "FR-26 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-27 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
       "msg": "FR-28 is not referenced by any recording manifest under docs/qa/"
     },
     {
@@ -773,11 +897,19 @@
     },
     {
       "check": "recording-evidence",
+      "msg": "FR-30 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
       "msg": "FR-31 is not referenced by any recording manifest under docs/qa/"
     },
     {
       "check": "recording-evidence",
       "msg": "FR-32 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-36 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }

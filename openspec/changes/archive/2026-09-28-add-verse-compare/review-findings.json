@@ -1,0 +1,27 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "add-verse-compare",
+  "change": "add-verse-compare",
+  "baseRef": "de9ac11",
+  "headRef": "feature/add-verse-compare",
+  "dimensions": {
+    "correctness": { "confirmed": 12, "contested": 0, "rejected": 0, "fixed": 11, "deferred": 1 }
+  },
+  "fixed": [
+    "1: database re-queried on every render — loaded once per panel set in .task(id:)",
+    "2: panel click reloaded twice — ReaderViewModel.open(_:in:focus:) with one reload",
+    "3: Synodal panel focused a verse by KJV number — opens the chapter without focus when numbering may differ",
+    "4: reference claimed verses the panel lacked — built from the verses actually found",
+    "5: drag conflicted with the panel button — drag handle is the header",
+    "6: any text dropped reordered panels — prefixed transfer type; drop reports whether the order changed",
+    "7: window title followed the main window translation — first panel's language",
+    "8: raw error dump — localizedDescription",
+    "9: silent empty window without a database — explicit error",
+    "10: VoiceOver — panel label is the translation, body button has a hint",
+    "12: repositoryForCompare leaked the repository — ReaderViewModel.compare(_:panels:)"
+  ],
+  "deferred": "11 (copy+compare buttons at the largest interface scale — UI tests click rows by coordinate; covered by CI UI run)",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T03:40:00Z"
+}
