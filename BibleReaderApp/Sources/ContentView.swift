@@ -51,8 +51,7 @@ struct ContentView: View {
                 let other = preferences.preferences.parallelTranslation
                 model.parallelTranslation = other == model.translation ? nil : other
             }
-            // Поле пошуку по центру тулбара, а не праворуч (запит власника 2026-09-28).
-            .searchable(text: $model.query, placement: .toolbarPrincipal, prompt: "Слово або посилання (Ин 3:16)")
+            .modifier(SearchField(query: $model.query))
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
@@ -109,5 +108,19 @@ struct HiddenToolbarTitle: ViewModifier {
         } else {
             content
         }
+    }
+}
+
+/// Поле пошуку по центру тулбара, а не праворуч (запит власника 2026-09-28).
+/// `.toolbarPrincipal` є лише в SDK нових Xcode (Swift 6.2+); зі старішим (CI на macos-15) поле праворуч.
+struct SearchField: ViewModifier {
+    @Binding var query: String
+
+    func body(content: Content) -> some View {
+        #if compiler(>=6.2)
+        content.searchable(text: $query, placement: .toolbarPrincipal, prompt: "Слово або посилання (Ин 3:16)")
+        #else
+        content.searchable(text: $query, prompt: "Слово або посилання (Ин 3:16)")
+        #endif
     }
 }
