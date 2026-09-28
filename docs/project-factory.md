@@ -66,6 +66,7 @@ Swift описано в [ADR-0001](adr/0001-adopt-swift-stack.md).
 - **PD-12 (2026-09-27).** `qa-verify` і CI: член `app-build` тепер `scripts/check-platform.mjs` — Release-збірка замість Debug, і на ній перевіряється — мінімальна macOS 14.0, архітектура `arm64`, `.app` < 100 МБ (WARN від 80). Причина: NFR-1 і NFR-5 не мали механізму перевірки (слайс `add-platform-checks`); власник звузив NFR-1 до Apple Silicon і підняв межу NFR-5 до 100 МБ.
 - **PD-13 (2026-09-28).** `check-trajectory`: коміти з `Slice:` рахуються лише досяжні з `HEAD` (було `git log --all`). Причина: `--all` залежав від локальних гілок і старих SHA після rebase, тож звіт, згенерований на машині розробника, у CI був «застарілим» (PR #12), а його регенерація нічого не виправляла.
 - **PD-14 (2026-09-28).** CI: UI-тест часу запуску (NFR-3) на спільній VM GitHub має межу 2000 мс (`TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS`), локально на Mac — 1000 мс. Причина: на CI теплий запуск Debug-збірки коливався 800–1800 мс навіть на PR лише з документацією; вимір лишається й записується у вкладення, а межа 1 с перевіряється на реальному Mac (`QA_UI_TESTS=1`).
+- **PD-15 (2026-09-28).** Pre-commit хук читає staged-файли через `execFileSync("git", [...])` замість shell-рядка (ім'я файлу з `$(...)` більше не виконується, tech debt #8); CI має `permissions: contents: read`, actions закріплено за SHA, `@fission-ai/openspec` — за версією 1.13.2 (tech debt #9).
 
 ## Correction events
 

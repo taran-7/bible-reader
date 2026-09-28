@@ -9,8 +9,8 @@
 | 5 | Синодальний береться з іншого джерела (scrollmapper), ніж KJV, і конвертується скриптом | у `thiagobodruk/bible` немає Есфірі й Даниїла | прийнято |
 | 6 | `make test` обходить відсутність XCTest у Command Line Tools прапорцями компілятора | Xcode не встановлено | до встановлення Xcode |
 | 7 | Екран помилки бази (задача 7.6) реалізовано, але вручну не перевірено: треба запустити `.app` без `bible.sqlite` і побачити «Не вдалося відкрити базу» | користувач відклав перевірку при закритті MVP; логіка покрита тестами `RepositoryTests.testMissingDatabaseThrows`, `ReaderViewModelTests.testDatabaseError` | закрито 2026-09-27: `testMissingDatabaseShowsErrorScreen` |
-| 8 | Pre-commit хук передає імена staged-файлів у `execSync` через shell (`scripts/hooks-pre-commit.mjs:50`): ім'я файлу з `$(...)` виконається | retrofit-рев'ю 2026-09-27, low; скрипт під lock (потрібен `Refs: PD-x`) | відкрито |
-| 9 | CI: `@fission-ai/openspec` і actions не закріплені за версією/SHA, немає `permissions: contents: read` | retrofit-рев'ю 2026-09-27, low (supply-chain) | відкрито |
+| 8 | Pre-commit хук передає імена staged-файлів у `execSync` через shell (`scripts/hooks-pre-commit.mjs:50`): ім'я файлу з `$(...)` виконається | retrofit-рев'ю 2026-09-27, low; скрипт під lock (потрібен `Refs: PD-x`) | закрито 2026-09-28 (PD-15: `execFileSync` без shell) |
+| 9 | CI: `@fission-ai/openspec` і actions не закріплені за версією/SHA, немає `permissions: contents: read` | retrofit-рев'ю 2026-09-27, low (supply-chain) | закрито 2026-09-28 (PD-15: SHA, версія openspec, `contents: read`) |
 | 10 | Hardened Runtime вимкнено (`project.yml`), ad-hoc підпис; без нього не буде нотаризації | не потрібен, поки немає розповсюдження | відкрито |
 | 11 | `Navigator.previous` може дати розділ 0, якщо `chapterCount` попередньої книги впав у 0; одна помилка читання назавжди показує екран помилки бази | retrofit-рев'ю, low; досяжно лише при зіпсованій базі | відкрито |
 | 12 | Навігація (книга, ◀ ▶) не закриває відкриті результати пошуку; `canGoPrevious/Next` роблять SQL-запит на кожен рендер | retrofit-рев'ю, low; поведінку не описано в спеці | відкрито |
