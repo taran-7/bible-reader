@@ -83,7 +83,7 @@ struct ChapterView: View {
             // Esc знімає виділення. Кнопка з клавішею Cancel, а не `onExitCommand`: той спрацьовує, лише коли
             // фокус у списку. Поки праворуч відкрита панель, Esc належить їй.
             .background {
-                if !selection.isEmpty, model.illustrations == nil {
+                if !selection.isEmpty, model.illustrations == nil, !drafts.isOpen {
                     Button("Зняти виділення") { selection = [] }
                         .keyboardShortcut(.cancelAction)
                         .opacity(0)
