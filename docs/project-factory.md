@@ -71,3 +71,4 @@ Swift описано в [ADR-0001](adr/0001-adopt-swift-stack.md).
 ## Correction events
 
 - **2026-09-27, vacuous passes у журналі.** `trace/process-health.json` мав 2 vacuous passes: `qa-verify` 2026-09-26 запускав `eval-ratchet` на нульовому скоупі (`scope_n: 0`, exit 0), бо evals тоді не були відкладені. Причину усунуто PD-9 (`eval-ratchet` у `qa-verify` як DEFERRED). Журнал до виправлення заархівовано локально як `trace/ledger-2026-09-26.jsonl`; baseline процесу зароблено на новому журналі.
+- **PD-16 (2026-09-28).** Основна гілка перейменована `main` → `master` (запит власника): CI запускається на push у `master`, а `--release` для traceability і trajectory — на `master`.
