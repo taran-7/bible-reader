@@ -39,6 +39,11 @@ struct BibleReaderApp: App {
         .commands {
             ExportCommands(userData: userData, model: model)
             BookmarkCommands(userData: userData, model: model)
+            CommandGroup(after: .pasteboard) {
+                Button("Зняти виділення") { model.clearSelection() }
+                    .keyboardShortcut(.escape, modifiers: [])
+                    .disabled(!model.canClearSelection)
+            }
             FindCommands()
             FontCommands(preferences: preferences)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
