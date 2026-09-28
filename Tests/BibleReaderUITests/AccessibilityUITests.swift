@@ -44,11 +44,18 @@ final class AccessibilityUITests: XCTestCase {
         XCTAssertTrue(window.waitForExistence(timeout: 5), "вікно «\(title)»", file: file, line: line)
     }
 
+    /// Число з елемента `launch-time`; перечитуємо, поки текст не з'явиться (елемент буває порожнім мить).
     private func launchMilliseconds() -> Int {
         let report = app.staticTexts["launch-time"]
         XCTAssertTrue(report.waitForExistence(timeout: 10))
-        let text = (report.value as? String).flatMap { $0.isEmpty ? nil : $0 } ?? report.label
-        return Int(text) ?? .max
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline {
+            let text = (report.value as? String).flatMap { $0.isEmpty ? nil : $0 } ?? report.label
+            if let milliseconds = Int(text) { return milliseconds }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+        }
+        XCTFail("launch-time без числа: value «\(report.value ?? "")», label «\(report.label)»")
+        return .max
     }
 
     // @trace NFR-3
