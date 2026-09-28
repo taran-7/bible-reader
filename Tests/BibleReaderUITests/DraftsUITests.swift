@@ -75,6 +75,8 @@ final class DraftsUITests: XCTestCase {
         element("drafts-toolbar").click()
         let row = element("draft-row")
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Про любов"].exists)
+        // Рядок — кнопка: назва в її мітці (на CI окремого staticText усередині немає).
+        XCTAssertTrue(app.buttons.matching(identifier: "draft-row").matching(NSPredicate(format: "label CONTAINS %@", "Про любов")).count
+                      + app.staticTexts.matching(NSPredicate(format: "label == %@", "Про любов")).count > 0, "чорнетка «Про любов» після перезапуску")
     }
 }
