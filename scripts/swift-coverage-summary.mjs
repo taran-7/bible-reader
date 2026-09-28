@@ -48,3 +48,8 @@ for (const fn of report.data.flatMap((d) => d.functions ?? [])) {
     console.log(`    never called: ${fn.filenames[0].replace(/^.*\/Sources\//, "Sources/")}:${fn.regions?.[0]?.[0] ?? "?"} ${name}`);
   }
 }
+// Непокриті регіони (гілки всередині функцій): файл і рядки початку.
+for (const f of files) {
+  const lines = f.segments.filter((s) => s[3] && s[4] && s[2] === 0 && !s[5]).map((s) => s[0]);
+  if (lines.length) console.log(`    uncovered regions: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} lines ${[...new Set(lines)].join(", ")}`);
+}
