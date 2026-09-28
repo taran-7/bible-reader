@@ -48,8 +48,13 @@ import Testing
         #expect(Set(store.list(matching: " любов ").map(\.title)) == ["Про любов", "Віра"])
         #expect(store.list(matching: "").count == 3)
         store.activeID = love.id
+        store.isPresenting = true
         store.delete(love.id)
-        #expect(store.activeID == nil)
+        #expect(store.activeID == nil && !store.isPresenting)
+        store.changeSermonFont(by: 100)
+        #expect(store.sermonFontSize == 72)
+        store.changeSermonFont(by: -100)
+        #expect(store.sermonFontSize == 16)
         #expect(store.drafts.map(\.title) == ["Надія", "Віра"])
     }
 
@@ -149,6 +154,7 @@ import Testing
         let reference = DraftReferences.find(in: text)[0]
         #expect(text[reference.range] == "2 Тим 3:16")
         #expect(reference.keys.map(\.verse) == [16])
+        #expect(DraftReferences.find(in: "Ин 3:1-9999999")[0].keys.count == 201)
     }
 
     // @trace FR-38

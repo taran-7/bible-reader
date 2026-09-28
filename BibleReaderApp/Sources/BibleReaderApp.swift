@@ -47,7 +47,7 @@ struct BibleReaderApp: App {
                     .keyboardShortcut("d", modifiers: [.command, .option])
             }
             FindCommands()
-            FontCommands(preferences: preferences)
+            FontCommands(preferences: preferences, drafts: drafts)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
             TranslationCommands(model: model, preferences: preferences)
         }
@@ -78,16 +78,25 @@ struct BibleReaderApp: App {
 
 struct FontCommands: Commands {
     let preferences: PreferencesStore
+    /// У режимі «Проповідь» ⌘+ / ⌘− змінюють його шрифт, а не шрифт читання (FR-40).
+    let drafts: DraftStore
 
     var body: some Commands {
         CommandGroup(after: .toolbar) {
             Divider()
-            Button("Збільшити шрифт") { preferences.preferences.increaseFonts() }
-                .keyboardShortcut("=", modifiers: .command)
-                .disabled(!preferences.preferences.canIncreaseFonts)
-            Button("Зменшити шрифт") { preferences.preferences.decreaseFonts() }
-                .keyboardShortcut("-", modifiers: .command)
-                .disabled(!preferences.preferences.canDecreaseFonts)
+            if drafts.isPresenting {
+                Button("Збільшити шрифт проповіді") { drafts.changeSermonFont(by: 2) }
+                    .keyboardShortcut("=", modifiers: .command)
+                Button("Зменшити шрифт проповіді") { drafts.changeSermonFont(by: -2) }
+                    .keyboardShortcut("-", modifiers: .command)
+            } else {
+                Button("Збільшити шрифт") { preferences.preferences.increaseFonts() }
+                    .keyboardShortcut("=", modifiers: .command)
+                    .disabled(!preferences.preferences.canIncreaseFonts)
+                Button("Зменшити шрифт") { preferences.preferences.decreaseFonts() }
+                    .keyboardShortcut("-", modifiers: .command)
+                    .disabled(!preferences.preferences.canDecreaseFonts)
+            }
             Button("Стандартний розмір") { preferences.preferences.resetFonts() }
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.areFontsDefault)

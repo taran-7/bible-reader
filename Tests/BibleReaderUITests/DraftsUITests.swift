@@ -66,6 +66,7 @@ final class DraftsUITests: XCTestCase {
         XCTAssertTrue(element("sermon-mode").waitForExistence(timeout: 5))
         app.windows.firstMatch.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(element("sermon-mode").waitForNonExistence(timeout: 5))
+        XCTAssertTrue(element("draft-text").exists, "після Esc — знову панель із чорнеткою")
 
         app.terminate()
         launch()

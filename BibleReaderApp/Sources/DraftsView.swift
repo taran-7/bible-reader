@@ -41,7 +41,8 @@ struct DraftList: View {
                 Button("Закрити чорнетки", systemImage: "xmark") { store.isOpen = false }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
-                    .keyboardShortcut(.cancelAction)
+                    // У режимі «Проповідь» Esc належить йому: панель під ним лишається відкритою.
+                    .keyboardShortcut(store.isPresenting ? nil : .cancelAction)
                     .accessibilityIdentifier("drafts-close")
             }
             HStack {
@@ -131,7 +132,8 @@ struct DraftEditor: View {
                 Button("Закрити чорнетки", systemImage: "xmark") { store.isOpen = false }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
-                    .keyboardShortcut(.cancelAction)
+                    // У режимі «Проповідь» Esc належить йому: панель під ним лишається відкритою.
+                    .keyboardShortcut(store.isPresenting ? nil : .cancelAction)
                     .accessibilityIdentifier("drafts-close")
             }
             TextField("Назва", text: $title)
@@ -275,16 +277,15 @@ struct DraftDocument: View {
 struct SermonView: View {
     @Bindable var store: DraftStore
     let model: ReaderViewModel
-    @AppStorage("sermonFontSize") private var fontSize = 30.0
     @Environment(\.theme) private var theme
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text(store.active?.displayTitle ?? "").font(.system(size: fontSize * 1.4, weight: .bold))
-                DraftDocument(text: store.active?.text ?? "", fontSize: fontSize)
+                Text(store.active?.displayTitle ?? "").font(.system(size: store.sermonFontSize * 1.4, weight: .bold))
+                DraftDocument(text: store.active?.text ?? "", fontSize: store.sermonFontSize)
             }
-            .frame(maxWidth: fontSize * 36, alignment: .leading)
+            .frame(maxWidth: store.sermonFontSize * 36, alignment: .leading)
             .padding(48)
             .frame(maxWidth: .infinity)
         }
@@ -292,10 +293,9 @@ struct SermonView: View {
         .background(ThemeBackground())
         .overlay(alignment: .topTrailing) {
             HStack {
-                Button("Менший шрифт", systemImage: "textformat.size.smaller") { fontSize = max(fontSize - 2, 16) }
-                    .keyboardShortcut("-", modifiers: .command)
-                Button("Більший шрифт", systemImage: "textformat.size.larger") { fontSize = min(fontSize + 2, 72) }
-                    .keyboardShortcut("=", modifiers: .command)
+                // ⌘+ / ⌘− — у меню «Вигляд» (FontCommands): у цьому режимі вони змінюють цей шрифт.
+                Button("Менший шрифт", systemImage: "textformat.size.smaller") { store.changeSermonFont(by: -2) }
+                Button("Більший шрифт", systemImage: "textformat.size.larger") { store.changeSermonFont(by: 2) }
                 Button("Вийти з режиму «Проповідь»", systemImage: "xmark") { store.isPresenting = false }
                     .keyboardShortcut(.cancelAction)
                     .accessibilityIdentifier("sermon-close")

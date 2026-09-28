@@ -61,13 +61,15 @@ public struct Draft: Identifiable, Equatable, Codable, Sendable {
 public struct DraftReference: Equatable, Sendable {
     public let range: Range<String.Index>
     public let reference: Reference
+    static let maxRange = 200
 
     /// Вірші посилання в нумерації KJV: діапазон — кожен вірш.
     public var keys: [VerseKey] {
         // `find` повертає лише посилання з віршем.
         let start = reference.verseStart!
         var end = start
-        if let verseEnd = reference.verseEnd { end = verseEnd }
+        // Найдовший розділ — 176 віршів: «Ин 3:1-9999999» не має створювати мільйони ключів на кожен символ.
+        if let verseEnd = reference.verseEnd { end = min(verseEnd, start + Self.maxRange) }
         return (start...end).map { VerseKey(book: reference.book, chapter: reference.chapter, verse: $0) }
     }
 }
@@ -111,6 +113,13 @@ public final class DraftStore {
     public var isOpen = false
     /// Режим «Проповідь»: активна чорнетка на все вікно (FR-40).
     public var isPresenting = false
+    /// Розмір шрифту режиму «Проповідь»: ⌘+ / ⌘− меню «Вигляд» змінюють його, поки режим відкритий.
+    public private(set) var sermonFontSize = 30.0
+
+    /// Крок ⌘+ / ⌘− у режимі «Проповідь»; межі 16…72 pt.
+    public func changeSermonFont(by delta: Double) {
+        sermonFontSize = min(max(sermonFontSize + delta, 16), 72)
+    }
     /// Список лише чорнеток, що згадують цей вірш (клік по позначці біля вірша, FR-39); `nil` — усі.
     public var mentionFilter: VerseKey?
     /// Вірш KJV → чорнетки, що на нього посилаються.
@@ -174,7 +183,10 @@ public final class DraftStore {
     public func delete(_ id: String) {
         guard write("DELETE FROM draft WHERE id = ?", [id]) else { return }
         drafts.removeAll { $0.id == id }
-        if activeID == id { activeID = nil }
+        if activeID == id {
+            activeID = nil
+            isPresenting = false
+        }
         unindex(id)
     }
 

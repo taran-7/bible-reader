@@ -77,8 +77,10 @@ struct ContentView: View {
             // Праворуч одна панель: чорнетки закривають ілюстрації і навпаки.
             .onChange(of: drafts.isOpen) { _, open in if open { model.closeIllustrations() } }
             .onChange(of: model.illustrations) { _, request in if request != nil { drafts.isOpen = false } }
+            // Під режимом «Проповідь» — ні фокусу, ні VoiceOver.
+            .accessibilityHidden(drafts.isPresenting)
             .overlay {
-                if drafts.isPresenting, drafts.active != nil {
+                if drafts.isPresenting, drafts.isOpen, drafts.active != nil {
                     SermonView(store: drafts, model: model)
                 }
             }
@@ -141,13 +143,27 @@ struct DatabaseErrorView: View {
 /// Помилка бази користувача: без неї нотатки тихо губилися б після перезапуску.
 struct UserDataWarning: View {
     @Environment(UserData.self) private var userData
+    @Environment(DraftStore.self) private var drafts
 
     var body: some View {
+        // Чорнетка, що не записалася, інакше зникла б мовчки після перезапуску (рев'ю add-sermon-drafts).
+        if let error = drafts.lastError, !userData.isInMemoryOnly {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                Text("Не вдалося зберегти чорнетку: \(error)").textSelection(.enabled)
+                Spacer()
+                Button("Закрити") { drafts.dismissError() }
+            }
+            .padding(8)
+            .background(.bar)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("drafts-error")
+        }
         if let error = userData.lastError {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                 Text(userData.isInMemoryOnly
-                     ? "Закладки й нотатки не зберігаються: базу користувача не відкрито (\(error))."
+                     ? "Закладки, нотатки й чорнетки не зберігаються: базу користувача не відкрито (\(error))."
                      : "Не вдалося зберегти зміну: \(error)")
                     .textSelection(.enabled)
                 Spacer()
