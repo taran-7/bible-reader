@@ -74,7 +74,7 @@
     {
       "slice": "2026-09-28-add-illustrations",
       "reviewEvidence": "missing",
-      "trailerCommits": 3,
+      "trailerCommits": 4,
       "libDomains": [
         "BibleCore"
       ],
@@ -128,7 +128,7 @@
     {
       "slice": "2026-09-28-close-tech-debt-batch",
       "reviewEvidence": "missing",
-      "trailerCommits": 5,
+      "trailerCommits": 6,
       "libDomains": [
         "BibleCore",
         "bible-import"
