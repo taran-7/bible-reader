@@ -64,7 +64,8 @@ final class CompareUITests: XCTestCase {
         XCTAssertFalse(mode.descendants(matching: .any)["compare-column-bkr"].exists)
         // Увесь розділ: є і сусідні вірші, а виділений підсвічено.
         XCTAssertTrue(mode.descendants(matching: .any)["compare-row-15"].exists)
-        XCTAssertEqual(mode.descendants(matching: .any)["compare-row-16"].value as? String, "виділено")
+        XCTAssertTrue(mode.descendants(matching: .any)["compare-row-16-selected"].exists)
+        XCTAssertFalse(mode.descendants(matching: .any)["compare-row-15-selected"].exists)
         let attachment = XCTAttachment(screenshot: window.screenshot())
         attachment.name = "compare"
         attachment.lifetime = .keepAlways

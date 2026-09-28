@@ -80,8 +80,9 @@ struct CompareView: View {
         .padding(.horizontal, 6)
         .background(highlighted ? Color(theme.selection) : .clear, in: RoundedRectangle(cornerRadius: 6))
         .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("compare-row-\(row.primary.verse)")
-        .accessibilityValue(highlighted ? "виділено" : "")
+        // Позначка виділення — в ідентифікаторі: value об'єднаного елемента macOS не віддає ні VoiceOver, ні XCUI.
+        .accessibilityIdentifier("compare-row-\(row.primary.verse)" + (highlighted ? "-selected" : ""))
+        .accessibilityAddTraits(highlighted ? .isSelected : [])
     }
 
     /// Порожня клітинка — вірш злито з попереднім або відповідника немає.
