@@ -129,10 +129,10 @@ extension ParallelTests {
 
     // @trace FR-30
     @Test func testCustomTableMapsToAndFromKJV() {
-        #expect(v.map(key(19, 10, 1), from: .kjv, to: Self.vulgate) == key(19, 9, 22))
-        #expect(v.map(key(39, 3, 24), from: Self.vulgate, to: .kjv) == key(39, 4, 6))
+        #expect(v.map(key(19, 10, 1), fromNumbering: .kjv, to: Self.vulgate) == key(19, 9, 22))
+        #expect(v.map(key(39, 3, 24), fromNumbering: Self.vulgate, to: .kjv) == key(39, 4, 6))
         // Вірші поза сегментами — той самий номер.
-        #expect(v.map(key(19, 23, 1), from: .kjv, to: Self.vulgate) == key(19, 23, 1))
+        #expect(v.map(key(19, 23, 1), fromNumbering: .kjv, to: Self.vulgate) == key(19, 23, 1))
         #expect(v.allKJV(from: Self.vulgate, key(19, 9, 22)) == [key(19, 10, 1)])
         #expect(v.allKJV(from: .kjv, key(1, 1, 1)) == [key(1, 1, 1)])
     }
@@ -140,11 +140,11 @@ extension ParallelTests {
     // @trace FR-30
     @Test func testTwoNonKJVSystemsGoThroughKJV() {
         // Вульгата Пс 9:22 → KJV Пс 10:1 → Синодальний Пс 9:22.
-        #expect(v.map(key(19, 9, 22), from: Self.vulgate, to: .synodal) == key(19, 9, 22))
-        #expect(v.map(key(19, 22, 1), from: .synodal, to: Self.vulgate) == key(19, 23, 1))
+        #expect(v.map(key(19, 9, 22), fromNumbering: Self.vulgate, to: .synodal) == key(19, 9, 22))
+        #expect(v.map(key(19, 22, 1), fromNumbering: .synodal, to: Self.vulgate) == key(19, 23, 1))
         // Невідома система або вірш без відповідника — nil, а не падіння.
-        #expect(v.map(key(19, 10, 1), from: .kjv, to: "lxx") == nil)
-        #expect(v.map(key(99, 1, 1), from: Self.vulgate, to: .synodal) == nil)
+        #expect(v.map(key(19, 10, 1), fromNumbering: .kjv, to: "lxx") == nil)
+        #expect(v.map(key(99, 1, 1), fromNumbering: Self.vulgate, to: .synodal) == nil)
     }
 }
 

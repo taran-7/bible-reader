@@ -22,7 +22,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
             failNextVerses = false
             throw Boom()
         }
-        (1...5).map { Verse(translation: translation, book: book, chapter: chapter, verse: $0, text: "\(translation.rawValue) \(book):\(chapter):\($0)") }
+        return (1...5).map { Verse(translation: translation, book: book, chapter: chapter, verse: $0, text: "\(translation.rawValue) \(book):\(chapter):\($0)") }
     }
     /// «many» дає 250 збігів (вірші 1…250 Буття 1), інше — один Ин 3:16.
     func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage {

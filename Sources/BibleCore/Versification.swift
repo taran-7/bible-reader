@@ -198,7 +198,7 @@ public struct Versification: Sendable {
     }
 
     /// Вірш в іншій системі нумерації; `nil` — відповідника немає (або немає таблиці системи).
-    public func map(_ key: VerseKey, from source: Translation.Numbering, to target: Translation.Numbering) -> VerseKey? {
+    public func map(_ key: VerseKey, fromNumbering source: Translation.Numbering, to target: Translation.Numbering) -> VerseKey? {
         if source == target { return key }
         let kjv = source == .kjv ? key : tables[source]?.toKJV[key]
         guard let kjv else { return nil }
@@ -207,7 +207,7 @@ public struct Versification: Sendable {
 
     /// Вірш іншого перекладу; `nil` — відповідника немає.
     public func map(_ key: VerseKey, from source: Translation, to target: Translation) -> VerseKey? {
-        map(key, from: source.numbering, to: target.numbering)
+        map(key, fromNumbering: source.numbering, to: target.numbering)
     }
 
     public static func load(from repository: SQLiteBibleRepository) throws -> Versification {
