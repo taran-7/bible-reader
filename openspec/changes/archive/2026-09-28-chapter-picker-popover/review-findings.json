@@ -1,0 +1,23 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer)",
+  "scope": "chapter-picker-popover",
+  "change": "chapter-picker-popover",
+  "baseRef": "751c3fb",
+  "headRef": "feature/chapter-picker-popover",
+  "dimensions": {
+    "correctness": { "confirmed": 8, "contested": 0, "rejected": 1, "fixed": 6, "deferred": 1 }
+  },
+  "fixed": [
+    "H1: book list lost arrow-key navigation (buttons instead of List selection) — List(selection:) restored, selection = book with open picker (NFR-4)",
+    "H2: chapter grid not reachable from keyboard — focused grid, arrows move a cursor, Return opens, Esc closes (NFR-4); UI test covers it",
+    "M3: picker stayed open after ⌘]/⌘[, bookmarks, translation switch — open() and translation didSet close it; unit test",
+    "M4: Esc via cancelAction depended on focus — onKeyPress(.escape) on the focused grid",
+    "L5: dimming invisible in dark themes, weak card border — dimming uses theme text colour, border 0.5",
+    "L6: current chapter marked by background only — plus a border"
+  ],
+  "rejected": "L7: sidebar marks the book whose picker is open as selected — intended, it is the book being chosen",
+  "deferred": "L8: overlay covers only the text column; the sidebar stays usable to switch books — intended",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T09:40:00Z"
+}

@@ -37,6 +37,7 @@
     "FR-34": "Future",
     "FR-35": "Future",
     "FR-36": "MVP",
+    "FR-37": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "MVP",
@@ -775,6 +776,34 @@
         "tests/BibleReaderUITests/CompareUITests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-37",
+      "specs": [
+        "openspec/specs/bible-reading/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleCoreTests/ChapterPickerTests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleCoreTests/ChapterPickerTests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift"
+      ],
+      "recordings": []
     }
   ],
   "failures": [],
@@ -910,6 +939,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-36 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-37 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }

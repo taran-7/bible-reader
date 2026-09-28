@@ -29,7 +29,8 @@ struct ContentView: View {
                 .background(ThemeBackground())
         } else {
             NavigationSplitView {
-                BookList(model: model, fontSize: preferences.preferences.bookListFontSize)
+                BookList(model: model, fontSize: preferences.preferences.bookListFontSize,
+                         verseFontSize: preferences.preferences.verseFontSize)
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
                 Group {
@@ -42,6 +43,7 @@ struct ContentView: View {
                 .font(.system(size: scale.systemFontSize))
                 .toolbar { ReaderToolbar(model: model, userData: userData, preferences: preferences, scale: scale) }
                 .modifier(ToolbarTheme())
+                .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
             // Паралельний переклад з налаштувань; той самий, що основний, — вимкнено.
@@ -49,7 +51,7 @@ struct ContentView: View {
                 let other = preferences.preferences.parallelTranslation
                 model.parallelTranslation = other == model.translation ? nil : other
             }
-            .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
+            .modifier(SearchField(query: $model.query))
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
@@ -94,5 +96,31 @@ struct UserDataWarning: View {
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("userdata-error")
         }
+    }
+}
+
+/// Назву розділу в тулбарі показує кнопка вибору розділу; системний заголовок у тулбарі ховаємо,
+/// а заголовок вікна лишається (меню «Window», VoiceOver). На macOS 14 без API — обидва видно.
+struct HiddenToolbarTitle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 15, *) {
+            content.toolbar(removing: .title)
+        } else {
+            content
+        }
+    }
+}
+
+/// Поле пошуку по центру тулбара, а не праворуч (запит власника 2026-09-28).
+/// `.toolbarPrincipal` є лише в SDK нових Xcode (Swift 6.2+); зі старішим (CI на macos-15) поле праворуч.
+struct SearchField: ViewModifier {
+    @Binding var query: String
+
+    func body(content: Content) -> some View {
+        #if compiler(>=6.2)
+        content.searchable(text: $query, placement: .toolbarPrincipal, prompt: "Слово або посилання (Ин 3:16)")
+        #else
+        content.searchable(text: $query, prompt: "Слово або посилання (Ин 3:16)")
+        #endif
     }
 }

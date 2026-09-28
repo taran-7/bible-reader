@@ -30,6 +30,7 @@
 | 5 | `add-parallel-view` (v2.0) | FR-26, FR-27 | — | зроблено 2026-09-28 (архів `2026-09-28-add-parallel-view`) |
 | 6 | `add-translations` (v2.1) | FR-28, FR-29 | — (нумерація Огієнка = Синодальний; таблиця потрібна лише паралельному перегляду) | зроблено 2026-09-27 (архів `2026-09-27-add-translations`) |
 | 6a | `add-translation-modules` (v2.1) | FR-30 | 6 | зроблено 2026-09-28 (архів `2026-09-28-add-translation-modules`) |
+| 6b | `chapter-picker-popover` (v2.1) | FR-37 | — | зроблено 2026-09-28 (архів `2026-09-28-chapter-picker-popover`) |
 | 4 | `add-illustrations` (v2.2) | FR-33, FR-34, FR-35 | 1a (кнопка поруч із 6.3) | serialize; останнім |
 
 Механізми NFR (затверджено 2026-09-27):

@@ -149,7 +149,8 @@ final class ReaderUITests: XCTestCase {
         expectSelected(16)
         XCTAssertTrue(button.waitForExistence(timeout: 5))
         NSPasteboard.general.clearContents()
-        button.click()
+        guard let single = app.visibleButton("copy-button") else { return XCTFail("кнопки копіювання не видно") }
+        single.click()
         let text = pasteboardText()
         XCTAssertTrue(text?.hasPrefix("«For God so loved the world") == true, text ?? "буфер порожній")
         XCTAssertTrue(text?.hasSuffix("(John 3:16)") == true, text ?? "буфер порожній")
@@ -160,12 +161,16 @@ final class ReaderUITests: XCTestCase {
         wait(for: [expectation(for: restored, evaluatedWith: button)], timeout: 4)
 
         // Кілька віршів: кнопка над першим, копіює весь діапазон.
-        verseRow(18).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
-        XCUIElement.perform(withKeyModifiers: .shift) {
-            verseRow(16).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
-        }
+        // Діапазон з клавіатури: рядок 18 буває під нижнім краєм вікна, і клік по ньому губиться.
+        verseRow(16).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
+        expectSelected(16)
+        app.typeKey(.downArrow, modifierFlags: .shift)
+        app.typeKey(.downArrow, modifierFlags: .shift)
+        expectSelected(18)
+        expectSelected(17)
         NSPasteboard.general.clearContents()
-        button.click()
+        guard let visible = app.visibleButton("copy-button") else { return XCTFail("кнопки копіювання не видно") }
+        visible.click()
         let range = pasteboardText()
         XCTAssertTrue(range?.hasSuffix("»\n(John 3:16-18)") == true, range ?? "буфер порожній")
         // Номер перед кожним віршем, кожен з нового рядка.
@@ -312,5 +317,110 @@ final class ReaderUITests: XCTestCase {
         note.click()
         expectTitle("John 3")
         expectSelected(16)
+    }
+
+    // @trace FR-37
+    func testBookClickShowsChapterPicker() {
+        launch()
+        expectTitle("Genesis 1")
+        XCTAssertFalse(app.popUpButtons["Розділ"].exists, "вибору розділу в тулбарі більше немає")
+        #if compiler(>=6.2)
+        // Поле пошуку по центру тулбара, а не праворуч (лише з SDK, де є .toolbarPrincipal).
+        let field = app.searchFields.firstMatch
+        let window = app.windows.firstMatch.frame
+        XCTAssertEqual(field.frame.midX, window.midX, accuracy: window.width * 0.15, "пошук по центру")
+        #endif
+        let picker = app.descendants(matching: .any)["chapter-picker"].firstMatch
+        app.descendants(matching: .any)["book-8"].firstMatch.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        // Текст поточного розділу лишається під вікном.
+        expectTitle("Genesis 1")
+        XCTAssertTrue(verseRow(1).exists)
+        app.buttons["chapter-4"].click()
+        expectTitle("Ruth 4")
+        XCTAssertFalse(picker.exists)
+        // Esc закриває вікно без переходу; поточний розділ позначено.
+        app.descendants(matching: .any)["book-8"].firstMatch.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["chapter-4"].label, "Розділ 4, поточний")
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
+        expectTitle("Ruth 4")
+        // Клавіатура (NFR-4): курсор стоїть на поточному розділі, ← і Return відкривають попередній.
+        app.descendants(matching: .any)["book-8"].firstMatch.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        // Курсор з'являється, коли сітка отримала фокус.
+        let grid = app.descendants(matching: .any).matching(NSPredicate(format: "hasKeyboardFocus == true")).firstMatch
+        XCTAssertTrue(grid.waitForExistence(timeout: 5))
+        app.typeKey(.leftArrow, modifierFlags: [])
+        app.typeKey(.return, modifierFlags: [])
+        expectTitle("Ruth 3")
+        XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
+    }
+
+    /// Знімок вікна для огляду (QA_SHOTS_DIR); без змінної — лише вкладення до результату тесту.
+    private func shot(_ name: String) {
+        let screenshot = XCUIScreen.main.screenshot()  // увесь екран: popover виходить за межі вікна
+        let attachment = XCTAttachment(screenshot: screenshot)
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        if let dir = ProcessInfo.processInfo.environment["QA_SHOTS_DIR"] {
+            try? screenshot.pngRepresentation.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+    }
+
+    // @trace FR-37
+    func testPsalmsPickerAndTitleDropdown() {
+        launch()
+        expectTitle("Genesis 1")
+        // Найбільша книга: 150 розділів у вікні збоку від «Psalms», прокрутка всередині.
+        let picker = app.descendants(matching: .any)["chapter-picker"].firstMatch
+        app.descendants(matching: .any)["book-19"].firstMatch.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        let book = app.descendants(matching: .any)["book-19"].firstMatch
+        XCTAssertGreaterThan(picker.frame.minX, book.frame.minX, "вікно праворуч від книги")
+        XCTAssertTrue(app.buttons["chapter-1"].exists)
+        shot("psalms-sidebar")
+        // Граничне значення: вікно не виходить за екран; якщо екран дозволяє, 150-й видно без прокрутки.
+        let screen = NSScreen.main?.frame.height ?? 0
+        XCTAssertLessThanOrEqual(picker.frame.maxY, screen, "вікно в межах екрана")
+        let last = app.buttons["chapter-150"]
+        if screen >= 900 { XCTAssertTrue(last.isHittable, "усі 150 розділів видно на екрані \(Int(screen)) pt") }
+        last.scrollToVisible()
+        shot("psalms-sidebar-scrolled")
+        last.click()
+        expectTitle("Psalms 150")
+        // Назва розділу в тулбарі — випадайка донизу з розділами відкритої книги.
+        let title = app.descendants(matching: .any)["chapter-title"].firstMatch
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        title.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(picker.frame.midY, title.frame.maxY, "вікно під назвою")
+        XCTAssertEqual(app.buttons["chapter-150"].label, "Розділ 150, поточний")
+        shot("psalms-title")
+        let standard = app.buttons["chapter-23"].frame.width
+        app.buttons["chapter-23"].click()
+        expectTitle("Psalms 23")
+        // Шрифт віршів (⌘+) збільшує й номери розділів у вікні.
+        for _ in 0..<4 {
+            app.menuBars.menuBarItems["View"].click()
+            app.menuBars.menuItems["Збільшити шрифт"].click()
+        }
+        title.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(app.buttons["chapter-23"].frame.width, standard, "номери більші після ⌘+")
+        shot("psalms-title-large-font")
+    }
+}
+
+private extension XCUIElement {
+    /// Прокрутка вниз, поки кнопка не стане видимою в сітці розділів.
+    func scrollToVisible() {
+        var tries = 0
+        while !isHittable, tries < 20 {
+            XCUIApplication().descendants(matching: .any)["chapter-picker"].firstMatch.scroll(byDeltaX: 0, deltaY: -200)
+            tries += 1
+        }
     }
 }
