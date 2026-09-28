@@ -36,6 +36,18 @@ import Testing
     }
 
     // @trace FR-3
+    @Test func testCommandImportsFullCanon() throws {
+        let dir = try TestSupport.tempDirectory()
+        let canon = "[" + (1...66).map { #"{"chapters":[["Verse \#($0)."]]}"# }.joined(separator: ",") + "]"
+        try TestSupport.writeFixture(to: dir, kjv: canon, synodal: canon, ohienko: canon, bkr: canon)
+        let out = dir.appendingPathComponent("bible.sqlite")
+        var stderr = ""
+        #expect(ImportCommand.run(arguments: ["bible-import", dir.path, out.path], stderr: { stderr += $0 }) == 0)
+        #expect(stderr.isEmpty)
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses", in: out) == 66 * 4)
+    }
+
+    // @trace FR-3
     @Test func testCommandImportErrorExits1WithMessage() throws {
         let dir = try TestSupport.tempDirectory()
         try TestSupport.writeFixture(to: dir)

@@ -55,7 +55,7 @@ public struct Versification: Sendable {
 
     /// Лінійний шматок: вірші `from...to` розділу KJV ідуть підряд від `localVerse` у розділі `localChapter`.
     /// `merge` — усі ці вірші KJV складають один вірш іншої системи.
-    public struct Segment: Codable, Hashable, Sendable {
+    public struct Segment: Decodable, Hashable, Sendable {
         public let book: Int, chapter: Int, from: Int, to: Int
         public let localChapter: Int, localVerse: Int
         public var merge = false
@@ -229,7 +229,7 @@ public struct Versification: Sendable {
 
 /// Таблиця відповідностей нової системи нумерації до KJV (поле `versification` маніфесту, tech debt #25):
 /// лише відмінності від KJV; вірші поза сегментами мають той самий номер.
-public struct VersificationTable: Codable, Hashable, Sendable {
+public struct VersificationTable: Decodable, Hashable, Sendable {
     public let segments: [Versification.Segment]
 
     public init(segments: [Versification.Segment]) {
