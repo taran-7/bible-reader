@@ -82,4 +82,14 @@ final class CompareUITests: XCTestCase {
         XCTAssertEqual(app.checkBoxes["compare-choice-bkr"].value as? Int, 0)
         XCTAssertEqual(app.checkBoxes["compare-choice-synodal"].value as? Int, 1)
     }
+
+    // @trace FR-17
+    func testEscapeClearsSelection() {
+        launch(reset: true)
+        search("John 3:16")
+        XCTAssertNotNil(app.visibleButton("compare-button"), "виділення після переходу")
+        app.windows.firstMatch.typeKey(.escape, modifierFlags: [])
+        let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button") == nil }
+        wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 5)
+    }
 }
