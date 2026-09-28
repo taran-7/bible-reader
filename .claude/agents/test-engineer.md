@@ -46,6 +46,19 @@ is probably too weak — strengthen it until red is meaningful.
 - Passwords from env with a documented default; never hardcode production
   credentials.
 
+## Boundary values rule
+
+Every slice that renders or processes a collection, range or size gets tests at
+its extremes, not only a typical case. Derive the extremes from the real data,
+not from fixtures: the longest and shortest book, the book with the most
+chapters (Psalms, 150) and with one chapter (Obadiah, Jude), the longest verse,
+the first and last chapter of the Bible, empty results, the minimum and maximum
+font and interface scale, the smallest supported window. For UI, assert layout
+at the extreme (nothing clipped outside the window or screen, the last item
+reachable) and attach a screenshot. Field evidence: the chapter picker was
+tested on Ruth (4 chapters) only; Psalms (150) overflowed the window
+(owner feedback 2026-09-28, FR-37).
+
 ## Regression rule
 
 Every fixed bug gets a test that fails on the old code, named/commented with
