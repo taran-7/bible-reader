@@ -23,7 +23,7 @@ Result: PASS, 2 warning(s)
 | 2026-09-28-add-user-notes | clean | 5 | yes | BibleCore |
 | 2026-09-28-add-verse-compare | clean | 1 | yes | BibleCore |
 | 2026-09-28-chapter-picker-popover | clean | 5 | yes | BibleCore |
-| 2026-09-28-close-tech-debt-batch | **missing** | 2 | yes | BibleCore, bible-import |
+| 2026-09-28-close-tech-debt-batch | **missing** | 3 | yes | BibleCore, bible-import |
 | 2026-09-28-improve-search | clean | 2 | yes | BibleCore, CSnowball |
 | 2026-09-28-tweak-reading-ui | clean | 3 | yes | BibleCore |
 
