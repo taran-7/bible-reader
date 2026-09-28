@@ -95,7 +95,7 @@ NFR з PRD §3 і §7 поки не мають автоматичного мех
 |---|---|---|---|---|
 | NFR-1 | MVP | Platform | macOS 14+, лише Apple Silicon (`arm64`); Intel поза обсягом (рішення власника 2026-09-27, open source: хто потребує — збере сам). | local-verifiable |
 | NFR-2 | MVP | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35), лише домени з allowlist. | local-verifiable |
-| NFR-3 | MVP | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії (пошук: тест `improve-search`; запуск: `launch-time` у UI-тесті — Debug-збірка, теплий запуск). | local-verifiable |
+| NFR-3 | MVP | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії (пошук: тест `improve-search`; запуск: `launch-time` у UI-тесті — Debug-збірка, теплий запуск; межа 1 с на Mac, 2 с на VM CI — PD-14). | local-verifiable |
 | NFR-4 | MVP | A11y | VoiceOver читає номери й тексти віршів; повна робота з клавіатури; контраст WCAG AA. | local-verifiable |
 | NFR-5 | MVP | Size | Розмір Release `.app` < 100 МБ (попередження від 80 МБ); межу піднято з 60 МБ рішенням власника 2026-09-27. | local-verifiable |
 
