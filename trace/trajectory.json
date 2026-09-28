@@ -74,7 +74,7 @@
     {
       "slice": "2026-09-28-add-illustrations",
       "reviewEvidence": "missing",
-      "trailerCommits": 10,
+      "trailerCommits": 11,
       "libDomains": [
         "BibleCore"
       ],
