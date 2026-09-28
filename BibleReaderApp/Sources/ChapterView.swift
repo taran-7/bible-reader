@@ -41,12 +41,11 @@ struct ChapterView: View {
                     }
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? CopyButton.width(for: scale) + CompareButton.width(for: scale)
-                                    + IllustrationsButton.width(for: scale) + 16 : 36)
+                                  ? SelectionButton.rowWidth(for: scale) : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
-                                HStack(spacing: 4) {
+                                HStack(spacing: SelectionButton.spacing) {
                                     IllustrationsButton { [verses = selection] in illustrations(verses) }
                                     CompareButton { [verses = selection] in compare(verses) }
                                     CopyButton { [verses = selection] in copy(verses) }

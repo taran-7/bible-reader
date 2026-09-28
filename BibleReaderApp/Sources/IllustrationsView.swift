@@ -303,29 +303,12 @@ enum BraveKey {
     }
 }
 
-/// Кнопка «Ілюстрації» поруч із «Порівняти» на виділенні (FR-33).
+/// «Ілюстрації» поруч із «Порівняти» на виділенні (FR-33).
 struct IllustrationsButton: View {
-    static func width(for scale: InterfaceScale) -> CGFloat { 32 * scale.factor }
-
     let action: () -> Void
-    @State private var isHovered = false
-    @Environment(\.theme) private var theme
-    @Environment(\.interfaceScale) private var scale
 
     var body: some View {
-        Button(action: action) {
-            Image(systemName: "text.book.closed")
-                .font(.system(size: scale.systemFontSize))
-                .foregroundStyle(Color(theme.accent))
-                .frame(width: IllustrationsButton.width(for: scale) - 12)
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(Color(theme.copyButton).opacity(isHovered ? 1 : 0.6), in: RoundedRectangle(cornerRadius: 6))
-        }
-        .buttonStyle(.borderless)
-        .onHover { isHovered = $0 }
-        .help("Пошук ілюстрацій")
-        .accessibilityLabel("Пошук ілюстрацій")
-        .accessibilityIdentifier("illustrations-button")
+        SelectionButton(title: "Ілюстрації", systemImage: "text.book.closed", help: "Пошук ілюстрацій",
+                        identifier: "illustrations-button", action: action)
     }
 }
