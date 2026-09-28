@@ -59,7 +59,9 @@ final class DraftsUITests: XCTestCase {
         let predicate = NSPredicate(format: "value CONTAINS %@", "(John 3:16)")
         wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: text)], timeout: 5)
         XCTAssertTrue(element("draft-references").exists, "живе посилання під текстом")
-        XCTAssertTrue(element("draft-mark-16").waitForExistence(timeout: 5), "позначка біля вірша")
+        // Рядок вірша — один елемент доступності (children: .ignore): позначку видно в його мітці.
+        let marked = NSPredicate(format: "label CONTAINS %@", "є в чорнетках")
+        wait(for: [XCTNSPredicateExpectation(predicate: marked, object: element("verse-16"))], timeout: 5)
 
         // Режим «Проповідь» і Esc.
         element("draft-present").click()
