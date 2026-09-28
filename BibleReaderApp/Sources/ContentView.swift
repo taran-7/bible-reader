@@ -51,7 +51,8 @@ struct ContentView: View {
                 let other = preferences.preferences.parallelTranslation
                 model.parallelTranslation = other == model.translation ? nil : other
             }
-            .searchable(text: $model.query, prompt: "Слово або посилання (Ин 3:16)")
+            // Поле пошуку по центру тулбара, а не праворуч (запит власника 2026-09-28).
+            .searchable(text: $model.query, placement: .toolbarPrincipal, prompt: "Слово або посилання (Ин 3:16)")
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }

@@ -180,10 +180,20 @@ struct FindCommands: Commands {
         // Замість системного «Знайти…» (панель пошуку в тексті), щоб не було двох ⌘F.
         CommandGroup(replacing: .textEditing) {
             Button("Знайти") {
-                let item = NSApp.keyWindow?.toolbar?.items.lazy.compactMap { $0 as? NSSearchToolbarItem }.first
-                item?.beginSearchInteraction()
+                guard let window = NSApp.keyWindow, let items = window.toolbar?.items else { return }
+                if let item = items.lazy.compactMap({ $0 as? NSSearchToolbarItem }).first {
+                    item.beginSearchInteraction()
+                } else if let field = items.lazy.compactMap({ $0.view.flatMap(Self.searchField(in:)) }).first {
+                    // Поле по центру тулбара (.toolbarPrincipal) — звичайне NSSearchField усередині item.
+                    window.makeFirstResponder(field)
+                }
             }
             .keyboardShortcut("f", modifiers: .command)
         }
+    }
+
+    private static func searchField(in view: NSView) -> NSSearchField? {
+        if let field = view as? NSSearchField { return field }
+        return view.subviews.lazy.compactMap(searchField(in:)).first
     }
 }

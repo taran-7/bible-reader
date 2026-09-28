@@ -324,6 +324,10 @@ final class ReaderUITests: XCTestCase {
         launch()
         expectTitle("Genesis 1")
         XCTAssertFalse(app.popUpButtons["Розділ"].exists, "вибору розділу в тулбарі більше немає")
+        // Поле пошуку по центру тулбара, а не праворуч.
+        let field = app.searchFields.firstMatch
+        let window = app.windows.firstMatch.frame
+        XCTAssertEqual(field.frame.midX, window.midX, accuracy: window.width * 0.15, "пошук по центру")
         let picker = app.descendants(matching: .any)["chapter-picker"].firstMatch
         app.descendants(matching: .any)["book-8"].firstMatch.click()
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
