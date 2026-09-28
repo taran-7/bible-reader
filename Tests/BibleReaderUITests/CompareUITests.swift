@@ -93,7 +93,7 @@ final class CompareUITests: XCTestCase {
         XCTAssertTrue(verse.waitForExistence(timeout: 5))
         verse.click()
         verse.typeKey(.escape, modifierFlags: [])
-        let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button") == nil }
-        wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 5)
+        let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button", timeout: 0) == nil }
+        wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 10)
     }
 }

@@ -147,7 +147,7 @@
     {
       "slice": "2026-09-28-comfortable-reading",
       "reviewEvidence": "clean",
-      "trailerCommits": 8,
+      "trailerCommits": 9,
       "libDomains": [
         "BibleCore"
       ],
