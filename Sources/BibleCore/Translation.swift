@@ -37,9 +37,18 @@ public enum Language: Hashable, Sendable {
 /// файлом у `data/raw` і рядком маніфесту, без змін коду. Порядок у маніфесті — порядок у меню і в ⌘⌥1…9.
 /// Коди `kjv`, `bkr`, `ohienko`, `synodal` обов'язкові: на них спираються код і таблиця відповідностей.
 public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, CustomStringConvertible {
-    /// Нумерація віршів: `kjv` або `synodal`. Інші системи (Вульгата, LXX) не підтримуються: для них
-    /// потрібна власна таблиця відповідностей (tech debt #25).
-    public enum Numbering: String, Codable, Sendable { case kjv, synodal }
+    /// Система нумерації віршів. `kjv` — вузол: кожна інша система має таблицю відповідностей до KJV,
+    /// а між двома не-KJV системами вірш іде через KJV. `synodal` має вбудовану таблицю; нова система
+    /// (Вульгата, LXX) приносить свою в маніфесті полем `versification` (tech debt #25).
+    public struct Numbering: RawRepresentable, Hashable, Codable, Sendable, ExpressibleByStringLiteral {
+        public let rawValue: String
+        public init(rawValue: String) { self.rawValue = rawValue }
+        public init(stringLiteral value: String) { self.rawValue = value }
+        public static let kjv: Numbering = "kjv"
+        public static let synodal: Numbering = "synodal"
+        /// Системи з таблицею в коді: для них маніфест не мусить приносити таблицю.
+        public var isBuiltIn: Bool { self == .kjv || self == .synodal }
+    }
 
     public struct BookName: Codable, Hashable, Sendable {
         public let name: String
@@ -56,6 +65,8 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public let sourceFileName: String
     /// Назви книг для мови без вбудованих назв (66, у порядку канону).
     public let books: [BookName]?
+    /// Таблиця відповідностей до KJV для нової системи нумерації (з маніфесту).
+    public let versificationTable: VersificationTable?
 
     public var id: String { rawValue }
     public var description: String { rawValue }
@@ -64,7 +75,7 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public var menuTitle: String { "\(title) — \(languageTitle)" }
 
     public init(rawValue: String, title: String, language: Language, languageTitle: String, numbering: Numbering,
-                sourceFileName: String, books: [BookName]? = nil) {
+                sourceFileName: String, books: [BookName]? = nil, versificationTable: VersificationTable? = nil) {
         self.rawValue = rawValue
         self.title = title
         self.language = language
@@ -72,6 +83,7 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
         self.numbering = numbering
         self.sourceFileName = sourceFileName
         self.books = books
+        self.versificationTable = versificationTable
     }
 
     /// Переклад із каталогу за кодом.
@@ -116,12 +128,15 @@ public enum TranslationCatalog {
         case duplicateCode(String)
         case missingBookNames(String)
         case badBookNames(String)
+        case missingVersification(String)
 
         public var description: String {
             switch self {
             case .duplicateCode(let code): "переклад «\(code)» у маніфесті двічі"
             case .missingBookNames(let code): "переклад «\(code)»: мова без вбудованих назв книг — потрібен список books (66)"
             case .badBookNames(let code): "переклад «\(code)»: books має містити 66 назв"
+            case .missingVersification(let code):
+                "переклад «\(code)»: нова система нумерації без таблиці відповідностей — потрібне поле versification"
             }
         }
     }
@@ -130,6 +145,7 @@ public enum TranslationCatalog {
         let code, title, language, languageTitle, file: String
         let numbering: Translation.Numbering
         let books: [Translation.BookName]?
+        let versification: VersificationTable?
     }
 
     public static var bundledManifest: Data {
@@ -138,17 +154,21 @@ public enum TranslationCatalog {
         }
     }
 
-    /// Розбирає маніфест і перевіряє: коди унікальні, мова без вбудованих назв приносить 66 назв книг.
+    /// Розбирає маніфест і перевіряє: коди унікальні, мова без вбудованих назв приносить 66 назв книг,
+    /// нова система нумерації має таблицю відповідностей хоча б в одному модулі.
     public static func load(from data: Data) throws -> [Translation] {
         let entries = try JSONDecoder().decode([Entry].self, from: data)
+        let tabled = Set(entries.filter { $0.versification != nil }.map(\.numbering))
         var seen = Set<String>()
         return try entries.map { entry in
             guard seen.insert(entry.code).inserted else { throw Error.duplicateCode(entry.code) }
+            if !entry.numbering.isBuiltIn, !tabled.contains(entry.numbering) { throw Error.missingVersification(entry.code) }
             let language = Language(code: entry.language)
             if let books = entry.books, books.count != 66 { throw Error.badBookNames(entry.code) }
             if !language.hasBuiltInBookNames, entry.books == nil { throw Error.missingBookNames(entry.code) }
             return Translation(rawValue: entry.code, title: entry.title, language: language, languageTitle: entry.languageTitle,
-                               numbering: entry.numbering, sourceFileName: entry.file, books: entry.books)
+                               numbering: entry.numbering, sourceFileName: entry.file, books: entry.books,
+                               versificationTable: entry.versification)
         }
     }
 }
@@ -157,5 +177,14 @@ public enum TranslationCatalog {
 public enum TranslationShortcut {
     public static func digit(forIndex index: Int) -> Character? {
         (0..<9).contains(index) ? Character("\(index + 1)") : nil
+    }
+
+    /// Фізичні клавіші цифрового ряду 1…9 (коди ANSI). На чеській розкладці ряд без Shift дає
+    /// `+ ě š č`, тож ⌘⌥1…9 ловимо за кодом клавіші, а не за символом (tech debt #23).
+    static let digitKeyCodes: [UInt16] = [18, 19, 20, 21, 23, 22, 26, 28, 25]
+
+    /// Індекс перекладу для клавіші цифрового ряду; `nil` — інша клавіша.
+    public static func index(forKeyCode keyCode: UInt16) -> Int? {
+        digitKeyCodes.firstIndex(of: keyCode)
     }
 }
