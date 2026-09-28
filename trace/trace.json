@@ -412,12 +412,12 @@
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
-        "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "Tests/BibleReaderUITests/CompareUITests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
-        "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleReaderUITests/CompareUITests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
