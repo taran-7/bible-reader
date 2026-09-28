@@ -1,7 +1,9 @@
 # illustrations Specification
 
 ## Purpose
-TBD - created by archiving change add-illustrations. Update Purpose after archive.
+Показує до виділених віршів реальні історії-ілюстрації з дозволених протестантських джерел і Вікіпедії: живий пошук під час кліку, без індексу і без збереження.
+
+Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-33, FR-34, FR-35, NFR-2.
 
 ## Requirements
 
