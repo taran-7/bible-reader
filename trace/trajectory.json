@@ -110,7 +110,7 @@
     {
       "slice": "2026-09-28-chapter-picker-popover",
       "reviewEvidence": "clean",
-      "trailerCommits": 4,
+      "trailerCommits": 5,
       "libDomains": [
         "BibleCore"
       ],
