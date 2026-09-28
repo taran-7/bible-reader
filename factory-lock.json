@@ -1,6 +1,6 @@
 {
-  "createdAt": "2026-09-27T22:35:54.331Z",
-  "gitHead": "828a17240fed29f8817d302247a1319a47db8e69",
+  "createdAt": "2026-09-28T01:30:11.750Z",
+  "gitHead": "b67bc86f1b28176a42247d9974f31137439876d3",
   "files": {
     ".claude/workflows/eval-suite.js": "f93c99d868b812cfa7412927f52b62d1042525396a9d0265f16cfe435b9c6098",
     ".claude/workflows/review-gate.js": "7295d8e94ba347213120b9d190b9ebbb88dee373173cfc7daba2114b726ca76b",
@@ -10,8 +10,8 @@
     ".claude/workflows/vision-verify.js": "84c893a066088a158d308a3a21cf7cd3b44fdefb4f503ef9bd85507b7364fc69",
     ".githooks/commit-msg": "c6427b364dbc15da31235e4c0f9a8ac74639b7f0512cadce95f301637387fb5c",
     ".githooks/pre-commit": "c64e18049003ddd126e8ac2c61c1ce759923977748f5f044ee34fc1c3212eaea",
-    ".github/workflows/ci.yml": "a0d09613c959dd8b157bf592180cd871dce1d40b820b26073c27d8e24a48e1b8",
-    "quality/coverage-baseline.json": "da38b7508e2c0ca27346713c08a04da56fbfd261d8cba13d5645d5c22d9dc1a3",
+    ".github/workflows/ci.yml": "11d1982a9cd242105a5bde6d4bc49df8cbaa028a194b2dd4ac7b413d406882c5",
+    "quality/coverage-baseline.json": "300d30180716188eb31e13271e7d67916ca434711bf53427971e37c4ccce9541",
     "quality/process-baseline.json": "4363df6ac375e25c06c8ee85a3aaf49c8cd69f6fab2fbd3e76409ca715c4e20b",
     "quality/telemetry.config.json": "98276dbbd18f9d694f3378aed7ecc042439d99c8e292bb3caeed7a833005835b",
     "scripts/check-acceptance-methods.mjs": "9ad98594fcdc7892e15b3f704a41be423ad66a8c06c38d1e387eb5b1cede1d82",
@@ -31,6 +31,7 @@
     "check-trajectory module scope: Sources/<Module>/",
     "qa-verify battery: make test, coverage via llvm-cov, xcodebuild; recordings/visual-fidelity/lint/e2e removed",
     "hooks: swift build instead of eslint/tsc; commit-msg feature dirs Sources/BibleReaderApp",
-    "check-trajectory counts Slice trailers reachable from HEAD (PD-13)"
+    "check-trajectory counts Slice trailers reachable from HEAD (PD-13)",
+    "CI launch-time budget 2000 ms on the shared VM, 1000 ms locally (PD-14)"
   ]
 }

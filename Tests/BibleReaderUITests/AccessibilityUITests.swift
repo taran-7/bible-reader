@@ -71,7 +71,9 @@ final class AccessibilityUITests: XCTestCase {
         let attachment = XCTAttachment(string: "launch: first \(cold) ms, second \(milliseconds) ms")
         attachment.lifetime = .keepAlways
         add(attachment)
-        XCTAssertLessThan(milliseconds, 1000, "запуск \(milliseconds) мс")
+        // NFR-3: 1000 мс на Mac; CI передає більшу межу для своєї VM (PD-14, TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS).
+        let budget = ProcessInfo.processInfo.environment["BIBLE_LAUNCH_BUDGET_MS"].flatMap(Int.init) ?? 1000
+        XCTAssertLessThan(milliseconds, budget, "запуск \(milliseconds) мс, межа \(budget) мс")
     }
 
     // @trace NFR-4
