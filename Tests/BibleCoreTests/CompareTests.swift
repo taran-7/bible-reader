@@ -7,7 +7,6 @@ import Testing
     @Test func testDefaultShowsAllTranslationsInMenuOrder() {
         let panels = ComparePanels()
         #expect(panels.visible == Translation.allCases)
-        #expect(panels.hidden.isEmpty)
     }
 
     // @trace FR-36
@@ -15,7 +14,6 @@ import Testing
         var panels = ComparePanels()
         panels.close(.bkr)
         #expect(panels.visible == [.kjv, .ohienko, .synodal])
-        #expect(panels.hidden == [.bkr])
         panels.add(.bkr)
         #expect(panels.visible == [.kjv, .ohienko, .synodal, .bkr])
         panels.add(.bkr)
@@ -29,32 +27,23 @@ import Testing
     }
 
     // @trace FR-36
-    @Test func testMoveLeftRightAndDrop() {
-        var panels = ComparePanels()
-        panels.moveRight(.kjv)
-        #expect(panels.visible == [.bkr, .kjv, .ohienko, .synodal])
-        panels.moveLeft(.synodal)
-        #expect(panels.visible == [.bkr, .kjv, .synodal, .ohienko])
-        #expect(!panels.canMoveLeft(.bkr) && !panels.canMoveRight(.ohienko))
-        panels.moveLeft(.bkr)
-        panels.moveRight(.ohienko)
-        #expect(panels.visible == [.bkr, .kjv, .synodal, .ohienko])
-        // Перетягування: панель стає на місце цільової.
-        panels.move(.ohienko, to: .bkr)
-        #expect(panels.visible == [.ohienko, .bkr, .kjv, .synodal])
-        panels.move(.ohienko, to: .synodal)
-        #expect(panels.visible == [.bkr, .kjv, .synodal, .ohienko])
-        panels.move(.kjv, to: .kjv)
-        #expect(panels.visible == [.bkr, .kjv, .synodal, .ohienko])
+    @Test func testToggleKeepsOneChoice() {
+        var panels = ComparePanels(visible: [.kjv, .synodal])
+        panels.toggle(.bkr)
+        #expect(panels.visible == [.kjv, .synodal, .bkr])
+        panels.toggle(.kjv)
+        panels.toggle(.synodal)
+        #expect(panels.visible == [.bkr])
+        panels.toggle(.bkr)
+        #expect(panels.visible == [.bkr])
     }
 
     // @trace FR-36
     @Test func testPersistedInPreferences() throws {
         var preferences = ReadingPreferences()
         preferences.comparePanels.close(.synodal)
-        preferences.comparePanels.moveLeft(.ohienko)
         let decoded = try JSONDecoder().decode(ReadingPreferences.self, from: JSONEncoder().encode(preferences))
-        #expect(decoded.comparePanels.visible == [.kjv, .ohienko, .bkr])
+        #expect(decoded.comparePanels.visible == [.kjv, .bkr, .ohienko])
         // Невідомі й повторені переклади відкидаємо; порожній список — стандартний.
         let odd = try JSONDecoder().decode(ReadingPreferences.self, from: Data(#"{"comparePanels":["kjv","xx","kjv","bkr"]}"#.utf8))
         #expect(odd.comparePanels.visible == [.kjv, .bkr])
@@ -65,81 +54,56 @@ import Testing
     }
 }
 
-@Suite struct VerseComparisonTests {
-    let repository = try! SQLiteBibleRepository(path: TestSupport.realDatabase)
-
-    // @trace FR-36
-    @Test func testJohn316InFourTranslations() throws {
-        let panels = try VerseComparison.load(from: repository, book: 43, chapter: 3, verses: [16], panels: ComparePanels())
-        #expect(panels.map(\.translation) == Translation.allCases)
-        #expect(panels.map(\.reference) == ["John 3:16", "J 3:16", "Ів. 3:16", "Ин. 3:16"])
-        #expect(panels.allSatisfy { $0.verses.count == 1 })
-        #expect(panels.first { $0.translation == .synodal }?.verses.first?.text.hasPrefix("Ибо так возлюбил") == true)
-        #expect(panels.filter(\.numberingMayDiffer).map(\.translation) == [.synodal])
+@MainActor @Suite struct ComparisonTests {
+    func makeModel() -> ReaderViewModel {
+        ReaderViewModel { try SQLiteBibleRepository(path: TestSupport.realDatabase) }
     }
 
     // @trace FR-36
-    @Test func testPsalmAndRangeInPanelOrder() throws {
-        var order = ComparePanels()
-        order.moveLeft(.synodal)
-        order.close(.bkr)
-        let panels = try VerseComparison.load(from: repository, book: 19, chapter: 23, verses: [1, 2], panels: order)
-        #expect(panels.map(\.translation) == [.kjv, .synodal, .ohienko])
-        #expect(panels[0].reference == "Ps 23:1-2")
-        #expect(panels[0].verses.map(\.verse) == [1, 2])
-        #expect(panels[0].verses.first?.text.hasPrefix("The LORD is my shepherd") == true)
-        #expect(panels.first { $0.translation == .ohienko }?.verses.first?.text.contains("Господь то мій Пастир") == true)
+    @Test func testWholeChapterInColumnsAlignedByVerse() throws {
+        let model = makeModel()
+        model.open(Location(book: 19, chapter: 22))
+        // Переклад на екрані — перша колонка, навіть якщо його вибрано ще раз.
+        model.showComparison(of: [3, 1], with: [.synodal, .kjv, .ohienko])
+        let comparison = try #require(model.comparison)
+        #expect(comparison.translations == [.kjv, .synodal, .ohienko])
+        #expect(comparison.rows.count == model.verses.count)
+        #expect(comparison.highlighted == [1, 3])
+        // Пс 22:1 KJV — надпис і Пс 21:2 Синодального; Огієнко — вірш у вірш.
+        #expect(comparison.rows[0].others[0].map { "\($0.chapter):\($0.verse)" } == ["21:1", "21:2"])
+        #expect(comparison.rows[0].others[1].map(\.verse) == [1])
+        #expect(comparison.title(of: .synodal) == "Псалтирь 22")
+        #expect(comparison.title(of: .ohienko).hasPrefix("Псал"))
+        #expect(comparison.title(of: .kjv) == "Psalms 22")
+        model.closeComparison()
+        #expect(model.comparison == nil)
     }
 
     // @trace FR-36
-    @Test func testEmptySelectionHasNoPanels() throws {
-        #expect(try VerseComparison.load(from: repository, book: 1, chapter: 1, verses: [], panels: ComparePanels()).isEmpty)
-    }
-}
-
-@MainActor @Suite struct CompareViewModelTests {
-    // @trace FR-36
-    @Test func testOpenInTranslationReloadsOnce() {
-        let repository = FakeRepository()
-        let model = ReaderViewModel { repository }
-        model.open(Location(book: 43, chapter: 3), in: .synodal, focus: 16)
-        #expect(model.translation == .synodal)
-        #expect(model.location == Location(book: 43, chapter: 3))
-        #expect(model.verses.first?.text.hasPrefix("synodal 43:3") == true)
-        #expect(model.takeFocus() == 16)
-        model.open(Location(book: 1, chapter: 2), in: .synodal, focus: nil)
-        #expect(model.location == Location(book: 1, chapter: 2))
+    @Test func testNothingSelectedOrNavigatedAway() {
+        let model = makeModel()
+        model.open(Location(book: 43, chapter: 3))
+        model.showComparison(of: [], with: [.synodal])
+        #expect(model.comparison == nil)
+        model.showComparison(of: [16], with: [.synodal])
+        #expect(model.comparison?.rows.first?.id == 1)
+        // Інший розділ — порівняння закривається.
+        model.goNext()
+        #expect(model.comparison == nil)
+        #expect(ReaderViewModel { throw FakeRepository.Boom() }.comparison == nil)
+        let broken = ReaderViewModel { throw FakeRepository.Boom() }
+        broken.showComparison(of: [1], with: [.kjv])
+        #expect(broken.comparison == nil)
     }
 
     // @trace FR-36
-    @Test func testCompareThroughModel() throws {
-        let model = ReaderViewModel { FakeRepository() }
-        let panels = try model.compare(CompareRequest(book: 43, chapter: 3, verses: [2, 9]), panels: ComparePanels())
-        #expect(panels.count == 4)
-        // FakeRepository має 5 віршів: 9-го немає, посилання — лише на знайдений.
-        #expect(panels[0].reference == "John 3:2")
-        #expect(throws: ReaderViewModel.Unavailable.self) {
-            try ReaderViewModel { throw FakeRepository.Boom() }.compare(CompareRequest(book: 1, chapter: 1, verses: [1]), panels: ComparePanels())
-        }
-        var order = ComparePanels()
-        let same = order.move(.kjv, to: .kjv)
-        let moved = order.move(.kjv, to: .synodal)
-        #expect(!same && moved)
-        #expect("\(ReaderViewModel.Unavailable())".contains("недоступна"))
-    }
-}
-
-extension ComparePanelsTests {
-    // @trace FR-36
-    @MainActor @Test func testHiddenPanelCannotMoveAndMissingVersesKeepReference() throws {
-        var panels = ComparePanels()
-        panels.close(.bkr)
-        #expect(!panels.canMoveLeft(.bkr) && !panels.canMoveRight(.bkr))
-        let model = ReaderViewModel { FakeRepository() }
-        let loaded = try model.compare(CompareRequest(book: 43, chapter: 3, verses: [40]), panels: panels)
-        // Вірша немає — лишається запитане посилання, а панель порожня.
-        #expect(loaded.map(\.id) == [.kjv, .ohienko, .synodal])
-        #expect(loaded[0].reference == "John 3:40" && loaded[0].verses.isEmpty)
+    @Test func testUnknownBookFallsBackToNumber() {
+        #expect(Reference.bookLabel(99, in: .kjv) == "99")
         #expect(Quote.format([Verse(translation: .kjv, book: 99, chapter: 1, verse: 1, text: "x")]) == "«x» (99 1:1)")
+    }
+
+    // @trace FR-15
+    @Test func testReadingColumnFitsAboutSeventyFiveCharacters() {
+        #expect(ReadingPreferences.readingColumnWidth(fontSize: 15) == 600)
     }
 }

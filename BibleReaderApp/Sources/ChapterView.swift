@@ -6,13 +6,14 @@ import SwiftUI
 struct ChapterView: View {
     let model: ReaderViewModel
     let fontSize: Double
+    /// «Порівняти» (FR-36): вибір перекладів і режим порівняння — у `ContentView`.
+    var compare: (Set<Int>) -> Void = { _ in }
     @State private var selection = Set<Int>()
     /// Ширина колонки тексту: у вузькій кнопки на виділенні — лише іконки.
     @State private var listWidth: CGFloat = 1000
     /// Вірш, нотатку до якого редагують.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
-    @Environment(\.openWindow) private var openWindow
     /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
     @FocusState private var listFocused: Bool
     @Environment(\.theme) private var theme
@@ -42,9 +43,14 @@ struct ChapterView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
+                        // Один переклад — колонка ~75 знаків по центру (FR-15): довгий рядок важко читати.
+                        .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
+                        .frame(maxWidth: .infinity)
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
-                        .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? SelectionButton.rowWidth(for: scale, compact: compactButtons) : 36)
+                        // Виділені вірші відступають від кнопок повністю, сусіди — сходинками ½ і ¼.
+                        .padding(.trailing, 36 + (SelectionButton.rowWidth(for: scale, compact: compactButtons) - 36)
+                                  * CopyButtonModel.shift(of: verse.verse, selection: selection))
+                        .animation(.easeInOut(duration: 0.2), value: selection)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
@@ -131,11 +137,6 @@ struct ChapterView: View {
     private func rowBackground(_ verse: Int, _ highlight: HighlightColor?) -> Color {
         if selection.contains(verse) { return Color(theme.selection) }
         return highlight.map(Color.highlight) ?? .clear
-    }
-
-    private func compare(_ verses: Set<Int>) {
-        guard !verses.isEmpty else { return }
-        openWindow(id: "compare", value: CompareRequest(book: model.location.book, chapter: model.location.chapter, verses: verses))
     }
 
     /// Ілюстрації — панеллю праворуч у тому самому вікні.

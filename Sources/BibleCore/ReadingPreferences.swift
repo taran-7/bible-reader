@@ -34,6 +34,11 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
     public static let verseFontRange = 11.0...32.0
     public static let bookListFontRange = 11.0...32.0
 
+    /// Колонка тексту без паралельного перекладу: ~75 знаків у рядку (середній знак ≈ 0,5 кегля) плюс номер вірша.
+    public static let readingColumnEms = 40.0
+
+    public static func readingColumnWidth(fontSize: Double) -> Double { fontSize * readingColumnEms }
+
     public var verseFontSize: Double {
         didSet { verseFontSize = verseFontSize.clamped(to: Self.verseFontRange) }
     }
@@ -42,7 +47,7 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
     }
     public var interfaceScale: InterfaceScale
     public var theme: ThemeChoice
-    /// Набір і порядок панелей «Порівняти» (FR-36).
+    /// Переклади, вибрані для «Порівняти» (FR-36), у порядку колонок.
     public var comparePanels: ComparePanels
     /// Другий переклад поруч (FR-26); `nil` — вимкнено.
     public var parallelTranslation: Translation?

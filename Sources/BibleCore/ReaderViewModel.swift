@@ -19,7 +19,8 @@ public final class ReaderViewModel {
     public private(set) var books: [Book] = []
     public private(set) var chapterCount = 0
     public private(set) var verses: [Verse] = [] {
-        didSet { rebuildParallel() }
+        // Інший розділ чи переклад — порівняння попереднього вже не про те, що на екрані.
+        didSet { rebuildParallel(); comparison = nil }
     }
     /// Перший виділений вірш (з `ChapterView`): при перемиканні перекладу відкривається саме він (FR-27).
     public var anchorVerse: Int?
@@ -72,31 +73,24 @@ public final class ReaderViewModel {
     public private(set) var searchError: String?
 
     private let repository: BibleRepository?
-    public struct Unavailable: Error, CustomStringConvertible {
-        public var description: String { "база Біблії недоступна" }
+    /// Режим «Порівняти» замість тексту розділу (FR-36); `nil` — звичайне читання.
+    public private(set) var comparison: Comparison?
+
+    /// Порівнює розділ на екрані з вибраними перекладами (переклад на екрані — перша колонка).
+    /// Без виділення нема чого підсвічувати — режим не відкривається.
+    public func showComparison(of selectedVerses: Set<Int>, with chosen: [Translation]) {
+        guard let repository, !selectedVerses.isEmpty, !verses.isEmpty else { return }
+        let others = chosen.filter { $0 != translation }
+        let columns = others.map { alignedVerses(of: $0, in: repository) }
+        comparison = Comparison(location: location, translations: [translation] + others,
+                                highlighted: selectedVerses,
+                                rows: verses.indices.map { row in CompareRow(primary: verses[row], others: columns.map { $0[row] }) })
     }
 
-    /// Панелі вікна «Порівняти» (FR-36) з тієї самої бази.
-    public func compare(_ request: CompareRequest, panels: ComparePanels) throws -> [ComparePanel] {
-        guard let repository else { throw Unavailable() }
-        return try VerseComparison.load(from: repository, book: request.book, chapter: request.chapter,
-                                        verses: Set(request.verses), panels: panels)
+    public func closeComparison() {
+        comparison = nil
     }
 
-    /// Відкриває місце в іншому перекладі одним перезавантаженням.
-    public func open(_ target: Location, in translation: Translation, focus verse: Int?) {
-        if translation != self.translation {
-            location = target
-            // Місце вже в нумерації цього перекладу — не перераховуємо.
-            keepLocationOnSwitch = true
-            defer { keepLocationOnSwitch = false }
-            self.translation = translation  // didSet: reload, savePosition, повтор пошуку
-            focusedVerse = verse
-            if verse != nil { focusRequest += 1 }
-        } else {
-            open(target, focus: verse)
-        }
-    }
     @ObservationIgnored private let positionStore: KeyValueStore?
 
     /// Останнє місце читання (FR-25): переклад, книга, розділ.
@@ -386,11 +380,16 @@ public final class ReaderViewModel {
             parallelRows = []
             return
         }
+        parallelRows = zip(verses, alignedVerses(of: other, in: repository)).map { ParallelRow(primary: $0, secondary: $1) }
+    }
+
+    /// Вірші іншого перекладу по рядках розділу на екрані (FR-26, FR-36).
+    private func alignedVerses(of other: Translation, in repository: BibleRepository) -> [[Verse]] {
+        var secondary: [[Verse]] = Array(repeating: [], count: verses.count)
         let book = location.book
         let chapter = location.chapter
         let targets = verses.compactMap { mapped(VerseKey(book: book, chapter: chapter, verse: $0.verse), from: translation, to: other) }
         let chapters = Set(targets.map(\.chapter)).sorted()
-        var secondary: [[Verse]] = Array(repeating: [], count: verses.count)
         let rowOf = Dictionary(uniqueKeysWithValues: verses.enumerated().map { ($1.verse, $0) })
         var lastRow: Int?
         for secondChapter in chapters {
@@ -406,7 +405,7 @@ public final class ReaderViewModel {
                 }
             }
         }
-        parallelRows = zip(verses, secondary).map { ParallelRow(primary: $0, secondary: $1) }
+        return secondary
     }
 
     private func reload() {

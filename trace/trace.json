@@ -361,6 +361,7 @@
       ],
       "planned": true,
       "tests": [
+        "Tests/BibleCoreTests/CompareTests.swift",
         "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
@@ -372,6 +373,7 @@
         "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "Tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "Tests/BibleReaderUITests/ReadingComfortUITests.swift",
+        "tests/BibleCoreTests/CompareTests.swift",
         "tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "tests/BibleCoreTests/ReadingPreferencesTests.swift",
         "tests/BibleCoreTests/ReadingPreferencesTests.swift",
@@ -410,7 +412,9 @@
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
@@ -591,7 +595,8 @@
     {
       "id": "FR-26",
       "specs": [
-        "openspec/specs/parallel-reading/spec.md"
+        "openspec/specs/parallel-reading/spec.md",
+        "openspec/specs/verse-compare/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -876,13 +881,7 @@
         "Tests/BibleCoreTests/CompareTests.swift",
         "Tests/BibleCoreTests/CompareTests.swift",
         "Tests/BibleCoreTests/CompareTests.swift",
-        "Tests/BibleCoreTests/CompareTests.swift",
-        "Tests/BibleCoreTests/CompareTests.swift",
-        "Tests/BibleCoreTests/CompareTests.swift",
         "Tests/BibleReaderUITests/CompareUITests.swift",
-        "tests/BibleCoreTests/CompareTests.swift",
-        "tests/BibleCoreTests/CompareTests.swift",
-        "tests/BibleCoreTests/CompareTests.swift",
         "tests/BibleCoreTests/CompareTests.swift",
         "tests/BibleCoreTests/CompareTests.swift",
         "tests/BibleCoreTests/CompareTests.swift",
