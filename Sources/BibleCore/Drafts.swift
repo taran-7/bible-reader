@@ -122,8 +122,9 @@ public final class DraftStore {
     }
     /// Список лише чорнеток, що згадують цей вірш (клік по позначці біля вірша, FR-39); `nil` — усі.
     public var mentionFilter: VerseKey?
-    /// Вірш KJV → чорнетки, що на нього посилаються.
-    @ObservationIgnored private var mentions: [VerseKey: Set<String>] = [:]
+    /// Вірш KJV → чорнетки, що на нього посилаються. Спостережуваний: позначки біля віршів (FR-39)
+    /// мають з'явитися, щойно посилання потрапило в чорнетку, а не при наступному перемальовуванні.
+    private var mentions: [VerseKey: Set<String>] = [:]
 
     @ObservationIgnored private let database: UserDatabase?
     @ObservationIgnored private let now: () -> Date
