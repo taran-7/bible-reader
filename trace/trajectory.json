@@ -92,7 +92,7 @@
     {
       "slice": "2026-09-28-add-sermon-drafts",
       "reviewEvidence": "clean",
-      "trailerCommits": 4,
+      "trailerCommits": 5,
       "libDomains": [
         "BibleCore"
       ],
