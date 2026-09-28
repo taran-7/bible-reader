@@ -31,4 +31,5 @@ coverage:
 # Збірка додатка і XCUITest (Tests/BibleReaderUITests). Локально потрібен Automation Mode
 # (перший запуск просить підтвердження; або `sudo automationmodetool enable-automationmode-without-authentication`).
 ui-test:
-	xcodebuild test -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader -destination 'platform=macOS'
+	rm -rf build/ui-tests.xcresult
+	xcodebuild test -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader -destination 'platform=macOS' -resultBundlePath build/ui-tests.xcresult

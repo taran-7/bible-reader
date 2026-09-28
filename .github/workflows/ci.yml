@@ -49,6 +49,13 @@ jobs:
           (cd BibleReaderApp && xcodegen generate)
           # PD-14: спільна VM CI в 1,5–2× повільніша за Mac користувача; межа NFR-3 тут 2000 мс, на Mac — 1000.
           TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS=2000 make ui-test
+      # PD-17: знімки екрана й журнал UI-тестів, коли вони падають лише на CI.
+      - name: Upload UI test results
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ui-tests-xcresult
+          path: build/ui-tests.xcresult
       - name: Platform and size (NFR-1, NFR-5)
         run: node scripts/check-platform.mjs
 
