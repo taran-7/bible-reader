@@ -4,15 +4,32 @@ import Foundation
 // Живий пошук під час кліку, без локального індексу й без збереження: мережа — лише в `IllustrationNetwork`,
 // тут — побудова запитів, розбір відповідей, allowlist, дедуплікація і партії по 7.
 
-/// Виділені вірші для вікна ілюстрацій: посилання мовою екрана і текст у KJV (пошук англійською).
+/// Виділені вірші для вікна ілюстрацій: посилання мовою екрана, текст у KJV (пошук англійською)
+/// і мова перекладу на екрані — у неї кнопка «Перекласти» на картці.
 public struct IllustrationRequest: Codable, Hashable, Sendable {
     public let reference: String
     public let kjvText: [String]
+    /// Код мови (`uk`, `ru`, `cs`, `en`…) перекладу Біблії на екрані.
+    public let language: String
 
-    public init(reference: String, kjvText: [String]) {
+    public init(reference: String, kjvText: [String], language: String = "en") {
         self.reference = reference
         self.kjvText = kjvText
+        self.language = language
     }
+
+    private enum CodingKeys: String, CodingKey { case reference, kjvText, language }
+
+    /// Вікно, відновлене macOS зі старої версії, не має мови — англійська.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(reference: try container.decode(String.self, forKey: .reference),
+                  kjvText: try container.decode([String].self, forKey: .kjvText),
+                  language: try container.decodeIfPresent(String.self, forKey: .language) ?? "en")
+    }
+
+    /// Мова, на яку перекладати історії; `nil` — англійська, перекладати нема що.
+    public var translationTarget: String? { language == "en" ? nil : language }
 }
 
 /// Історія: заголовок, текст сторінки, джерело. Нічого не зберігається — лише «Скопіювати».
@@ -36,7 +53,10 @@ public struct Illustration: Identifiable, Hashable, Sendable {
     }
 
     /// Текст для буфера: історія разом із джерелом, щоб її можна було вставити в нотатку.
-    public var copyText: String {
+    public var copyText: String { copyText(title: title, text: text) }
+
+    /// Те, що зараз на картці (оригінал або переклад), і джерело — завжди англомовне посилання.
+    public func copyText(title: String, text: String) -> String {
         "\(title)\n\n\(text)\n\nДжерело: \(siteName), \(source)"
     }
 }

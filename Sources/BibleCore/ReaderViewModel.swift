@@ -331,7 +331,7 @@ public final class ReaderViewModel {
         // `location` завжди в межах канону (його обрізають `open` і `reload`).
         let book = Book.all[location.book - 1].name(in: translation)
         let reference = "\(book) \(location.chapter):\(Quote.verseList(chosen.map(\.verse)))"
-        return IllustrationRequest(reference: reference, kjvText: texts)
+        return IllustrationRequest(reference: reference, kjvText: texts, language: translation.language.code)
     }
 
     public func quote(for selectedVerses: Set<Int>) -> String? {

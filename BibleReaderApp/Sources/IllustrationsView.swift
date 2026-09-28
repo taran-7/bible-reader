@@ -2,6 +2,9 @@ import AppKit
 import BibleCore
 import Security
 import SwiftUI
+#if canImport(Translation)
+@preconcurrency import Translation
+#endif
 
 /// Вікно «Ілюстрації» (FR-33): до 7 історій до виділених віршів, «Отримати ще», «Скопіювати» на картці.
 /// Нічого не зберігається: закрили вікно — історії зникли.
@@ -17,7 +20,7 @@ struct IllustrationsView: View {
                 Text("Ілюстрації до \(request.reference)")
                     .font(.system(size: scale.systemFontSize * 1.4, weight: .semibold))
                     .accessibilityIdentifier("illustrations-title")
-                ForEach(model.stories) { IllustrationCard(story: $0) }
+                ForEach(model.stories) { IllustrationCard(story: $0, targetLanguage: request.translationTarget) }
                 footer
             }
             .padding(20)
@@ -71,28 +74,53 @@ struct IllustrationsView: View {
     }
 }
 
-/// Картка історії: заголовок, джерело й дата, текст, «Читати на сайті» для уривка, «Скопіювати».
+/// Картка історії: заголовок, джерело й дата, текст, «Читати на сайті» для уривка, «Перекласти», «Скопіювати».
+/// «Перекласти» — мовою Біблії на екрані системним перекладачем Apple (офлайн, macOS 15+); «Скопіювати» бере те,
+/// що зараз на картці.
 struct IllustrationCard: View {
     let story: Illustration
+    /// Мова перекладу Біблії на екрані; `nil` — англійська, кнопки немає.
+    let targetLanguage: String?
     @State private var copied = false
+    @State private var translated: (title: String, text: String)?
+    @State private var showsTranslation = false
+    @State private var translating = false
+    @State private var translationError: String?
+    @State private var request = 0
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
 
+    private var shown: (title: String, text: String) {
+        showsTranslation ? translated ?? (story.title, story.text) : (story.title, story.text)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(story.title).font(.system(size: scale.systemFontSize * 1.15, weight: .semibold))
+            Text(shown.title).font(.system(size: scale.systemFontSize * 1.15, weight: .semibold))
             Text([story.siteName, story.date].compactMap { $0 }.joined(separator: " · "))
                 .font(.system(size: scale.systemFontSize * 0.9))
                 .foregroundStyle(Color(theme.secondaryText))
-            Text(story.text).font(.system(size: scale.systemFontSize)).textSelection(.enabled)
+            Text(shown.text).font(.system(size: scale.systemFontSize)).textSelection(.enabled)
+            if let translationError {
+                Text(translationError).font(.system(size: scale.systemFontSize * 0.9)).foregroundStyle(.orange)
+            }
             HStack {
                 if let url = IllustrationNetwork.link(for: story) {
                     Link(story.isExcerpt ? "Читати на сайті" : "Джерело", destination: url)
                 }
                 Spacer()
+                if targetLanguage != nil, TranslationSupport.isAvailable {
+                    Button {
+                        if translated == nil { request += 1 } else { showsTranslation.toggle() }
+                    } label: {
+                        if translating { ProgressView().controlSize(.small) } else { Text(showsTranslation ? "Оригінал" : "Перекласти") }
+                    }
+                    .disabled(translating)
+                    .accessibilityIdentifier("illustration-translate")
+                }
                 Button {
                     NSPasteboard.general.clearContents()
-                    NSPasteboard.general.setString(story.copyText, forType: .string)
+                    NSPasteboard.general.setString(story.copyText(title: shown.title, text: shown.text), forType: .string)
                     copied = true
                 } label: {
                     Label(copied ? "Скопійовано" : "Скопіювати", systemImage: copied ? "checkmark" : "doc.on.doc")
@@ -104,12 +132,92 @@ struct IllustrationCard: View {
         .background(Color(theme.results).opacity(0.9), in: RoundedRectangle(cornerRadius: 10))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("illustration-card")
+        .modifier(TranslationSupport(request: request, target: targetLanguage, texts: [story.title, story.text]) { result in
+            translating = false
+            switch result {
+            case .success(let texts) where texts.count == 2:
+                translated = (texts[0], texts[1])
+                showsTranslation = true
+                translationError = nil
+            case .success:
+                translationError = "Не вдалося перекласти"
+            case .failure(let error):
+                translationError = "Не вдалося перекласти: \(error.localizedDescription)"
+            }
+        } started: { translating = true })
         .task(id: copied) {
             guard copied else { return }
             try? await Task.sleep(for: CopyButtonModel.feedbackDuration)
             copied = false
         }
     }
+}
+
+/// Системний перекладач Apple (Translation, macOS 15+): англійська → мова Біблії на екрані, на пристрої.
+/// Мовний пакет система завантажує сама при першому перекладі; на macOS 14 кнопки немає.
+struct TranslationSupport: ViewModifier {
+    let request: Int
+    let target: String?
+    let texts: [String]
+    let completion: (Result<[String], Error>) -> Void
+    let started: () -> Void
+
+    static var isAvailable: Bool {
+        if #available(macOS 15.0, *) { return true }
+        return false
+    }
+
+    func body(content: Content) -> some View {
+        #if canImport(Translation)
+        if #available(macOS 15.0, *) {
+            content.modifier(Session(request: request, target: target, texts: texts, completion: completion, started: started))
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
+    }
+
+    #if canImport(Translation)
+    @available(macOS 15.0, *)
+    private struct Session: ViewModifier {
+        let request: Int
+        let target: String?
+        let texts: [String]
+        let completion: (Result<[String], Error>) -> Void
+        let started: () -> Void
+        @State private var configuration: TranslationSession.Configuration?
+
+        /// Сесія перекладу не `Sendable`: працюємо з нею на тому самому акторі, що й `translationTask`.
+        @MainActor private static func translate(_ texts: [String], with session: TranslationSession) async -> Result<[String], Error> {
+            do {
+                var translated: [String] = []
+                for text in texts { translated.append(try await session.translate(text).targetText) }
+                return .success(translated)
+            } catch {
+                return .failure(error)
+            }
+        }
+
+        func body(content: Content) -> some View {
+            content
+                .onChange(of: request) { _, _ in
+                    guard let target else { return }
+                    started()
+                    if configuration == nil {
+                        configuration = .init(source: Locale.Language(identifier: "en"), target: Locale.Language(identifier: target))
+                    } else {
+                        configuration?.invalidate()
+                    }
+                }
+                .translationTask(configuration) { session in
+                    let result = await Self.translate(texts, with: session)
+                    completion(result)
+                }
+        }
+    }
+    #endif
 }
 
 /// Стан вікна: історії, «Шукаю…», помилки. Пошук і фільтри — у `IllustrationSearch` (BibleCore).

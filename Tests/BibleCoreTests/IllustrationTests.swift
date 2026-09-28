@@ -263,6 +263,8 @@ extension IllustrationTests {
     @Test func testCopyTextCarriesSource() {
         let story = Illustration(title: "T", text: "Body", source: "https://www.imb.org/x", siteName: "IMB")
         #expect(story.copyText == "T\n\nBody\n\nДжерело: IMB, https://www.imb.org/x")
+        // Перекладена картка копіюється перекладом, джерело лишається англомовним посиланням.
+        #expect(story.copyText(title: "Т", text: "Текст") == "Т\n\nТекст\n\nДжерело: IMB, https://www.imb.org/x")
     }
 }
 
@@ -275,6 +277,9 @@ extension IllustrationTests {
         let request = model.illustrationRequest(for: [3, 1, 2])
         #expect(request?.reference == "От Иоанна 3:1-3")
         #expect(request?.kjvText == ["kjv 43:3:1", "kjv 43:3:2", "kjv 43:3:3"])
+        #expect(request?.language == "ru" && request?.translationTarget == "ru")
+        model.translation = .kjv
+        #expect(model.illustrationRequest(for: [1])?.translationTarget == nil)
         #expect(model.illustrationRequest(for: []) == nil)
         #expect(ReaderViewModel { throw FakeRepository.Boom() }.illustrationRequest(for: [1]) == nil)
     }
@@ -353,5 +358,15 @@ extension IllustrationTests {
         let model = ReaderViewModel { repository }
         repository.failNextVerses = true
         #expect(model.illustrationRequest(for: [1]) == nil)
+    }
+}
+
+extension IllustrationTests {
+    // @trace FR-33
+    @Test func testRequestDecodesWindowsSavedWithoutLanguage() throws {
+        let old = try JSONDecoder().decode(IllustrationRequest.self, from: Data(#"{"reference":"Mt 5:44","kjvText":["x"]}"#.utf8))
+        #expect(old.language == "en" && old.translationTarget == nil)
+        let request = IllustrationRequest(reference: "Мт 5:44", kjvText: ["x"], language: "uk")
+        #expect(try JSONDecoder().decode(IllustrationRequest.self, from: JSONEncoder().encode(request)) == request)
     }
 }
