@@ -5,6 +5,8 @@ struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
     @Environment(UserData.self) private var userData
+    /// Виділені вірші, для яких відкрито вибір перекладів «Порівняти».
+    @State private var compareSelection: CompareSelection?
 
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
 
@@ -42,16 +44,20 @@ struct ContentView: View {
                 Group {
                     if model.searchError != nil || model.results != nil {
                         SearchResultsView(model: model)
+                    } else if let comparison = model.comparison {
+                        CompareView(comparison: comparison, fontSize: preferences.preferences.verseFontSize,
+                                    close: model.closeComparison,
+                                    chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
                     } else if let request = model.illustrations {
                         // Текст ліворуч вузько (35 %), ілюстрації праворуч ширше (65 %); межу можна тягнути.
                         IllustrationsSplit {
-                            ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
+                            chapter
                         } illustrations: {
                             IllustrationsView(request: request, close: model.closeIllustrations)
                                 .id(request)
                         }
                     } else {
-                        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize)
+                        chapter
                     }
                 }
                 .font(.system(size: scale.systemFontSize))
@@ -60,6 +66,11 @@ struct ContentView: View {
                 .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
+            .sheet(item: $compareSelection) { selection in
+                CompareSetup(current: model.translation, preferences: preferences) { chosen in
+                    model.showComparison(of: selection.verses, with: chosen)
+                }
+            }
             // Паралельний переклад з налаштувань; той самий, що основний, — вимкнено.
             .onChange(of: [preferences.preferences.parallelTranslation, model.translation], initial: true) {
                 let other = preferences.preferences.parallelTranslation
@@ -73,6 +84,20 @@ struct ContentView: View {
             }
         }
     }
+}
+
+extension ContentView {
+    private var chapter: some View {
+        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize) { verses in
+            guard !verses.isEmpty else { return }
+            compareSelection = CompareSelection(verses: verses)
+        }
+    }
+}
+
+struct CompareSelection: Identifiable {
+    let verses: Set<Int>
+    let id = UUID()
 }
 
 struct DatabaseErrorView: View {

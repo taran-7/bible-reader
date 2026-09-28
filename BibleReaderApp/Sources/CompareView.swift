@@ -1,147 +1,142 @@
 import BibleCore
-import CoreTransferable
 import SwiftUI
 
-/// Вікно «Порівняти» (FR-36): виділені вірші в кожному перекладі, окремою панеллю.
-/// Панелі закриваються (×), повертаються через «+ Переклад» і переставляються ◀ ▶ або перетягуванням;
-/// набір і порядок зберігаються в налаштуваннях.
+/// Режим «Порівняти» в головному вікні (FR-36): увесь розділ колонками по перекладах, рядки вирівняні
+/// за віршами, виділені вірші підсвічені і прокручені у видиму частину. ✕ або Esc — назад до читання.
 struct CompareView: View {
-    let request: CompareRequest
-    let model: ReaderViewModel
-    @Bindable var preferences: PreferencesStore
-    @State private var loaded: Result<[ComparePanel], any Error>?
+    let comparison: Comparison
+    let fontSize: Double
+    let close: () -> Void
+    let chooseTranslations: () -> Void
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
 
-    private var panels: ComparePanels {
-        get { preferences.preferences.comparePanels }
-        nonmutating set { preferences.preferences.comparePanels = newValue }
-    }
-
     var body: some View {
-        Group {
-            switch loaded {
-            case nil:
-                ProgressView()
-            case .success(let panels):
-                ScrollView(.horizontal) {
-                    HStack(alignment: .top, spacing: 12) {
-                        ForEach(panels) { panel in
-                            panelView(panel)
+        VStack(spacing: 0) {
+            header
+            Divider()
+            ScrollViewReader { proxy in
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 0) {
+                        ForEach(comparison.rows) { row in
+                            rowView(row)
+                                .id(row.id)
                         }
                     }
-                    .padding(12)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-            case .failure(let error):
-                MessageView(title: "Не вдалося завантажити вірші", systemImage: "exclamationmark.triangle",
-                            lines: [error.localizedDescription])
+                .onAppear {
+                    guard let first = comparison.highlighted.min() else { return }
+                    DispatchQueue.main.async { proxy.scrollTo(first, anchor: .top) }
+                }
             }
         }
-        .frame(minWidth: 480, minHeight: 280)
-        // База читається лише при зміні набору чи порядку панелей, а не на кожен рендер.
-        .task(id: panels) { loaded = Result { try model.compare(request, panels: panels) } }
         .background(ThemeBackground())
-        .navigationTitle(title)
-        .toolbar {
-            ToolbarItem {
-                Menu {
-                    ForEach(panels.hidden, id: \.self) { translation in
-                        Button(translation.menuTitle) { panels.add(translation) }
-                    }
-                } label: {
-                    Label("Переклад", systemImage: "plus")
-                }
-                .disabled(panels.hidden.isEmpty)
-                .help("Повернути закриту панель")
-                .accessibilityIdentifier("compare-add")
-            }
-        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("compare-mode")
     }
 
-    /// Назва книги мовою першої панелі: не змінюється, коли в головному вікні перемкнули переклад.
-    private var title: String {
-        let name = Book(number: request.book)?.name(in: panels.visible[0]) ?? ""
-        return "Порівняти: \(name) \(request.chapter)"
-    }
-
-    private func panelView(_ panel: ComparePanel) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 4) {
+    private var header: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 16) {
+            ForEach(comparison.translations, id: \.self) { translation in
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(panel.translation.title).font(.system(size: scale.systemFontSize, weight: .semibold))
-                    Text(panel.reference).font(.system(size: scale.systemFontSize * 0.9))
+                    Text(comparison.title(of: translation))
+                        .font(.system(size: scale.systemFontSize * 1.15, weight: .semibold))
+                    Text(translation.title)
+                        .font(.system(size: scale.systemFontSize * 0.9))
                         .foregroundStyle(Color(theme.secondaryText))
                 }
-                Spacer(minLength: 8)
-                Button("Ліворуч", systemImage: "chevron.left") { panels.moveLeft(panel.translation) }
-                    .disabled(!panels.canMoveLeft(panel.translation))
-                    .accessibilityIdentifier("compare-left-\(panel.translation.rawValue)")
-                Button("Праворуч", systemImage: "chevron.right") { panels.moveRight(panel.translation) }
-                    .disabled(!panels.canMoveRight(panel.translation))
-                    .accessibilityIdentifier("compare-right-\(panel.translation.rawValue)")
-                Button("Закрити", systemImage: "xmark") { panels.close(panel.translation) }
-                    .disabled(!panels.canClose)
-                    .accessibilityIdentifier("compare-close-\(panel.translation.rawValue)")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("compare-column-\(translation.rawValue)")
+            }
+            HStack(spacing: 4) {
+                Button("Переклади…", systemImage: "checklist", action: chooseTranslations)
+                    .help("Вибрати переклади")
+                    .accessibilityIdentifier("compare-choose")
+                Button("Закрити порівняння", systemImage: "xmark", action: close)
+                    .keyboardShortcut(.cancelAction)
+                    .help("Назад до читання (Esc)")
+                    .accessibilityIdentifier("compare-close")
             }
             .labelStyle(.iconOnly)
             .buttonStyle(.borderless)
-            // Тягнемо за заголовок: тіло панелі — кнопка переходу, і drag з неї конфліктував би з кліком.
-            .draggable(PanelDrag(translation: panel.translation))
-            if panel.numberingMayDiffer {
-                Label("Нумерація може відрізнятися", systemImage: "exclamationmark.circle")
-                    .font(.system(size: scale.systemFontSize * 0.85))
-                    .foregroundStyle(Color(theme.secondaryText))
-            }
-            Button {
-                // Клік відкриває це місце в головному вікні в цьому перекладі. Якщо нумерація може відрізнятися,
-                // відкриваємо розділ без фокусу на вірші: номер міг би вказати на інший вірш.
-                model.open(Location(book: request.book, chapter: request.chapter), in: panel.translation,
-                           focus: panel.numberingMayDiffer ? nil : request.verses.first)
-            } label: {
-                VStack(alignment: .leading, spacing: 6) {
-                    if panel.verses.isEmpty {
-                        Text("Немає цих віршів у перекладі").foregroundStyle(Color(theme.secondaryText))
-                    }
-                    ForEach(panel.verses) { verse in
-                        (Text("\(verse.verse) ").foregroundStyle(Color(theme.verseNumber)) + Text(verse.text))
-                            .font(theme.verseFont(size: preferences.preferences.verseFontSize))
-                            .foregroundStyle(Color(theme.text))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .help("Відкрити в перекладі \(panel.translation.title)")
-            .accessibilityHint("Відкрити в головному вікні")
         }
-        .padding(12)
-        .frame(width: 260, alignment: .topLeading)
-        .background(Color(theme.sidebar), in: RoundedRectangle(cornerRadius: 8))
-        .dropDestination(for: PanelDrag.self) { items, _ in
-            guard let dragged = items.first else { return false }
-            return panels.move(dragged.translation, to: panel.translation)
+        .foregroundStyle(Color(theme.text))
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+
+    private func rowView(_ row: CompareRow) -> some View {
+        let highlighted = comparison.highlighted.contains(row.primary.verse)
+        return HStack(alignment: .firstTextBaseline, spacing: 16) {
+            column([row.primary])
+            ForEach(Array(row.others.enumerated()), id: \.offset) { _, verses in column(verses) }
+            // Під кнопками заголовка — щоб колонки стояли точно під своїми назвами.
+            Color.clear.frame(width: 44 * scale.factor, height: 1)
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(panel.translation.title)
-        .accessibilityIdentifier("compare-panel-\(panel.translation.rawValue)")
+        .padding(.vertical, 4)
+        .padding(.horizontal, 6)
+        .background(highlighted ? Color(theme.selection) : .clear, in: RoundedRectangle(cornerRadius: 6))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("compare-row-\(row.primary.verse)")
+        .accessibilityValue(highlighted ? "виділено" : "")
+    }
+
+    /// Порожня клітинка — вірш злито з попереднім або відповідника немає.
+    private func column(_ verses: [Verse]) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            ForEach(verses) { verse in
+                (Text(ParallelColumn.label(verse, primaryChapter: comparison.location.chapter) + " ")
+                    .foregroundStyle(Color(theme.verseNumber)) + Text(verse.text))
+                    .font(theme.verseFont(size: fontSize))
+                    .foregroundStyle(Color(theme.text))
+                    .lineSpacing(fontSize * theme.lineSpacing)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
-/// Панель, яку перетягують. Передається рядком із префіксом: текст з інших програм без префікса не
-/// розпізнається, тож не переставляє панелі (власний UTType вимагав би окремого Info.plist).
-struct PanelDrag: Transferable {
-    static let prefix = "bible-reader-panel:"
-    struct NotAPanel: Error {}
+/// Вікно вибору перекладів для «Порівняти»: чекбокси, вибір запам'ятовується в налаштуваннях.
+/// Переклад на екрані завжди перша колонка, тож його в списку немає.
+struct CompareSetup: View {
+    let current: BibleCore.Translation
+    @Bindable var preferences: PreferencesStore
+    let compare: ([BibleCore.Translation]) -> Void
+    @Environment(\.dismiss) private var dismiss
 
-    let translation: BibleCore.Translation
+    private var choices: [BibleCore.Translation] { BibleCore.Translation.allCases.filter { $0 != current } }
+    private var chosen: [BibleCore.Translation] {
+        preferences.preferences.comparePanels.visible.filter { $0 != current }
+    }
 
-    static var transferRepresentation: some TransferRepresentation {
-        ProxyRepresentation(exporting: { prefix + $0.translation.rawValue }, importing: { (text: String) in
-            guard text.hasPrefix(prefix), let translation = BibleCore.Translation(rawValue: String(text.dropFirst(prefix.count)))
-            else { throw NotAPanel() }
-            return PanelDrag(translation: translation)
-        })
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Порівняти з перекладами").font(.headline)
+            ForEach(choices, id: \.self) { translation in
+                Toggle(translation.menuTitle, isOn: Binding(
+                    get: { chosen.contains(translation) },
+                    set: { _ in preferences.preferences.comparePanels.toggle(translation) }))
+                    .toggleStyle(.checkbox)
+                    .accessibilityIdentifier("compare-choice-\(translation.rawValue)")
+            }
+            HStack {
+                Spacer()
+                Button("Скасувати") { dismiss() }.keyboardShortcut(.cancelAction)
+                Button("Порівняти") {
+                    compare(chosen)
+                    dismiss()
+                }
+                .keyboardShortcut(.defaultAction)
+                .disabled(chosen.isEmpty)
+                .accessibilityIdentifier("compare-start")
+            }
+        }
+        .padding(20)
+        .frame(minWidth: 340)
     }
 }
