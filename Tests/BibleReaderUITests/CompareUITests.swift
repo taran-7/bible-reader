@@ -88,7 +88,11 @@ final class CompareUITests: XCTestCase {
         launch(reset: true)
         search("John 3:16")
         XCTAssertNotNil(app.visibleButton("compare-button"), "виділення після переходу")
-        app.windows.firstMatch.typeKey(.escape, modifierFlags: [])
+        // Фокус у списку віршів (на CI після пошуку він може лишитися в полі пошуку).
+        let verse = app.descendants(matching: .any)["verse-16"].firstMatch
+        XCTAssertTrue(verse.waitForExistence(timeout: 5))
+        verse.click()
+        verse.typeKey(.escape, modifierFlags: [])
         let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button") == nil }
         wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 5)
     }
