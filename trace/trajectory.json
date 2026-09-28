@@ -119,7 +119,7 @@
     {
       "slice": "2026-09-28-close-tech-debt-batch",
       "reviewEvidence": "missing",
-      "trailerCommits": 1,
+      "trailerCommits": 2,
       "libDomains": [
         "BibleCore",
         "bible-import"
