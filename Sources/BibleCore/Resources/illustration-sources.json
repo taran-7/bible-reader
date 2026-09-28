@@ -1,12 +1,49 @@
 {
-  "allow": ["sermonillustrations.com", "preachingtoday.com", "sermoncentral.com", "bible.org", "christianitytoday.com",
-            "christianhistoryinstitute.org", "desiringgod.org", "spurgeon.org", "founders.org", "baptistpress.com", "imb.org",
-            "wholesomewords.org", "vom.org", "billygraham.org", "thegospelcoalition.org", "ligonier.org", "moodybible.org"],
-  "block": ["vatican.va", "catholic.com", "catholicculture.org", "catholicnewsagency.com", "ewtn.com", "newadvent.org",
-            "franciscanmedia.org", "aleteia.org", "oca.org", "goarch.org", "orthodoxwiki.org", "orthochristian.com",
-            "antiochian.org", "pravoslavie.ru", "azbyka.ru"],
+  "allow": [
+    "sermonillustrations.com",
+    "preachingtoday.com",
+    "sermoncentral.com",
+    "bible.org",
+    "christianitytoday.com",
+    "christianhistoryinstitute.org",
+    "desiringgod.org",
+    "spurgeon.org",
+    "founders.org",
+    "baptistpress.com",
+    "imb.org",
+    "wholesomewords.org",
+    "vom.org",
+    "billygraham.org",
+    "thegospelcoalition.org",
+    "ligonier.org",
+    "moodybible.org",
+    "en.wikipedia.org"
+  ],
+  "block": [
+    "vatican.va",
+    "catholic.com",
+    "catholicculture.org",
+    "catholicnewsagency.com",
+    "ewtn.com",
+    "newadvent.org",
+    "franciscanmedia.org",
+    "aleteia.org",
+    "oca.org",
+    "goarch.org",
+    "orthodoxwiki.org",
+    "orthochristian.com",
+    "antiochian.org",
+    "pravoslavie.ru",
+    "azbyka.ru"
+  ],
   "wordpress": [
-    {"name": "Christianity Today", "host": "www.christianitytoday.com"},
-    {"name": "IMB", "host": "www.imb.org"}
+    {
+      "name": "Christianity Today",
+      "host": "www.christianitytoday.com"
+    },
+    {
+      "name": "IMB",
+      "host": "www.imb.org"
+    }
   ]
 }

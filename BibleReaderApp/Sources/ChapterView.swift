@@ -41,11 +41,13 @@ struct ChapterView: View {
                     }
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? CopyButton.width(for: scale) + CompareButton.width(for: scale) + 12 : 36)
+                                  ? CopyButton.width(for: scale) + CompareButton.width(for: scale)
+                                    + IllustrationsButton.width(for: scale) + 16 : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
                                 HStack(spacing: 4) {
+                                    IllustrationsButton { [verses = selection] in illustrations(verses) }
                                     CompareButton { [verses = selection] in compare(verses) }
                                     CopyButton { [verses = selection] in copy(verses) }
                                 }
@@ -64,6 +66,7 @@ struct ChapterView: View {
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)
                 Button("Порівняти в перекладах") { compare(verses) }.disabled(verses.isEmpty)
+                Button("Пошук ілюстрацій") { illustrations(verses) }.disabled(verses.isEmpty)
                 if let first = verses.min() {
                     Divider()
                     let canonical = key(first)
@@ -126,6 +129,11 @@ struct ChapterView: View {
     private func compare(_ verses: Set<Int>) {
         guard !verses.isEmpty else { return }
         openWindow(id: "compare", value: CompareRequest(book: model.location.book, chapter: model.location.chapter, verses: verses))
+    }
+
+    private func illustrations(_ verses: Set<Int>) {
+        guard let request = model.illustrationRequest(for: verses) else { return }
+        openWindow(id: "illustrations", value: request)
     }
 
     private func copy(_ verses: Set<Int>) {

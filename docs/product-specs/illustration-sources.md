@@ -5,7 +5,12 @@
 Правила (див. [PRD 6.17](prd.md)):
 - Пошук лише в allowlist; англомовні баптистські або протестантські (євангельські) ресурси.
 - Blocklist православних і католицьких доменів як запасна перевірка в `BibleCore`.
-- Локальний індекс (sitemap/RSS) і живий пошук ходять лише на домени з allowlist; blocklist перевіряє `BibleCore`.
+- Живий пошук під час кліку (без індексу) ходить лише на домени з allowlist, API Вікіпедії і, з ключем користувача, Brave Search; blocklist перевіряє `BibleCore`.
+
+## Як шукаємо (перевірено 2026-09-28)
+- **WordPress REST, повний текст (початок ≤ 1500 символів):** `christianitytoday.com` (туди ж переадресовує `preachingtoday.com`), `imb.org`.
+- **Закриті перевіркою Cloudflare для ботів** (`bible.org`, `desiringgod.org`, `founders.org`, `baptistpress.com`, `vom.org`, `thegospelcoalition.org`, `ligonier.org`) і без відкритого API (`sermonillustrations.com`, `sermoncentral.com`, `christianhistoryinstitute.org`, `spurgeon.org`, `wholesomewords.org`, `billygraham.org`, `moodybible.org`): лише через Brave Search `site:` — заголовок, уривок, посилання. Захист не обходимо.
+- **Вікіпедія** (`en.wikipedia.org`, CC BY-SA): вступ статті; лише біографії (категорії «… births/deaths»), без категорій зі словами catholic, orthodox, pope, saint, cardinal, monk, nun, monastery, patriarch, jesuit, franciscan, dominican, benedictine, beatified, canonized, venerated.
 
 ## Allowlist
 
@@ -28,6 +33,7 @@
 | `thegospelcoalition.org` | статті, біографії | реформатський євангельський | ні |
 | `ligonier.org` | церковна історія, біографії | реформатський | ні |
 | `moodybible.org` | статті, історія (Moody Bible Institute) | євангельський | ні |
+| `en.wikipedia.org` | біографії (фільтр категорій) | нейтральний | так (рішення власника 2026-09-28) |
 
 Ризик: навіть протестантські сайти (особливо `christianitytoday.com`, `christianhistoryinstitute.org`) іноді пишуть про католицьких чи православних персоналій. Allowlist гарантує джерело, а не тему; промпт додатково просить історії про протестантських героїв віри або нейтральні історичні події.
 

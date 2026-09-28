@@ -35,6 +35,8 @@ targets:
         ENABLE_APP_SANDBOX: YES
         # Експорт нотаток у файл, обраний користувачем (FR-24).
         ENABLE_USER_SELECTED_FILES: readwrite
+        # Ілюстрації (FR-33…FR-35): єдиний мережевий доступ, після кліку, лише allowlist.
+        ENABLE_OUTGOING_NETWORK_CONNECTIONS: YES
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         CODE_SIGN_IDENTITY: "-"
     preBuildScripts:

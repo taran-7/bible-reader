@@ -52,6 +52,13 @@ struct BibleReaderApp: App {
             }
         }
 
+        WindowGroup("Ілюстрації", id: "illustrations", for: IllustrationRequest.self) { $request in
+            if let request {
+                IllustrationsView(request: request)
+                    .modifier(ThemedScene(preferences: preferences))
+            }
+        }
+
         Settings {
             SettingsView(preferences: preferences)
                 .modifier(ThemedScene(preferences: preferences))

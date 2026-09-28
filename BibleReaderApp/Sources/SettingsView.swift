@@ -3,6 +3,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @Bindable var preferences: PreferencesStore
+    @State private var braveKey = BraveKey.load() ?? ""
 
     var body: some View {
         Form {
@@ -19,6 +20,16 @@ struct SettingsView: View {
             ThemePicker(preferences: preferences)
                 .accessibilityIdentifier("theme")
             Button("Скинути до стандартних") { preferences.reset() }
+            Section {
+                SecureField("Ключ Brave Search API", text: $braveKey)
+                    .accessibilityIdentifier("brave-key")
+                    .onSubmit { BraveKey.save(braveKey) }
+                    .onChange(of: braveKey) { _, key in BraveKey.save(key) }
+            } header: {
+                Text("Ілюстрації")
+            } footer: {
+                Text("Без ключа історії шукаються на Christianity Today, IMB і у Вікіпедії. З ключем — ще на всіх сайтах списку через Brave Search (безкоштовний план). Ключ зберігається в Keychain.")
+            }
         }
         .formStyle(.grouped)
         // Фон форми — тема, а не системний сірий (tech debt #18).
