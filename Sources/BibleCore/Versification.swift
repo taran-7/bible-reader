@@ -221,8 +221,13 @@ public struct Versification: Sendable {
                 return result
             }
         }
-        let custom = Dictionary(Translation.allCases.compactMap { t in t.versificationTable.map { (t.numbering, $0) } },
-                                uniquingKeysWith: { first, _ in first })
+        // Таблиця системи — з першого модуля, що її приносить.
+        var custom: [Translation.Numbering: VersificationTable] = [:]
+        for translation in Translation.allCases {
+            if let table = translation.versificationTable, custom[translation.numbering] == nil {
+                custom[translation.numbering] = table
+            }
+        }
         return Versification(kjvCounts: try counts(.kjv), synodalCounts: try counts(.synodal), custom: custom)
     }
 }
