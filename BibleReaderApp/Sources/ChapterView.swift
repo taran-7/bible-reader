@@ -7,6 +7,8 @@ struct ChapterView: View {
     let model: ReaderViewModel
     let fontSize: Double
     @State private var selection = Set<Int>()
+    /// Ширина колонки тексту: у вузькій кнопки на виділенні — лише іконки.
+    @State private var listWidth: CGFloat = 1000
     /// Вірш, нотатку до якого редагують.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
@@ -25,6 +27,7 @@ struct ChapterView: View {
         // Дані користувача в нумерації KJV: у Синодальному позначки стають на той самий зміст.
         let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
         let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
+        let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale)
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
@@ -41,7 +44,7 @@ struct ChapterView: View {
                     }
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         .padding(.trailing, verse.verse == CopyButtonModel.anchorVerse(for: selection)
-                                  ? SelectionButton.rowWidth(for: scale) : 36)
+                                  ? SelectionButton.rowWidth(for: scale, compact: compactButtons) : 36)
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
@@ -59,6 +62,11 @@ struct ChapterView: View {
                 }
             }
             .scrollContentBackground(.hidden)
+            .environment(\.compactSelectionButtons, compactButtons)
+            .background(GeometryReader { geometry in
+                Color.clear.onAppear { listWidth = geometry.size.width }
+                    .onChange(of: geometry.size.width) { _, width in listWidth = width }
+            })
             .background(ThemeBackground())
             .focused($listFocused)
             .navigationTitle(title)

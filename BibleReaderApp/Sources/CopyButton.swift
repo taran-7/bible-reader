@@ -4,12 +4,20 @@ import SwiftUI
 /// Кнопка на виділенні: іконка з написом, однакова ширина для «Ілюстрації», «Порівняти», «Копіювати»,
 /// напівпрозора підкладка, текст вірша під неї не заходить (FR-17, FR-33, FR-36).
 struct SelectionButton: View {
-    /// Ширина кожної кнопки за масштабом інтерфейсу; `ChapterView` лишає рядку з кнопками праве поле під три.
-    static func width(for scale: InterfaceScale) -> CGFloat { 124 * scale.factor }
+    /// Ширина кожної кнопки за масштабом інтерфейсу; `compact` — лише іконка (вузька колонка тексту).
+    static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 32 : 124) * scale.factor }
     static let spacing: CGFloat = 4
 
     /// Праве поле рядка під три кнопки.
-    static func rowWidth(for scale: InterfaceScale) -> CGFloat { 3 * width(for: scale) + 2 * spacing + 12 }
+    static func rowWidth(for scale: InterfaceScale, compact: Bool = false) -> CGFloat {
+        3 * width(for: scale, compact: compact) + 2 * spacing + 12
+    }
+
+    /// Написи лише коли текстові вірша лишається хоча б 360 pt; інакше вірш стискається у вузьку високу
+    /// колонку, і кнопки над першим віршем виділення виходять за край при прокручуванні.
+    static func isCompact(listWidth: CGFloat, scale: InterfaceScale) -> Bool {
+        listWidth - rowWidth(for: scale) < 360 * scale.factor
+    }
 
     let title: String
     let systemImage: String
@@ -19,13 +27,19 @@ struct SelectionButton: View {
     @State private var isHovered = false
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
+    @Environment(\.compactSelectionButtons) private var compact
 
     var body: some View {
         Button(action: action) {
-            Label(title, systemImage: systemImage)
-                .labelStyle(.titleAndIcon)
+            Group {
+                if compact {
+                    Label(title, systemImage: systemImage).labelStyle(.iconOnly)
+                } else {
+                    Label(title, systemImage: systemImage).labelStyle(.titleAndIcon)
+                }
+            }
                 .lineLimit(1)
-                .frame(width: SelectionButton.width(for: scale) - 12)
+                .frame(width: SelectionButton.width(for: scale, compact: compact) - 12)
                 .font(.system(size: scale.systemFontSize))
                 .foregroundStyle(Color(theme.accent))
                 .padding(.horizontal, 6)
@@ -71,4 +85,9 @@ struct CompareButton: View {
         SelectionButton(title: "Порівняти", systemImage: "rectangle.split.3x1", help: "Порівняти в перекладах",
                         identifier: "compare-button", action: action)
     }
+}
+
+extension EnvironmentValues {
+    /// Кнопки на виділенні лише іконками (вузька колонка тексту); підказка лишається.
+    @Entry var compactSelectionButtons = false
 }
