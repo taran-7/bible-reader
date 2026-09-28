@@ -96,6 +96,12 @@ import Testing
         #expect(broken.comparison == nil)
     }
 
+    // @trace FR-36
+    @Test func testUnknownBookFallsBackToNumber() {
+        #expect(Reference.bookLabel(99, in: .kjv) == "99")
+        #expect(Quote.format([Verse(translation: .kjv, book: 99, chapter: 1, verse: 1, text: "x")]) == "«x» (99 1:1)")
+    }
+
     // @trace FR-15
     @Test func testReadingColumnFitsAboutSeventyFiveCharacters() {
         #expect(ReadingPreferences.readingColumnWidth(fontSize: 15) == 600)
