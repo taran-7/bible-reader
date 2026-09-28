@@ -8,12 +8,14 @@ import SwiftUI
 struct ChapterPickerView: View {
     let model: ReaderViewModel
     let picker: ChapterPicker
+    /// Розмір шрифту віршів: ⌘+ / ⌘− збільшують і номери розділів (FR-15).
+    let fontSize: Double
     @State private var cursor = 1
     @FocusState private var focused: Bool
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
 
-    private var cellSize: CGFloat { 44 * scale.factor }
+    private var cellSize: CGFloat { fontSize * 44 / 15 }  // 44 pt при стандартних 15 pt
 
     /// Усі розділи без прокрутки, якщо дозволяє екран (Псалми — 15 рядків);
     /// на низькому екрані сітка прокручується. Запас — заголовок вікна, Dock і рамка popover.
@@ -36,7 +38,7 @@ struct ChapterPickerView: View {
         VStack(alignment: .leading, spacing: 10 * scale.factor) {
             HStack {
                 Text(bookName)
-                    .font(.system(size: scale.systemFontSize + 2, weight: .semibold))
+                    .font(.system(size: fontSize + 2, weight: .semibold))
                     .foregroundStyle(Color(theme.text))
                 Spacer()
                 Button("Закрити", systemImage: "xmark") { model.dismissChapterPicker() }
@@ -105,7 +107,7 @@ struct ChapterPickerView: View {
         let isCurrent = chapter == picker.current
         return Button { model.pickChapter(chapter) } label: {
             Text(verbatim: String(chapter))
-                .font(.system(size: scale.systemFontSize, weight: isCurrent ? .semibold : .regular))
+                .font(.system(size: fontSize, weight: isCurrent ? .semibold : .regular))
                 .foregroundStyle(Color(theme.text))
                 .frame(width: cellSize, height: cellSize * 0.8)
                 .background(

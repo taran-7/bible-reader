@@ -44,7 +44,7 @@ struct ReaderToolbar: ToolbarContent {
             .popover(isPresented: model.chapterPickerBinding(book: model.location.book, origin: .title),
                      arrowEdge: .bottom) {
                 if let picker = model.chapterPicker {
-                    ChapterPickerView(model: model, picker: picker)
+                    ChapterPickerView(model: model, picker: picker, fontSize: preferences.preferences.verseFontSize)
                 }
             }
         }

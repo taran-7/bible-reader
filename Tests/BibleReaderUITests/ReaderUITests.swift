@@ -393,8 +393,18 @@ final class ReaderUITests: XCTestCase {
         XCTAssertGreaterThan(picker.frame.midY, title.frame.maxY, "вікно під назвою")
         XCTAssertEqual(app.buttons["chapter-150"].label, "Розділ 150, поточний")
         shot("psalms-title")
+        let standard = app.buttons["chapter-23"].frame.width
         app.buttons["chapter-23"].click()
         expectTitle("Psalms 23")
+        // Шрифт віршів (⌘+) збільшує й номери розділів у вікні.
+        for _ in 0..<4 {
+            app.menuBars.menuBarItems["View"].click()
+            app.menuBars.menuItems["Збільшити шрифт"].click()
+        }
+        title.click()
+        XCTAssertTrue(picker.waitForExistence(timeout: 5))
+        XCTAssertGreaterThan(app.buttons["chapter-23"].frame.width, standard, "номери більші після ⌘+")
+        shot("psalms-title-large-font")
     }
 }
 
