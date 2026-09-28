@@ -47,10 +47,9 @@ struct ChapterView: View {
                         .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
                         .frame(maxWidth: .infinity)
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
-                        // Виділені вірші відступають від кнопок повністю, сусіди — сходинками ½ і ¼.
-                        .padding(.trailing, 36 + (SelectionButton.rowWidth(for: scale, compact: compactButtons) - 36)
-                                  * CopyButtonModel.shift(of: verse.verse, selection: selection))
-                        .animation(.easeInOut(duration: 0.2), value: selection)
+                        // Однакове праве поле в усіх рядках: кнопки на виділенні не налазять на текст,
+                        // а виділений вірш не зсувається (запит власника 2026-09-28).
+                        .padding(.trailing, SelectionButton.rowWidth(for: scale, compact: compactButtons))
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
@@ -75,6 +74,8 @@ struct ChapterView: View {
             })
             .background(ThemeBackground())
             .focused($listFocused)
+            // Esc — пункт меню «Правка → Зняти виділення»: працює за будь-якого фокусу (FR-17).
+            .onChange(of: model.clearSelectionRequest) { _, _ in selection = [] }
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)

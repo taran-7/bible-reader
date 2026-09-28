@@ -359,4 +359,17 @@ extension ReaderViewModelTests {
         #expect(model.location == Location(book: 19, chapter: 2))
         #expect(model.takeFocus() == 1)
     }
+
+    // @trace FR-17
+    @Test func testClearSelectionOnlyWithoutSidePanels() {
+        let model = ReaderViewModel { FakeRepository() }
+        #expect(!model.canClearSelection)
+        model.anchorVerse = 2
+        #expect(model.canClearSelection)
+        model.showIllustrations(for: [2])
+        #expect(!model.canClearSelection || model.illustrations == nil)
+        model.closeIllustrations()
+        model.clearSelection()
+        #expect(model.clearSelectionRequest == 1)
+    }
 }

@@ -1,6 +1,6 @@
 {
-  "createdAt": "2026-09-28T15:41:38.803Z",
-  "gitHead": "5499bf063422b3be4db236036c4b25f53cfbb247",
+  "createdAt": "2026-09-28T19:55:50.395Z",
+  "gitHead": "64ca409a5e6fb75d9604fc1f1079c328f2aaeb02",
   "files": {
     ".claude/workflows/eval-suite.js": "f93c99d868b812cfa7412927f52b62d1042525396a9d0265f16cfe435b9c6098",
     ".claude/workflows/review-gate.js": "7295d8e94ba347213120b9d190b9ebbb88dee373173cfc7daba2114b726ca76b",
@@ -10,7 +10,7 @@
     ".claude/workflows/vision-verify.js": "84c893a066088a158d308a3a21cf7cd3b44fdefb4f503ef9bd85507b7364fc69",
     ".githooks/commit-msg": "c6427b364dbc15da31235e4c0f9a8ac74639b7f0512cadce95f301637387fb5c",
     ".githooks/pre-commit": "c64e18049003ddd126e8ac2c61c1ce759923977748f5f044ee34fc1c3212eaea",
-    ".github/workflows/ci.yml": "5db677f0f5ebe65a86902697e8af7d72ae8a5563719d2b3f85a9785e22345d9b",
+    ".github/workflows/ci.yml": "7dfecb20d46f9d788b6d41b341665cc53d845954003ba95c223020f4005d0a53",
     "quality/coverage-baseline.json": "300d30180716188eb31e13271e7d67916ca434711bf53427971e37c4ccce9541",
     "quality/process-baseline.json": "4363df6ac375e25c06c8ee85a3aaf49c8cd69f6fab2fbd3e76409ca715c4e20b",
     "quality/telemetry.config.json": "98276dbbd18f9d694f3378aed7ecc042439d99c8e292bb3caeed7a833005835b",
@@ -26,6 +26,6 @@
     "scripts/qa-verify.mjs": "df2e47ea60d4713a342fcdb033b757aa775a0d70e15d706ceddabf235fc8e731"
   },
   "adaptations": [
-    "default branch master (PD-16)"
+    "CI uploads UI xcresult on failure (PD-17)"
   ]
 }

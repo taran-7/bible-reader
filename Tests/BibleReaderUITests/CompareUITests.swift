@@ -82,4 +82,23 @@ final class CompareUITests: XCTestCase {
         XCTAssertEqual(app.checkBoxes["compare-choice-bkr"].value as? Int, 0)
         XCTAssertEqual(app.checkBoxes["compare-choice-synodal"].value as? Int, 1)
     }
+
+    // @trace FR-17
+    func testEscapeClearsSelection() {
+        launch(reset: true)
+        search("John 3:16")
+        XCTAssertNotNil(app.visibleButton("compare-button"), "виділення після переходу")
+        // Пункт меню з клавішею Esc. Саму клавішу на CI може перехопити поле пошуку в тулбарі старішого SDK
+        // (там воно не по центру), тож тест натискає пункт, а Esc перевірено вручну.
+        let item = app.menuItems["Зняти виділення"]
+        XCTAssertTrue(item.waitForExistence(timeout: 5))
+        // Меню «Правка» / «Edit» — залежно від мови системи.
+        for name in ["Правка", "Edit"] where app.menuBarItems[name].exists {
+            app.menuBarItems[name].click()
+            break
+        }
+        item.click()
+        let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button", timeout: 0) == nil }
+        wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 10)
+    }
 }
