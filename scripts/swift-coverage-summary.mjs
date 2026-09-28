@@ -40,3 +40,11 @@ for (const f of files) {
     console.log(`  uncovered: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} — functions ${fn.covered}/${fn.count}, lines ${f.summary.lines.covered}/${f.summary.lines.count}`);
   }
 }
+const ours = new Set(files.map((f) => f.filename));
+for (const fn of report.data.flatMap((d) => d.functions ?? [])) {
+  if (fn.count === 0 && fn.filenames.some((name) => ours.has(name))) {
+    let name = fn.name;
+    try { name = execFileSync("xcrun", ["swift-demangle", "-compact", fn.name], { encoding: "utf8" }).trim(); } catch {}
+    console.log(`    never called: ${fn.filenames[0].replace(/^.*\/Sources\//, "Sources/")}:${fn.regions?.[0]?.[0] ?? "?"} ${name}`);
+  }
+}
