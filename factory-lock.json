@@ -1,6 +1,6 @@
 {
-  "createdAt": "2026-09-28T19:55:50.395Z",
-  "gitHead": "64ca409a5e6fb75d9604fc1f1079c328f2aaeb02",
+  "createdAt": "2026-09-29T07:15:00.775Z",
+  "gitHead": "a7721233cf7fb895be76756f773b436fa490752e",
   "files": {
     ".claude/workflows/eval-suite.js": "f93c99d868b812cfa7412927f52b62d1042525396a9d0265f16cfe435b9c6098",
     ".claude/workflows/review-gate.js": "7295d8e94ba347213120b9d190b9ebbb88dee373173cfc7daba2114b726ca76b",
@@ -10,7 +10,7 @@
     ".claude/workflows/vision-verify.js": "84c893a066088a158d308a3a21cf7cd3b44fdefb4f503ef9bd85507b7364fc69",
     ".githooks/commit-msg": "c6427b364dbc15da31235e4c0f9a8ac74639b7f0512cadce95f301637387fb5c",
     ".githooks/pre-commit": "c64e18049003ddd126e8ac2c61c1ce759923977748f5f044ee34fc1c3212eaea",
-    ".github/workflows/ci.yml": "7dfecb20d46f9d788b6d41b341665cc53d845954003ba95c223020f4005d0a53",
+    ".github/workflows/ci.yml": "38c11dcccb5f1709c02c777aa2dba462a7967b9f781f98d1edd6fd20246087cb",
     "quality/coverage-baseline.json": "300d30180716188eb31e13271e7d67916ca434711bf53427971e37c4ccce9541",
     "quality/process-baseline.json": "4363df6ac375e25c06c8ee85a3aaf49c8cd69f6fab2fbd3e76409ca715c4e20b",
     "quality/telemetry.config.json": "98276dbbd18f9d694f3378aed7ecc042439d99c8e292bb3caeed7a833005835b",
@@ -20,12 +20,14 @@
     "scripts/check-factory-integrity.mjs": "fbd605f988b157a3454f85a3cf7cd4b9656614e4e25798efe5a6ae6ec72c1dc0",
     "scripts/check-platform.mjs": "1a922072e84a06f81b1a99af2b3843f5aa0a98a422661bcd63bd5ef55f901972",
     "scripts/check-process-ratchet.mjs": "83f4176c333f17b9c3b3cd50318413d200715df2037404b461e901235608e12d",
+    "scripts/check-secrets.mjs": "4088de9e4d132aa561e98d235eac79cc63c05b7849c6a1600d62b2ddeb7dde4a",
+    "scripts/check-secrets.test.mjs": "3a989ba282e701827a2de50af0c60bdce77517ee22f52bf9328729551145f36b",
     "scripts/check-traceability.mjs": "1a8e88ebf999ffcb14f94a19be127e80673fd6286bfca8b7b9a3d5e6b45287f7",
     "scripts/check-trajectory.mjs": "2295f2987190cf693632fa6ac7c2b1900592a424e63614617217cbca6c4275de",
     "scripts/gate-status.mjs": "be6e6711f9a8f1749465e9ad97fabcbd2b4689d488bb6eedf2bfe4c83a26c4de",
     "scripts/qa-verify.mjs": "df2e47ea60d4713a342fcdb033b757aa775a0d70e15d706ceddabf235fc8e731"
   },
   "adaptations": [
-    "CI uploads UI xcresult on failure (PD-17)"
+    "secrets scanner in pre-commit and CI (PD-18)"
   ]
 }

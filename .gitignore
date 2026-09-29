@@ -16,3 +16,14 @@ trace/ledger-*.jsonl
 
 # Release-збірка для check-platform (NFR-1, NFR-5)
 build/
+
+# Секрети: ключі API лише в Keychain (scripts/check-secrets.mjs, PD-18).
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+credentials.json
+secrets.json
+secrets.plist

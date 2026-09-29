@@ -23,6 +23,15 @@ jobs:
       - run: npm install -g @fission-ai/openspec@1.13.2
 
       # --- статичні, швидкі, детерміновані ---
+      # PD-18: ключі API (Claude, Brave…) не в git — перевірка всіх файлів, навіть якщо коміт ішов повз хук.
+      - name: Secrets scan
+        run: |
+          node --test scripts/check-secrets.test.mjs
+          node scripts/check-secrets.mjs
+          # Кожен коміт PR: ключ, доданий і потім видалений, лишився б в історії.
+          if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
+            node scripts/check-secrets.mjs --history "${{ github.event.pull_request.base.sha }}..HEAD"
+          fi
       - name: Traceability chain (і свіжість звіту)
         run: |
           node scripts/check-traceability.mjs --check-fresh

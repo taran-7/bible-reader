@@ -171,6 +171,15 @@
         "BibleCore"
       ],
       "processComplete": true
+    },
+    {
+      "slice": "2026-09-29-add-illustration-curation",
+      "reviewEvidence": "clean",
+      "trailerCommits": 2,
+      "libDomains": [
+        "BibleCore"
+      ],
+      "processComplete": true
     }
   ],
   "overlaps": [
@@ -194,7 +203,8 @@
         "2026-09-28-close-tech-debt-batch",
         "2026-09-28-comfortable-reading",
         "2026-09-28-improve-search",
-        "2026-09-28-tweak-reading-ui"
+        "2026-09-28-tweak-reading-ui",
+        "2026-09-29-add-illustration-curation"
       ]
     }
   ],
@@ -206,7 +216,7 @@
     },
     {
       "check": "in-scope",
-      "msg": "lib/BibleCore/ modified by 18 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-illustrations, 2026-09-28-add-parallel-view, 2026-09-28-add-sermon-drafts, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-comfortable-reading, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui) — review for scope drift"
+      "msg": "lib/BibleCore/ modified by 19 slices (2026-09-25-bible-reader-mvp, 2026-09-27-add-copy-button, 2026-09-27-add-reading-comfort, 2026-09-27-add-themes, 2026-09-27-add-translations, 2026-09-27-add-ui-tests, 2026-09-28-add-a11y-launch-checks, 2026-09-28-add-illustrations, 2026-09-28-add-parallel-view, 2026-09-28-add-sermon-drafts, 2026-09-28-add-translation-modules, 2026-09-28-add-user-notes, 2026-09-28-add-verse-compare, 2026-09-28-chapter-picker-popover, 2026-09-28-close-tech-debt-batch, 2026-09-28-comfortable-reading, 2026-09-28-improve-search, 2026-09-28-tweak-reading-ui, 2026-09-29-add-illustration-curation) — review for scope drift"
     }
   ]
 }

@@ -23,6 +23,16 @@ final class FakeIllustrationHTTP: IllustrationHTTP, @unchecked Sendable {
         let (status, body) = responses["\(host)\(path)#\(page)"] ?? responses["\(host)\(path)"] ?? (404, "")
         return (status, Data(body.utf8))
     }
+
+    /// POST до API моделі: запит записується, відповідь — з `responses["host/path"]`.
+    private(set) var postRequests: [(host: String, path: String, headers: [String: String], body: Data)] = []
+
+    func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data) {
+        postRequests.append((host, path, headers, body))
+        if let error { throw error }
+        let (status, text) = responses["\(host)\(path)"] ?? (404, "")
+        return (status, Data(text.utf8))
+    }
 }
 
 enum IllustrationFixtures {

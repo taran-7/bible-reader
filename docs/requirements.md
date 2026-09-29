@@ -88,6 +88,7 @@ Verification tags: `local-verifiable` означає, що `swift test` (`Tests/
 | FR-38 | MVP | Drafts | «Чорнетки»: панель праворуч зі списком (пошук) і редактором Markdown, автозбереження в базі користувача; «В чорнетку» на виділених віршах дописує цитату з посиланням; посилання в тексті розпізнаються й відкривають місце (PRD 6.20). | local-verifiable |
 | FR-39 | MVP | Drafts | «Нова проповідь» зі структурою; «В чорнетку» на картці ілюстрації; позначка біля віршів, згаданих у чорнетках, з переходом до них (PRD 6.20). | local-verifiable |
 | FR-40 | MVP | Drafts | Режим «Проповідь» (лише текст великим шрифтом, ⌘+ / ⌘−, Esc); експорт: скопіювати, Markdown, друк / PDF (PRD 6.20). | local-verifiable |
+| FR-41 | MVP | Illustrations | Відбір ілюстрацій моделлю: модель (Claude з ключем користувача; без ключа — Apple на Mac) формулює пошукові запити за темою вірша, оцінює кандидатів (поріг 6, найкращі першими) і пише «Чому ця історія» мовою перекладу; без моделі чи при її помилці — як раніше (PRD 6.17). | local-verifiable |
 
 ## 3 Non-Functional Requirements (NFR)
 
@@ -98,7 +99,7 @@ NFR з PRD §3 і §7 поки не мають автоматичного мех
 | ID | Phase | Area | Description | Verification |
 |---|---|---|---|---|
 | NFR-1 | MVP | Platform | macOS 14+, лише Apple Silicon (`arm64`); Intel поза обсягом (рішення власника 2026-09-27, open source: хто потребує — збере сам). | local-verifiable |
-| NFR-2 | MVP | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35) після кліку: allowlist, API Вікіпедії і Brave; мережевий код лише в `IllustrationNetwork.swift` (тест `NetworkIsolationTests`). | local-verifiable |
+| NFR-2 | MVP | Privacy | Офлайн, без телеметрії; єдиний виняток мережі — ілюстрації (FR-33…FR-35) після кліку: allowlist, API Вікіпедії і Brave, а для відбору моделлю (FR-41) — API Claude з ключем користувача; мережевий код лише в `IllustrationNetwork.swift` (тест `NetworkIsolationTests`). | local-verifiable |
 | NFR-3 | MVP | Performance | Запуск < 1 с; пошук < 200 мс на всій Біблії (пошук: тест `improve-search`; запуск: `launch-time` у UI-тесті — Debug-збірка, теплий запуск; межа 1 с на Mac, 2 с на VM CI — PD-14). | local-verifiable |
 | NFR-4 | MVP | A11y | VoiceOver читає номери й тексти віршів; повна робота з клавіатури; контраст WCAG AA. | local-verifiable |
 | NFR-5 | MVP | Size | Розмір Release `.app` < 100 МБ (попередження від 80 МБ); межу піднято з 60 МБ рішенням власника 2026-09-27. | local-verifiable |
