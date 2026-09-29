@@ -1,0 +1,39 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer, security-reviewer)",
+  "scope": "add-illustration-curation",
+  "change": "add-illustration-curation",
+  "baseRef": "master",
+  "headRef": "feature/illustration-curation",
+  "dimensions": {
+    "correctness": {
+      "confirmed": 8,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 5,
+      "deferred": 3
+    },
+    "security": {
+      "confirmed": 5,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 5,
+      "deferred": 0
+    }
+  },
+  "fixed": [
+    "M1: at most two model judgements per batch (cost bounded)",
+    "M2: Apple on-device model uses pool 7 × 300 chars (4k context)",
+    "m3: Claude max_tokens 4000, stop_reason max_tokens reported",
+    "m4: fractional scores rounded, zero-based ids accepted, reason capped at 300 chars",
+    "m8: Settings curator status read on save, not every render",
+    "S1: pre-commit scan includes renamed files (ACMR)",
+    "S2: CI scans added lines of every PR commit (--history)",
+    "S3: patterns for keys without prefix in assignments, encrypted/PGP private keys, mysql/mongodb/redis/amqp URLs",
+    "S4: untrusted story text wrapped in <story> tags, system prompt says not to follow instructions inside; reason shown as plain Text",
+    "S5: Settings disclose references, language, titles, sites and excerpts, two requests per search"
+  ],
+  "deferred": "m5/m6/m7 → tech debt #34",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-29T08:00:00Z"
+}
