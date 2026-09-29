@@ -6,6 +6,7 @@
 //   node scripts/check-secrets.mjs --staged   — лише проіндексоване (pre-commit)
 //   node scripts/check-secrets.mjs --history <base>..<head> — додані рядки кожного коміту діапазону (CI для PR):
 //                                               ключ, доданий і потім видалений, лишається в історії
+//   pre-push (scripts/hooks-pre-push.mjs) — те саме для комітів, яких ще немає на GitHub
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
@@ -46,7 +47,7 @@ export function scan(files, read) {
 
 function main() {
   const history = process.argv.indexOf("--history");
-  if (history !== -1) return scanHistory(process.argv[history + 1]);
+  if (history !== -1) return scanHistory(process.argv.slice(history + 1));
   const staged = process.argv.includes("--staged");
   const git = (args) => execFileSync("git", args, { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   // R — перейменування: файл з ключем, перейменований у тому самому коміті, теж перевіряємо.
@@ -74,8 +75,11 @@ export function addedLines(patch) {
   return lines;
 }
 
-function scanHistory(range) {
-  const patch = execFileSync("git", ["log", "-p", "--no-color", "--format=commit %H", range], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+/** `range` — один аргумент git log (`a..b`) або кілька (`sha --not --remotes`, pre-push нової гілки). */
+export function scanHistory(range) {
+  const args = Array.isArray(range) ? range : [range];
+  range = args.join(" ");
+  const patch = execFileSync("git", ["log", "-p", "--no-color", "--format=commit %H", ...args], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
   const findings = [];
   for (const [file, line] of addedLines(patch)) {
     const hit = SECRET_PATTERNS.find(([, pattern]) => pattern.test(line));
