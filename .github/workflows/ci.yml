@@ -26,7 +26,7 @@ jobs:
       # PD-18: ключі API (Claude, Brave…) не в git — перевірка всіх файлів, навіть якщо коміт ішов повз хук.
       - name: Secrets scan
         run: |
-          node --test scripts/check-secrets.test.mjs
+          node --test scripts/check-secrets.test.mjs scripts/claude-hooks.test.mjs
           node scripts/check-secrets.mjs
           # Кожен коміт PR: ключ, доданий і потім видалений, лишився б в історії.
           if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
