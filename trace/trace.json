@@ -41,6 +41,7 @@
     "FR-38": "MVP",
     "FR-39": "MVP",
     "FR-40": "MVP",
+    "FR-41": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "MVP",
@@ -985,6 +986,36 @@
         "tests/BibleReaderUITests/DraftsUITests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-41",
+      "specs": [
+        "openspec/specs/illustrations/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "Tests/BibleCoreTests/IllustrationNetworkTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationCurationTests.swift",
+        "tests/BibleCoreTests/IllustrationNetworkTests.swift"
+      ],
+      "recordings": []
     }
   ],
   "failures": [],
@@ -1148,6 +1179,10 @@
     {
       "check": "recording-evidence",
       "msg": "FR-40 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-41 is not referenced by any recording manifest under docs/qa/"
     }
   ]
 }
