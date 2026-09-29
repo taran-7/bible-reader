@@ -120,7 +120,7 @@ final class ThemeUITests: XCTestCase {
         choose("Темна")
         expectBackground(0x121214, tolerance: 6, "dark")
         choose("Пастельна")
-        expectBackground(0xF7F3EE, tolerance: 6, "pastel")
+        expectBackground(0xFFE9F3, tolerance: 6, "pastel")
         choose("Скло")
         expectBackground(0xF2F4F8, tolerance: 20, "glass")
         choose("Манускрипт")
