@@ -18,18 +18,33 @@ public struct IllustrationNetwork: IllustrationHTTP {
     }
 
     public func get(host: String, path: String, query: [(String, String)], headers: [String: String]) async throws -> (status: Int, body: Data) {
+        try await send(host: host, path: path, query: query, headers: headers, body: nil)
+    }
+
+    /// POST JSON — лише до API моделі, що відбирає історії (FR-41).
+    public func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data) {
+        try await send(host: host, path: path, query: [], headers: headers, body: body)
+    }
+
+    private func send(host: String, path: String, query: [(String, String)], headers: [String: String],
+                      body: Data?) async throws -> (status: Int, body: Data) {
         var components = URLComponents()
         components.scheme = "https"
         components.host = host
         components.path = path
-        components.queryItems = query.map { URLQueryItem(name: $0.0, value: $0.1) }
+        components.queryItems = query.isEmpty ? nil : query.map { URLQueryItem(name: $0.0, value: $0.1) }
         guard let url = components.url else { throw IllustrationError.failed("некоректна адреса \(host)\(path)") }
         var request = URLRequest(url: url)
         for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+        if let body {
+            request.httpMethod = "POST"
+            request.httpBody = body
+        }
         do {
             let (data, response) = try await session.data(for: request)
             // Запит https — відповідь HTTP; інакше код 0, і адаптер вважає відповідь невдалою.
-            return ((response as? HTTPURLResponse)?.statusCode ?? 0, data)
+            guard let http = response as? HTTPURLResponse else { return (0, data) }
+            return (http.statusCode, data)
         } catch let error as URLError where Self.offlineCodes.contains(error.code) {
             throw IllustrationError.offline
         } catch {
@@ -44,6 +59,9 @@ public struct IllustrationNetwork: IllustrationHTTP {
 
     /// Сторінка, де користувач бере безкоштовний ключ Brave Search API (посилання в Settings).
     public static let braveKeyPage = URL(string: "https://brave.com/search/api/")!
+
+    /// Сторінка ключів Claude API (посилання в Settings, FR-41).
+    public static let claudeKeyPage = URL(string: "https://console.anthropic.com/settings/keys")!
 
     static let offlineCodes: Set<URLError.Code> = [
         .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff,

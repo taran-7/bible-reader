@@ -5,6 +5,9 @@ import SwiftUI
 #if canImport(Translation)
 @preconcurrency import Translation
 #endif
+#if canImport(FoundationModels)
+import FoundationModels
+#endif
 
 /// Панель «Ілюстрації» праворуч від тексту (FR-33): до 7 історій до виділених віршів, «Отримати ще»,
 /// «Перекласти» і «Скопіювати» на картці. Нічого не зберігається: закрили панель — історії зникли.
@@ -54,12 +57,25 @@ struct IllustrationsView: View {
             failure("Не вдалося знайти ілюстрації", detail: message)
         case .idle:
             if model.stories.isEmpty {
-                Text("Нічого не знайдено").foregroundStyle(Color(theme.secondaryText))
+                // Модель відкинула всіх переглянутих кандидатів, але шукати ще є де.
+                Text(model.hasMore ? "Поки нічого доречного — «Отримати ще» шукає далі" : "Нічого не знайдено").foregroundStyle(Color(theme.secondaryText))
                     .accessibilityIdentifier("illustrations-empty")
             }
             if model.hasMore {
                 Button("Отримати ще") { Task { await model.loadMore() } }
                     .accessibilityIdentifier("illustrations-more")
+            }
+            if let name = model.curatorName, !model.stories.isEmpty {
+                Label("Відібрано моделлю: \(name)", systemImage: "sparkles")
+                    .font(.system(size: scale.systemFontSize * 0.9))
+                    .foregroundStyle(Color(theme.secondaryText))
+                    .accessibilityIdentifier("illustrations-curator")
+            }
+            if let problem = model.curatorProblem {
+                Label("Без відбору моделлю — \(problem)", systemImage: "exclamationmark.triangle")
+                    .font(.system(size: scale.systemFontSize * 0.9))
+                    .foregroundStyle(.orange)
+                    .textSelection(.enabled)
             }
             if !model.hasBraveKey {
                 Text("Більше сайтів — з ключем Brave Search у Налаштуваннях.")
@@ -109,6 +125,14 @@ struct IllustrationCard: View {
             Text([story.siteName, story.date].compactMap { $0 }.joined(separator: " · "))
                 .font(.system(size: scale.systemFontSize * 0.9))
                 .foregroundStyle(Color(theme.secondaryText))
+            if let reason = story.reason {
+                // Пояснення моделі вже мовою перекладу на екрані (FR-41).
+                (Text("Чому ця історія: ").bold() + Text(reason))
+                    .font(.system(size: scale.systemFontSize * 0.95))
+                    .foregroundStyle(Color(theme.accent))
+                    .textSelection(.enabled)
+                    .accessibilityIdentifier("illustration-reason")
+            }
             Text(shown.text).font(.system(size: scale.systemFontSize)).textSelection(.enabled)
             if let translationError {
                 Text(translationError).font(.system(size: scale.systemFontSize * 0.9)).foregroundStyle(.orange)
@@ -251,6 +275,9 @@ final class IllustrationsModel {
     private(set) var state: State = .idle
     private(set) var hasMore = false
     private(set) var hasBraveKey = false
+    /// Хто відібрав історії (FR-41) і чому відбір моделлю не спрацював.
+    private(set) var curatorName: String?
+    private(set) var curatorProblem: String?
     @ObservationIgnored private var search: IllustrationSearch?
     @ObservationIgnored private var request: IllustrationRequest?
 
@@ -259,11 +286,12 @@ final class IllustrationsModel {
         stories = []
         do {
             let sources = try IllustrationSources.bundled
-            let key = BraveKey.load()
+            let key = KeychainKey.brave.load()
             hasBraveKey = key != nil
+            let http = IllustrationNetwork()
             search = IllustrationSearch(request: request, sources: sources,
                                         providers: IllustrationSearch.providers(sources: sources, braveKey: key),
-                                        http: IllustrationNetwork())
+                                        http: http, curator: Curators.preferred(http: http))
         } catch {
             state = .failed("\(error)")
             return
@@ -277,6 +305,8 @@ final class IllustrationsModel {
         do {
             stories += try await search.next()
             hasMore = await search.hasMore
+            curatorName = await search.curatorName
+            curatorProblem = await search.curatorProblem
             state = .idle
         } catch IllustrationError.offline {
             state = .offline
@@ -293,11 +323,14 @@ final class IllustrationsModel {
     }
 }
 
-/// Ключ Brave Search API користувача в Keychain: у `.app` ключа немає (його витягнув би будь-хто).
-enum BraveKey {
-    private static let service = "dev.taraniuk.BibleReader.brave-search"
+/// Ключі API користувача в Keychain (Brave Search, Claude): у `.app` ключів немає (їх витягнув би будь-хто).
+struct KeychainKey {
+    static let brave = KeychainKey(service: "dev.taraniuk.BibleReader.brave-search")
+    static let claude = KeychainKey(service: "dev.taraniuk.BibleReader.claude")
 
-    static func load() -> String? {
+    let service: String
+
+    func load() -> String? {
         var item: CFTypeRef?
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service,
                                     kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne]
@@ -308,7 +341,7 @@ enum BraveKey {
 
     /// Порожній рядок видаляє ключ. `false` — Keychain не прийняв запис.
     @discardableResult
-    static func save(_ key: String) -> Bool {
+    func save(_ key: String) -> Bool {
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
         let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
@@ -324,6 +357,43 @@ enum BraveKey {
         return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
     }
 }
+
+/// Модель для відбору (FR-41): Claude, якщо є ключ; інакше модель Apple на Mac, якщо доступна; інакше без моделі.
+enum Curators {
+    static func preferred(http: IllustrationHTTP) -> IllustrationCurator? {
+        if let key = KeychainKey.claude.load() { return ClaudeCurator(key: key, http: http) }
+        return appleCurator
+    }
+
+    /// Назва моделі, що відбиратиме, для Налаштувань.
+    static var activeName: String? {
+        KeychainKey.claude.load() != nil ? "Claude (твій ключ)" : appleCurator.map { _ in "модель Apple на цьому Mac" }
+    }
+
+    static var appleCurator: IllustrationCurator? {
+        #if canImport(FoundationModels)
+        if #available(macOS 26.0, *), AppleCurator.isAvailable { return AppleCurator() }
+        #endif
+        return nil
+    }
+}
+
+#if canImport(FoundationModels)
+/// Модель Apple на пристрої (Apple Intelligence, macOS 26+): без ключа і без мережі.
+@available(macOS 26.0, *)
+struct AppleCurator: IllustrationCurator {
+    let name = "Apple Intelligence"
+    /// Контекст моделі на Mac ~4 тис. токенів: менший пул і коротші уривки, ніж для Claude.
+    let candidatePool = 7
+    let excerptLength = 300
+
+    static var isAvailable: Bool { SystemLanguageModel.default.isAvailable }
+
+    func complete(system: String, prompt: String) async throws -> String {
+        try await LanguageModelSession(instructions: system).respond(to: prompt).content
+    }
+}
+#endif
 
 /// «Ілюстрації» поруч із «Порівняти» на виділенні (FR-33).
 struct IllustrationsButton: View {

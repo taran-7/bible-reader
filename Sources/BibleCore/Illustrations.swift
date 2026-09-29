@@ -41,9 +41,13 @@ public struct Illustration: Identifiable, Hashable, Sendable {
     public let date: String?
     /// Показано лише початок або уривок: у картці посилання «Читати на сайті».
     public let isExcerpt: Bool
+    /// «Чому ця історія» від моделі мовою перекладу на екрані (FR-41); `nil` — без відбору моделлю.
+    public var reason: String?
     public var id: String { source }
 
-    public init(title: String, text: String, source: String, siteName: String, date: String? = nil, isExcerpt: Bool = false) {
+    public init(title: String, text: String, source: String, siteName: String, date: String? = nil, isExcerpt: Bool = false,
+                reason: String? = nil) {
+        self.reason = reason
         self.title = title
         self.text = text
         self.source = source
@@ -147,6 +151,8 @@ public enum IllustrationQuery {
 public protocol IllustrationHTTP: Sendable {
     /// GET за захищеною адресою `<host><path>?<query>` з заголовками; повертає код відповіді і тіло.
     func get(host: String, path: String, query: [(String, String)], headers: [String: String]) async throws -> (status: Int, body: Data)
+    /// POST JSON за захищеною адресою — для API моделі, що відбирає історії (FR-41).
+    func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data)
 }
 
 public enum IllustrationError: Error, Equatable, Sendable {
@@ -456,8 +462,19 @@ public enum HTMLText {
 public actor IllustrationSearch {
     public static let batchSize = 7
 
-    private let queries: [String]
+    private var queries: [String]
     private let keywords: [String]
+    private let request: IllustrationRequest
+    /// Модель, що формує запити й відбирає історії (FR-41); `nil` — сортування за ключовими словами.
+    private var curator: IllustrationCurator?
+    private var planned = false
+    /// Відібрані моделлю, найкращі першими: «Отримати ще» бере наступні з них.
+    private var curated: [(score: Int, story: Illustration)] = []
+    /// Чому відбір моделлю не спрацював (підпис під історіями); пошук тоді йде без моделі.
+    public private(set) var curatorProblem: String?
+    /// Скільки разів модель оцінює кандидатів за одне «Отримати ще»: ціна пошуку передбачувана;
+    /// не набралося 7 — показуємо менше, а «Отримати ще» лишається.
+    public static let judgementsPerBatch = 2
     private let providers: [IllustrationProvider]
     private let sources: IllustrationSources
     private let http: IllustrationHTTP
@@ -487,9 +504,11 @@ public actor IllustrationSearch {
     }
 
     public init(request: IllustrationRequest, sources: IllustrationSources, providers: [IllustrationProvider],
-                http: IllustrationHTTP) {
+                http: IllustrationHTTP, curator: IllustrationCurator? = nil) {
         let queries = IllustrationQuery.queries(from: request.kjvText)
         self.queries = queries
+        self.request = request
+        self.curator = curator
         self.keywords = IllustrationQuery.keywords(from: request.kjvText)
         self.providers = providers
         self.sources = sources
@@ -498,7 +517,10 @@ public actor IllustrationSearch {
     }
 
     /// Є ще що шукати: не всі запити, джерела й сторінки перебрано.
-    public var hasMore: Bool { cursor != nil || !pending.isEmpty }
+    public var hasMore: Bool { cursor != nil || !pending.isEmpty || !curated.isEmpty }
+
+    /// Назва моделі, що відбирає історії; `nil` — без моделі (або вона не впоралася).
+    public var curatorName: String? { curator?.name }
 
     /// Наступні до 7 історій, найрелевантніші першими; менше — більше не знайшлося.
     /// Помилка одного джерела не зупиняє інші; кидається, лише якщо нічого не знайшлося. Без мережі — одразу.
@@ -506,12 +528,92 @@ public actor IllustrationSearch {
         lastError = nil
         // Явний повтор («Повторити» чи «Отримати ще») знову питає джерела, що впали минулого разу.
         failed.removeAll()
+        if curator != nil { return try await nextCurated() }
+        // Модель відмовила посеред пошуку: спершу вже відібране нею.
+        if !curated.isEmpty {
+            let batch = curated.prefix(Self.batchSize).map(\.story)
+            curated.removeFirst(batch.count)
+            return batch
+        }
         while pending.count < Self.batchSize, try await fetchPage() {}
         if pending.isEmpty, let lastError { throw lastError }
         let batch = Array(pending.prefix(Self.batchSize))
         pending.removeFirst(batch.count)
         let ranked = batch.enumerated().map { (score: score($0.element), offset: $0.offset, story: $0.element) }
         return ranked.sorted { $0.score != $1.score ? $0.score > $1.score : $0.offset < $1.offset }.map(\.story)
+    }
+
+    /// Партія, відібрана моделлю: кандидати пулом (21 для Claude), не більше двох оцінок за раз, поріг 6, найкращі першими.
+    /// Модель не відповіла чи відповіла не JSON — далі без неї, з уже знайденими кандидатами.
+    private func nextCurated() async throws -> [Illustration] {
+        await plan()
+        var judgements = 0
+        while curated.count < Self.batchSize, judgements < Self.judgementsPerBatch, let pool = curator?.candidatePool {
+            while pending.count < pool, try await fetchPage() {}
+            guard !pending.isEmpty else { break }
+            judgements += 1
+            let candidates = Array(pending.prefix(pool))
+            guard let verdicts = await judge(candidates) else { return try await next() }
+            pending.removeFirst(candidates.count)
+            for (index, story) in candidates.enumerated() {
+                guard let verdict = verdicts[index], verdict.score >= CuratorPrompts.threshold else { continue }
+                var chosen = story
+                chosen.reason = verdict.reason.isEmpty ? nil : verdict.reason
+                curated.append((verdict.score, chosen))
+            }
+            // Стабільно: за оцінкою, за рівної — у порядку пошуку.
+            curated = curated.enumerated().sorted { $0.element.score != $1.element.score
+                ? $0.element.score > $1.element.score : $0.offset < $1.offset }.map(\.element)
+        }
+        if curator == nil, curated.isEmpty { return try await next() }
+        if curated.isEmpty, let lastError { throw lastError }
+        let batch = curated.prefix(Self.batchSize).map(\.story)
+        curated.removeFirst(batch.count)
+        return batch
+    }
+
+    /// Запити моделі за змістом вірша — першими, потім за ключовими словами (один раз на пошук).
+    private func plan() async {
+        guard !planned, let curator else { return }
+        planned = true
+        do {
+            let answer = try await curator.complete(system: CuratorPrompts.system, prompt: CuratorPrompts.queriesPrompt(for: request))
+            let extra = CuratorPrompts.queries(from: answer).filter { query in !queries.contains { $0.lowercased() == query.lowercased() } }
+            queries = extra + queries
+            if cursor == nil, !queries.isEmpty, !providers.isEmpty { cursor = Cursor(query: 0, provider: 0, page: 1) }
+        } catch {
+            give(up: error)
+        }
+    }
+
+    /// Оцінки кандидатів; `nil` — модель недоступна, далі без неї.
+    private func judge(_ candidates: [Illustration]) async -> [Int: CuratorVerdict]? {
+        guard let curator else { return nil }
+        do {
+            let answer = try await curator.complete(system: CuratorPrompts.system,
+                                                    prompt: CuratorPrompts.rankPrompt(for: request, candidates: candidates,
+                                                                                      excerptLength: curator.excerptLength))
+            guard let verdicts = CuratorPrompts.verdicts(from: answer, count: candidates.count) else {
+                give(up: IllustrationError.failed("незрозуміла відповідь моделі"))
+                return nil
+            }
+            return verdicts
+        } catch {
+            give(up: error)
+            return nil
+        }
+    }
+
+    private func give(up error: Error) {
+        guard let curator else { return }
+        let message: String
+        switch error {
+        case IllustrationError.offline: message = "немає мережі"
+        case IllustrationError.failed(let text): message = text
+        default: message = "\(error)"
+        }
+        curatorProblem = "\(curator.name): \(message)"
+        self.curator = nil
     }
 
     /// Ключові слова в заголовку важать удвічі.

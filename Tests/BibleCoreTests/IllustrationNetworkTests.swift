@@ -44,6 +44,18 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
         #expect(request.value(forHTTPHeaderField: "X-Test") == "1")
     }
 
+    // @trace FR-41
+    @Test func testPostSendsJSONBody() async throws {
+        StubURLProtocol.result = .success((200, Data("{}".utf8)))
+        let (status, _) = try await network().post(host: "api.anthropic.com", path: "/v1/messages",
+                                                   headers: ["x-api-key": "k"], body: Data("{\"a\":1}".utf8))
+        let request = try #require(StubURLProtocol.lastRequest)
+        #expect(status == 200 && request.httpMethod == "POST")
+        #expect(request.url?.absoluteString == "https://api.anthropic.com/v1/messages")
+        #expect(request.value(forHTTPHeaderField: "x-api-key") == "k")
+        #expect(IllustrationNetwork.claudeKeyPage.host == "console.anthropic.com")
+    }
+
     // @trace FR-33
     @Test func testNoConnectionIsOffline() async {
         StubURLProtocol.result = .failure(URLError(.notConnectedToInternet))

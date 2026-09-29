@@ -12,7 +12,7 @@
 - Як додати переклад: [translation-modules.md](../../translation-modules.md).
 
 ## Що далі (для агента)
-1. v2.3 «Чорнетки проповідей» (FR-38…40) — слайс `add-sermon-drafts`. Наступні слайси на вибір власника: (а) Foster «New Cyclopaedia of Prose Illustrations» (public domain) — локальне джерело ілюстрацій поруч з онлайн-пошуком; (б) перехресні посилання KJV (TSK / OpenBible.info). Відкрито: перевірити конфесію доменів allowlist ілюстрацій перед релізом.
+1. v2.3 «Чорнетки проповідей» (FR-38…40) — слайс `add-sermon-drafts`; v2.4 відбір ілюстрацій моделлю (FR-41) — `add-illustration-curation`. Наступні слайси на вибір власника: (а) Foster «New Cyclopaedia of Prose Illustrations» (public domain) — локальне джерело ілюстрацій поруч з онлайн-пошуком; (б) перехресні посилання KJV (TSK / OpenBible.info). Відкрито: перевірити конфесію доменів allowlist ілюстрацій перед релізом.
 2. Відкритий tech debt: [tech-debt-tracker.md](../tech-debt-tracker.md) (зокрема #20 права на Огієнка, #26 новіший Xcode у CI). Пакет #8, #9, #11–#15, #18, #23, #25 закрито слайсом `close-tech-debt-batch`.
 3. Ручна перевірка людиною: VoiceOver-прохід, вигляд тем і паралельного перегляду на широкому/вузькому вікні.
 
