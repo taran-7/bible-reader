@@ -192,10 +192,11 @@ public enum Theme {
                 searchHighlight: c(0xFFE58F), selection: c(0xD6E2F7), sidebarSelection: c(0xDDE3EE), copyButton: c(0xFFFFFF),
                 font: .sfPro, colorScheme: .light, plateOpacity: 0.92, chromeOpacity: 0.92, usesGlass: true)
         case .pastel:
+            // Палітра coolors.co/512d38-b27092-f4bfdb-ffe9f3; акценти — темніші відтінки B27092 заради контрасту.
             ThemeTokens(
-                background: c(0xF7F3EE), sidebar: c(0xE3EDF7), results: c(0xE8F3EA),
-                text: c(0x2E3440), secondaryText: c(0x565A64), accent: c(0x3F5F92), verseNumber: c(0x565A64),
-                searchHighlight: c(0xFBE3A6), selection: c(0xF6E7EC), sidebarSelection: c(0xCFDDEC), copyButton: c(0xEEE8F6),
+                background: c(0xFFE9F3), sidebar: c(0xF4BFDB), results: c(0xFFF5F9),
+                text: c(0x512D38), secondaryText: c(0x7A3E5E), accent: c(0x8C4A6E), verseNumber: c(0x7A3E5E),
+                searchHighlight: c(0xD6EDDD), selection: c(0xF4BFDB), sidebarSelection: c(0xFFE9F3), copyButton: c(0xFFF5F9),
                 font: .newYork, colorScheme: .light)
         case .manuscript:
             ThemeTokens(

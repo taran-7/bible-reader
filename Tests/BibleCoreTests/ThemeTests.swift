@@ -53,7 +53,7 @@ import Testing
         #expect(glass.background.hex == 0xF2F4F8 && glass.plateOpacity == 0.92 && glass.usesGlass)
         #expect(glass.font == .sfPro)
         let pastel = Theme.tokens(for: .pastel)
-        #expect(pastel.background.hex == 0xF7F3EE && pastel.text.hex == 0x2E3440 && pastel.sidebar.hex == 0xE3EDF7)
+        #expect(pastel.background.hex == 0xFFE9F3 && pastel.text.hex == 0x512D38 && pastel.sidebar.hex == 0xF4BFDB)
         let manuscript = Theme.tokens(for: .manuscript)
         #expect(manuscript.background.hex == 0xEFE4CC && manuscript.text.hex == 0x3B2A1A)
         #expect(manuscript.verseNumber.hex == 0x8B2E1F && manuscript.font == .ebGaramond)
