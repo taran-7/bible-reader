@@ -196,7 +196,7 @@ public enum Theme {
             ThemeTokens(
                 background: c(0xFFE9F3), sidebar: c(0xF4BFDB), results: c(0xFFF5F9),
                 text: c(0x512D38), secondaryText: c(0x7A3E5E), accent: c(0x8C4A6E), verseNumber: c(0x7A3E5E),
-                searchHighlight: c(0xFBE3A6), selection: c(0xF4BFDB), sidebarSelection: c(0xFFE9F3), copyButton: c(0xFFF5F9),
+                searchHighlight: c(0xD6EDDD), selection: c(0xF4BFDB), sidebarSelection: c(0xFFE9F3), copyButton: c(0xFFF5F9),
                 font: .newYork, colorScheme: .light)
         case .manuscript:
             ThemeTokens(
