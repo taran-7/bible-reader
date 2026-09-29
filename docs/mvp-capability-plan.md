@@ -32,6 +32,7 @@
 | 6a | `add-translation-modules` (v2.1) | FR-30 | 6 | зроблено 2026-09-28 (архів `2026-09-28-add-translation-modules`) |
 | 6b | `chapter-picker-popover` (v2.1) | FR-37 | — | зроблено 2026-09-28 (архів `2026-09-28-chapter-picker-popover`) |
 | 4 | `add-illustrations` (v2.2) | FR-33, FR-34, FR-35 | 1a (кнопка поруч із 6.3) | зроблено 2026-09-28 (архів `2026-09-28-add-illustrations`) |
+| 7 | `add-sermon-drafts` (v2.3) | FR-38, FR-39, FR-40 | 1a (кнопка на виділенні), 4 (картка ілюстрації) | зроблено 2026-09-28 (архів `2026-09-28-add-sermon-drafts`) |
 
 Механізми NFR (затверджено 2026-09-27):
 

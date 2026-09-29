@@ -16,6 +16,8 @@ struct BibleReaderApp: App {
         return try UserDatabase(path: UserDatabase.defaultURL(profile: profile))
     }
     @State private var userData = BibleReaderApp.makeUserData()
+    /// Чорнетки проповідей у тій самій базі користувача (FR-38).
+    @State private var drafts = DraftStore(database: try? BibleReaderApp.userDatabase.get())
     @State private var model = ReaderViewModel(positionStore: try? BibleReaderApp.userDatabase.get()) {
         #if DEBUG
         let environment = ProcessInfo.processInfo.environment // BIBLE_READER_DB для UI-тестів
@@ -33,19 +35,24 @@ struct BibleReaderApp: App {
         WindowGroup {
             ContentView(model: model, preferences: preferences)
                 .environment(userData)
+                .environment(drafts)
                 .frame(minWidth: 800, minHeight: 500)
                 .onAppear { TranslationKeyMonitor.install(model: model) }
         }
         .commands {
             ExportCommands(userData: userData, model: model)
             BookmarkCommands(userData: userData, model: model)
+            CommandGroup(after: .sidebar) {
+                Button(drafts.isOpen ? "Сховати чорнетки" : "Чорнетки") { drafts.isOpen.toggle() }
+                    .keyboardShortcut("d", modifiers: [.command, .option])
+            }
             CommandGroup(after: .pasteboard) {
                 Button("Зняти виділення") { model.clearSelection() }
                     .keyboardShortcut(.escape, modifiers: [])
-                    .disabled(!model.canClearSelection)
+                    .disabled(!model.canClearSelection || drafts.isOpen || drafts.isPresenting)
             }
             FindCommands()
-            FontCommands(preferences: preferences)
+            FontCommands(preferences: preferences, drafts: drafts)
             CommandGroup(after: .toolbar) { ThemePicker(preferences: preferences) }
             TranslationCommands(model: model, preferences: preferences)
         }
@@ -76,16 +83,25 @@ struct BibleReaderApp: App {
 
 struct FontCommands: Commands {
     let preferences: PreferencesStore
+    /// У режимі «Проповідь» ⌘+ / ⌘− змінюють його шрифт, а не шрифт читання (FR-40).
+    let drafts: DraftStore
 
     var body: some Commands {
         CommandGroup(after: .toolbar) {
             Divider()
-            Button("Збільшити шрифт") { preferences.preferences.increaseFonts() }
-                .keyboardShortcut("=", modifiers: .command)
-                .disabled(!preferences.preferences.canIncreaseFonts)
-            Button("Зменшити шрифт") { preferences.preferences.decreaseFonts() }
-                .keyboardShortcut("-", modifiers: .command)
-                .disabled(!preferences.preferences.canDecreaseFonts)
+            if drafts.isPresenting {
+                Button("Збільшити шрифт проповіді") { drafts.changeSermonFont(by: 2) }
+                    .keyboardShortcut("=", modifiers: .command)
+                Button("Зменшити шрифт проповіді") { drafts.changeSermonFont(by: -2) }
+                    .keyboardShortcut("-", modifiers: .command)
+            } else {
+                Button("Збільшити шрифт") { preferences.preferences.increaseFonts() }
+                    .keyboardShortcut("=", modifiers: .command)
+                    .disabled(!preferences.preferences.canIncreaseFonts)
+                Button("Зменшити шрифт") { preferences.preferences.decreaseFonts() }
+                    .keyboardShortcut("-", modifiers: .command)
+                    .disabled(!preferences.preferences.canDecreaseFonts)
+            }
             Button("Стандартний розмір") { preferences.preferences.resetFonts() }
                 .keyboardShortcut("0", modifiers: .command)
                 .disabled(preferences.preferences.areFontsDefault)
@@ -165,15 +181,7 @@ struct ExportCommands: Commands {
     }
 
     private func save(name: String, type: UTType, contents: () throws -> Data) {
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = name
-        panel.allowedContentTypes = [type]
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        do {
-            try contents().write(to: url, options: .atomic)
-        } catch {
-            NSAlert(error: error).runModal()
-        }
+        FileExport.save(name: name, type: type, contents: contents)
     }
 }
 

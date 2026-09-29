@@ -14,6 +14,7 @@ struct ChapterView: View {
     /// Вірш, нотатку до якого редагують.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
+    @Environment(DraftStore.self) private var drafts
     /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
     @FocusState private var listFocused: Bool
     @Environment(\.theme) private var theme
@@ -28,13 +29,15 @@ struct ChapterView: View {
         // Дані користувача в нумерації KJV: у Синодальному позначки стають на той самий зміст.
         let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
         let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
-        let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale)
+        let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale, count: buttonCount)
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
                     HStack(alignment: .firstTextBaseline, spacing: 16) {
                         VerseRow(verse: verse, isFocused: verse.verse == model.focusedVerse, fontSize: fontSize,
                                  marks: marks[verse.verse] ?? VerseMarks(), openNote: { editingNote = key(verse.verse) },
+                                 inDrafts: drafts.isMentioned(model.canonicalKeys(verse.verse)),
+                                 openDrafts: { drafts.showMentions(of: model.canonicalKeys(verse.verse)) },
                                  parallelText: spokenParallel(parallel[verse.verse]))
                             .frame(maxWidth: .infinity, alignment: .leading)
                         if let secondary = parallel[verse.verse], let other = model.parallelTranslation {
@@ -49,7 +52,7 @@ struct ChapterView: View {
                         // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
                         // Однакове праве поле в усіх рядках: кнопки на виділенні не налазять на текст,
                         // а виділений вірш не зсувається (запит власника 2026-09-28).
-                        .padding(.trailing, SelectionButton.rowWidth(for: scale, compact: compactButtons))
+                        .padding(.trailing, SelectionButton.rowWidth(for: scale, compact: compactButtons, count: buttonCount))
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
@@ -57,6 +60,9 @@ struct ChapterView: View {
                                     IllustrationsButton { [verses = selection] in illustrations(verses) }
                                     CompareButton { [verses = selection] in compare(verses) }
                                     CopyButton { [verses = selection] in copy(verses) }
+                                    if drafts.isOpen {
+                                        DraftButton { [verses = selection] in addToDraft(verses) }
+                                    }
                                 }
                             }
                         }
@@ -81,6 +87,7 @@ struct ChapterView: View {
                 Button("Копіювати") { copy(verses) }.disabled(verses.isEmpty)
                 Button("Порівняти в перекладах") { compare(verses) }.disabled(verses.isEmpty)
                 Button("Пошук ілюстрацій") { illustrations(verses) }.disabled(verses.isEmpty)
+                Button("В чорнетку") { addToDraft(verses) }.disabled(verses.isEmpty)
                 if let first = verses.min() {
                     Divider()
                     let canonical = key(first)
@@ -145,6 +152,15 @@ struct ChapterView: View {
         model.showIllustrations(for: verses)
     }
 
+    /// «В чорнетку» відкрита лише з панеллю чорнеток: інакше четверта кнопка забирала б місце в кожному рядку.
+    private var buttonCount: Int { drafts.isOpen ? 4 : 3 }
+
+    /// Та сама цитата, що й копіювання, у кінець активної чорнетки (FR-38).
+    private func addToDraft(_ verses: Set<Int>) {
+        guard let quote = model.quote(for: verses) else { return }
+        drafts.append(quote)
+    }
+
     private func copy(_ verses: Set<Int>) {
         guard let quote = model.quote(for: verses) else { return }
         NSPasteboard.general.clearContents()
@@ -159,6 +175,7 @@ struct VerseRow: View {
         if let highlight = marks.highlight { parts.append("підсвітка: \(highlight.title)") }
         if marks.isBookmarked { parts.append("закладка") }
         if marks.hasNote { parts.append("є нотатка") }
+        if inDrafts { parts.append("є в чорнетках") }
         return parts.joined(separator: ", ")
     }
 
@@ -167,6 +184,9 @@ struct VerseRow: View {
     let fontSize: Double
     var marks = VerseMarks()
     var openNote: () -> Void = {}
+    /// Вірш згадано в чорнетці (FR-39): позначка веде до цих чорнеток.
+    var inDrafts = false
+    var openDrafts: () -> Void = {}
     /// Другий переклад для VoiceOver: рядок читається разом із паралельною колонкою.
     var parallelText: String?
     @Environment(\.theme) private var theme
@@ -182,6 +202,13 @@ struct VerseRow: View {
                         Image(systemName: "bookmark.fill")
                             .accessibilityLabel("Закладка")
                             .accessibilityIdentifier("bookmark-mark-\(verse.verse)")
+                    }
+                    if inDrafts {
+                        Button(action: openDrafts) { Image(systemName: "square.and.pencil") }
+                            .buttonStyle(.plain)
+                            .help("Є в чорнетках")
+                            .accessibilityLabel("Є в чорнетках")
+                            .accessibilityIdentifier("draft-mark-\(verse.verse)")
                     }
                     if marks.hasNote {
                         Button(action: openNote) { Image(systemName: "note.text") }

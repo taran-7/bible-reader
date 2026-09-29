@@ -5,6 +5,7 @@ struct ContentView: View {
     @Bindable var model: ReaderViewModel
     let preferences: PreferencesStore
     @Environment(UserData.self) private var userData
+    @Environment(DraftStore.self) private var drafts
     /// Виділені вірші, для яких відкрито вибір перекладів «Порівняти».
     @State private var compareSelection: CompareSelection?
 
@@ -48,6 +49,13 @@ struct ContentView: View {
                         CompareView(comparison: comparison, fontSize: preferences.preferences.verseFontSize,
                                     close: model.closeComparison,
                                     chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
+                    } else if drafts.isOpen {
+                        // Текст ліворуч, чорнетка праворуч — та сама межа, що й для ілюстрацій.
+                        IllustrationsSplit {
+                            chapter
+                        } illustrations: {
+                            DraftsPanel(store: drafts, model: model)
+                        }
                     } else if let request = model.illustrations {
                         // Текст ліворуч вузько (35 %), ілюстрації праворуч ширше (65 %); межу можна тягнути.
                         IllustrationsSplit {
@@ -66,6 +74,16 @@ struct ContentView: View {
                 .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
+            // Праворуч одна панель: чорнетки закривають ілюстрації і навпаки.
+            .onChange(of: drafts.isOpen) { _, open in if open { model.closeIllustrations() } }
+            .onChange(of: model.illustrations) { _, request in if request != nil { drafts.isOpen = false } }
+            // Під режимом «Проповідь» — ні фокусу, ні VoiceOver.
+            .accessibilityHidden(drafts.isPresenting)
+            .overlay {
+                if drafts.isPresenting, drafts.isOpen, drafts.active != nil {
+                    SermonView(store: drafts, model: model)
+                }
+            }
             .sheet(item: $compareSelection) { selection in
                 CompareSetup(current: model.translation, preferences: preferences) { chosen in
                     model.showComparison(of: selection.verses, with: chosen)
@@ -125,13 +143,27 @@ struct DatabaseErrorView: View {
 /// Помилка бази користувача: без неї нотатки тихо губилися б після перезапуску.
 struct UserDataWarning: View {
     @Environment(UserData.self) private var userData
+    @Environment(DraftStore.self) private var drafts
 
     var body: some View {
+        // Чорнетка, що не записалася, інакше зникла б мовчки після перезапуску (рев'ю add-sermon-drafts).
+        if let error = drafts.lastError, !userData.isInMemoryOnly {
+            HStack(spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                Text("Не вдалося зберегти чорнетку: \(error)").textSelection(.enabled)
+                Spacer()
+                Button("Закрити") { drafts.dismissError() }
+            }
+            .padding(8)
+            .background(.bar)
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("drafts-error")
+        }
         if let error = userData.lastError {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                 Text(userData.isInMemoryOnly
-                     ? "Закладки й нотатки не зберігаються: базу користувача не відкрито (\(error))."
+                     ? "Закладки, нотатки й чорнетки не зберігаються: базу користувача не відкрито (\(error))."
                      : "Не вдалося зберегти зміну: \(error)")
                     .textSelection(.enabled)
                 Spacer()

@@ -1,0 +1,35 @@
+{
+  "generatedBy": "review-gate (manual dispatch: code-reviewer, spec-compliance-auditor)",
+  "scope": "add-sermon-drafts",
+  "change": "add-sermon-drafts",
+  "baseRef": "fix/selection-still",
+  "headRef": "feature/sermon-drafts",
+  "dimensions": {
+    "correctness": {
+      "confirmed": 9,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 6,
+      "deferred": 3
+    },
+    "spec-compliance": {
+      "confirmed": 5,
+      "contested": 0,
+      "rejected": 0,
+      "fixed": 2,
+      "deferred": 3
+    }
+  },
+  "fixed": [
+    "C3: draft save errors shown in the warning bar; in-memory warning mentions drafts",
+    "M1: ⌘+ / ⌘− in sermon mode change the sermon font via the View menu (menu shortcuts win over in-view buttons)",
+    "M2/spec 9: panel Esc shortcuts disabled while presenting; UI test checks the panel stays after Esc",
+    "M4: verse range capped at 200 keys (Ин 3:1-9999999 froze the main thread)",
+    "m8: deleting the active draft ends sermon mode; overlay requires the panel to be open",
+    "m9: content under sermon mode hidden from VoiceOver"
+  ],
+  "deferred": "M5 numbering of typed references → tech debt #32 (design decision); m6/m7 debounce and partial insert → #33; spec gaps for delete confirmation / illustration card / context menu UI tests noted",
+  "confirmedTitles": [],
+  "clean": true,
+  "generatedAt": "2026-09-28T19:00:00Z"
+}

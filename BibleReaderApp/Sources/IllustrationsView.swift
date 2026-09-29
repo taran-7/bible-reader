@@ -94,6 +94,8 @@ struct IllustrationCard: View {
     @State private var translating = false
     @State private var translationError: String?
     @State private var request = 0
+    @State private var addedToDraft = false
+    @Environment(DraftStore.self) private var drafts
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
 
@@ -126,6 +128,14 @@ struct IllustrationCard: View {
                     .accessibilityIdentifier("illustration-translate")
                 }
                 Button {
+                    // Те, що зараз на картці (оригінал чи переклад), з джерелом (FR-39).
+                    drafts.append("### " + story.copyText(title: shown.title, text: shown.text))
+                    addedToDraft = true
+                } label: {
+                    Label(addedToDraft ? "Додано" : "В чорнетку", systemImage: addedToDraft ? "checkmark" : "square.and.pencil")
+                }
+                .accessibilityIdentifier("illustration-draft")
+                Button {
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(story.copyText(title: shown.title, text: shown.text), forType: .string)
                     copied = true
@@ -152,6 +162,11 @@ struct IllustrationCard: View {
                 translationError = "Не вдалося перекласти: \(error.localizedDescription)"
             }
         } started: { translating = true })
+        .task(id: addedToDraft) {
+            guard addedToDraft else { return }
+            try? await Task.sleep(for: CopyButtonModel.feedbackDuration)
+            addedToDraft = false
+        }
         .task(id: copied) {
             guard copied else { return }
             try? await Task.sleep(for: CopyButtonModel.feedbackDuration)

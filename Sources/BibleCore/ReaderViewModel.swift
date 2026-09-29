@@ -349,6 +349,22 @@ public final class ReaderViewModel {
         return IllustrationRequest(reference: reference, kjvText: texts, language: translation.language.code)
     }
 
+    /// Текст місця з чорнетки (нумерація KJV) у перекладі на екрані — підказка до живого посилання (FR-38).
+    public func text(of reference: Reference) -> String? {
+        guard let repository, let start = reference.verseStart else { return nil }
+        let first = localReference(book: reference.book, chapter: reference.chapter, verse: start)
+        let last = localReference(book: reference.book, chapter: reference.chapter, verse: reference.verseEnd ?? start)
+        // `localReference` з віршем завжди повертає вірш.
+        let from = first.verseStart!
+        guard let verses = try? repository.verses(book: first.book, chapter: first.chapter, translation: translation)
+        else { return nil }
+        // Діапазон, що переходить у наступний розділ іншої нумерації, — до кінця розділу.
+        let to = last.chapter == first.chapter ? last.verseStart! : Int.max
+        let texts = verses.filter { (from...max(from, to)).contains($0.verse) }.map(\.text)
+        return texts.isEmpty ? nil : texts.joined(separator: " ")
+    }
+
+    /// Цитата виділених віршів для «В чорнетку» — та сама, що й копіювання (FR-38).
     public func quote(for selectedVerses: Set<Int>) -> String? {
         Quote.format(verses.filter { selectedVerses.contains($0.verse) })
     }
