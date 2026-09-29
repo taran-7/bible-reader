@@ -30,32 +30,12 @@ const staged = capture("git diff --cached --name-only --diff-filter=ACM")
   .split("\n")
   .filter(Boolean);
 
-// 1 — secret hygiene
-const envViolations = staged.filter((f) => /(^|\/)\.env(\.|$)/.test(f) && !f.endsWith(".example"));
-if (envViolations.length) {
-  console.error(`pre-commit: refusing to commit env file(s): ${envViolations.join(", ")}`);
-  process.exit(1);
-}
-const SECRET_PATTERNS = [
-  /-----BEGIN (RSA |EC )?PRIVATE KEY-----/,
-  /\b(sk|rk|re|ghp|gho|xox[bap])_[A-Za-z0-9]{16,}\b/,
-  /\bAKIA[0-9A-Z]{16}\b/,
-  /postgres(ql)?:\/\/[^\s'"]+:[^\s'"]+@/,
-];
-for (const file of staged) {
-  if (/\.(png|webm|jpg|jpeg|gif|pdf|ico|woff2?)$/.test(file)) continue;
-  let content = "";
-  try {
-    // argv, not a shell string: a file named `$(cmd)` must not execute (tech debt #8).
-    content = execFileSync("git", ["show", `:${file}`], { encoding: "utf8" }).trim();
-  } catch {
-    continue;
-  }
-  for (const pattern of SECRET_PATTERNS) {
-    if (pattern.test(content)) {
-      console.error(`pre-commit: possible secret in ${file} (pattern ${pattern}). Use env vars; bypass only with an explicit allowlist edit to this hook.`);
-      process.exit(1);
-    }
+// 1 — secret hygiene: спільний сканер (scripts/check-secrets.mjs) — той самий, що в CI.
+{
+  const secrets = spawnSync(process.execPath, ["scripts/check-secrets.mjs", "--staged"], { stdio: "inherit" });
+  if (secrets.status !== 0) {
+    console.error("pre-commit: possible secret staged — ключі API лише в Keychain, не в git.");
+    process.exit(1);
   }
 }
 
