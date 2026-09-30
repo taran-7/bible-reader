@@ -18,6 +18,8 @@ targets:
       - path: Resources/Fonts
         type: folder
         buildPhase: resources
+      # App icon; source: design/app-icon.svg.
+      - path: Resources/Assets.xcassets
     dependencies:
       - package: BibleCore
     settings:
@@ -26,6 +28,7 @@ targets:
         # NFR-1: Apple Silicon only (Intel out of scope, owner decision 2026-09-27).
         ARCHS: arm64
         PRODUCT_NAME: Bible Reader
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Bible Reader
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.reference

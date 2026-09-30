@@ -5,7 +5,7 @@
 Updated: 2026-09-30. The whole plan queue is done and merged (PR #10–#26).
 
 ## State
-- After the plan: sermon drafts FR-38…40 (#22), model curation of illustrations FR-41 (#23), a pink pastel theme with a mint highlight (#24), hooks: a pre-push secret scanner and Claude Code hooks (#25, PD-19), HANDOFF freshness (PD-20), documentation, specs and code comments in English (PD-21).
+- After the plan: sermon drafts FR-38…40 (#22), model curation of illustrations FR-41 (#23), a pink pastel theme with a mint highlight (#24), hooks: a pre-push secret scanner and Claude Code hooks (#25, PD-19), HANDOFF freshness (PD-20), documentation, specs and code comments in English (PD-21), an app icon (open book, `design/app-icon.svg`).
 - Merged into `master`: v1.1 (fonts, copying, themes), v1.2 search ([PR #11](https://github.com/taran-7/bible-reader/pull/11)), v1.3 bookmarks/highlights/notes ([PR #12](https://github.com/taran-7/bible-reader/pull/12)), accessibility and launch < 1 s, v1.5 "Compare", v2.0 parallel view and the KJV ↔ Synodal mapping table, v2.1 translation modules ([PR #13](https://github.com/taran-7/bible-reader/pull/13)), chapter picker ([PR #15](https://github.com/taran-7/bible-reader/pull/15)), a tech debt batch ([PR #16](https://github.com/taran-7/bible-reader/pull/16)), v2.2 illustrations ([PR #18](https://github.com/taran-7/bible-reader/pull/18)), "comfortable reading": a ~75-character column and "Compare" in the main window ([PR #19](https://github.com/taran-7/bible-reader/pull/19)).
 - Slices are archived in `openspec/changes/archive/2026-09-28-*` (review: `review-findings.json` in each); plan: [mvp-capability-plan.md](../../mvp-capability-plan.md).
 - `make test`: 235 tests; `npm run qa:verify`: [automated-verification-latest.md](../../qa/automated-verification-latest.md). UI tests run in CI (locally with `QA_UI_TESTS=1` and an unlocked screen).
@@ -29,14 +29,14 @@ Updated: 2026-09-30. The whole plan queue is done and merged (PR #10–#26).
 
 <!-- BEGIN GENERATED: do not edit by hand, updated by `node scripts/handoff.mjs` -->
 ## Recent changes (from git)
+- 2026-09-30 PR #30: Launch UI test: best of three warm launches (NFR-3) (NFR-3)
+- 2026-09-30 PR #29: PRD: future process improvements (CodeRabbit, GitGuardian) (PD-21)
+- 2026-09-30 PR #28: Fix red master CI: missing design.md in comfortable-reading (FR-15, FR-36)
 - 2026-09-30 PR #27: Docs, specs and code comments in English (PD-21) (FR-1, FR-11, FR-15, FR-22, FR-26, FR-30, FR-31, FR-33, FR-36, FR-37, FR-38, FR-41, FR-8, PD-21)
 - 2026-09-30 PR #26: HANDOFF: згенерований блок і перевірка свіжості (PD-20) (PD-20)
 - 2026-09-29 PR #25: Хуки: pre-push сканер секретів і хуки Claude Code (PD-19)
 - 2026-09-29 PR #24: Пастельна тема: рожева палітра (FR-31, FR-32)
 - 2026-09-29 PR #23: Відбір ілюстрацій моделлю (FR-41) і запобіжники від витоку ключів (PD-18)
-- 2026-09-29 PR #22: Чорнетки проповідей (FR-38…FR-40)
-- 2026-09-28 PR #21: Виділений вірш не зсувається; Esc знімає виділення (PD-17)
-- 2026-09-28 PR #20: Рев'ю останніх слайсів (maker ≠ checker), README і HANDOFF (PD-16, review-gate)
 
 Active openspec changes: none.
 <!-- END GENERATED -->
