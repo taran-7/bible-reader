@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import XCTest
 
-/// UI-докази для тем (FR-31): реальний Settings, реальний рендер, піксель фону під віршами.
+/// UI evidence for themes (FR-31): the real Settings, the real render, the background pixel under verses.
 @MainActor
 final class ThemeUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -10,7 +10,7 @@ final class ThemeUITests: XCTestCase {
     override func setUp() async throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        // Свій профіль користувача: останнє місце попереднього тесту не впливає на цей.
+        // A separate user profile: the previous test's last position does not affect this one.
         app.launchEnvironment = ["BIBLE_READER_PROFILE": UUID().uuidString]
     }
 
@@ -29,7 +29,7 @@ final class ThemeUITests: XCTestCase {
         app.outlineRows.containing(.any, identifier: "verse-\(verse)").firstMatch
     }
 
-    /// Символ фізичної клавіші в поточній розкладці, щоб тест не залежав від неї.
+    /// The physical key's character in the current layout, so the test does not depend on it.
     private func physicalKey(_ keyCode: Int, fallback: String) -> String {
         guard let source = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue(),
               let data = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
@@ -51,7 +51,7 @@ final class ThemeUITests: XCTestCase {
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
         picker.click()
         picker.menuItems[theme].click()
-        // Закриваємо саме вікно налаштувань: ⌘W міг би закрити головне вікно.
+        // Close exactly the settings window: ⌘W could close the main window.
         let settings = app.windows["com_apple_SwiftUI_Settings_window"]
         settings.buttons[XCUIIdentifierCloseWindow].click()
         XCTAssertTrue(settings.waitForNonExistence(timeout: 5))
@@ -79,7 +79,7 @@ final class ThemeUITests: XCTestCase {
         add(attachment)
     }
 
-    /// Колір пікселя в правому полі рядка вірша 1 (там немає тексту).
+    /// The pixel color in the right margin of verse 1's row (there is no text there).
     private func backgroundPixel(saveAs label: String? = nil) -> (r: Int, g: Int, b: Int) {
         let window = app.windows.firstMatch
         let row = verseRow(1)
@@ -124,13 +124,13 @@ final class ThemeUITests: XCTestCase {
         choose("Скло")
         expectBackground(0xF2F4F8, tolerance: 20, "glass")
         choose("Манускрипт")
-        // Текстура ~7 % зсуває піксель від чистого пергаменту.
+        // The ~7 % texture shifts the pixel from pure parchment.
         expectBackground(0xEFE4CC, tolerance: 22, "manuscript")
 
         app.terminate()
         launch(reset: false)
         expectBackground(0xEFE4CC, tolerance: 22, "manuscript-relaunch")
-        // Виділення, кнопка копіювання й підсвітка пошуку в темі — для огляду людиною.
+        // Selection, the copy button and the search highlight in the theme, for human review.
         search("John 3:16")
         XCTAssertTrue(app.buttons.matching(identifier: "copy-button").firstMatch.waitForExistence(timeout: 5))
         attach("manuscript-selection")
@@ -142,7 +142,7 @@ final class ThemeUITests: XCTestCase {
         choose("Світла")
         expectBackground(0xFFFFFF, tolerance: 6, "light")
 
-        // Із фіксованої темної назад до «Як у системі»: вікно має повернутися до схеми macOS.
+        // From a fixed dark theme back to "System": the window must return to the macOS scheme.
         choose("Темна")
         expectBackground(0x121214, tolerance: 6, "dark-again")
         choose("Як у системі")

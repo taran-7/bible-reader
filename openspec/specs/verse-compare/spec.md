@@ -1,30 +1,30 @@
 # verse-compare Specification
 
 ## Purpose
-«Порівняти»: режим у головному вікні — розділ колонками по вибраних перекладах, рядки вирівняні за віршами, виділені вірші підсвічені.
+"Compare" (Порівняти): a mode in the main window: the chapter in columns for the chosen translations, rows aligned by verse, selected verses highlighted.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-36.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-36.
 
 ## Requirements
 
-### Requirement: Порівняння розділу в головному вікні
-На виділенні одного чи кількох віршів SHALL бути кнопка «Порівняти» поруч із копіюванням і пункт контекстного меню. Вони SHALL відкривати вікно вибору перекладів з чекбоксами (переклад на екрані не пропонується — він завжди перша колонка), а після «Порівняти» — режим порівняння в тому самому вікні: увесь розділ колонками по перекладах, рядки вирівняні за віршами перекладу на екрані за таблицею відповідностей (FR-26), виділені вірші підсвічені й прокручені у видиму частину. Заголовок кожної колонки SHALL бути назвою книги мовою її перекладу. ✕ або Esc SHALL повертати до читання; перехід до іншого розділу чи перекладу SHALL закривати порівняння.
+### Requirement: Chapter comparison in the main window
+On a selection of one or more verses there SHALL be a "Compare" button next to copy, and a context menu item. They SHALL open a translation picker with checkboxes (the on-screen translation is not offered, it is always the first column), and after "Compare" a comparison mode in the same window: the whole chapter in columns by translation, rows aligned by the on-screen translation's verses via the mapping table (FR-26), selected verses highlighted and scrolled into view. The header of each column SHALL be the book name in its translation's language. ✕ or Esc SHALL return to reading; moving to another chapter or translation SHALL close the comparison.
 
-#### Scenario: Колонки в головному вікні
-- **WHEN** у KJV виділено John 3:16, натиснуто «Порівняти», знято Kralická і натиснуто «Порівняти»
-- **THEN** у тому самому вікні колонки KJV, Огієнко, Синодальний з усім розділом 3, вірш 16 підсвічено, вірш 15 теж видно
+#### Scenario: Columns in the main window
+- **WHEN** John 3:16 is selected in KJV, "Compare" is pressed, Kralická is unchecked and "Compare" is pressed
+- **THEN** the same window shows columns KJV, Ohienko, Synodal with the whole chapter 3, verse 16 highlighted, verse 15 also visible
 
-#### Scenario: Нумерація Синодального
-- **WHEN** у KJV порівнюють Пс 22 із Синодальним
-- **THEN** поруч із Пс 22:1 KJV стоять Пс 21:1–2 Синодального, а заголовок колонки — «Псалтирь 22»
+#### Scenario: Synodal numbering
+- **WHEN** Ps 22 in KJV is compared with the Synodal
+- **THEN** next to KJV Ps 22:1 stand Synodal Ps 21:1–2, and the column header is «Псалтирь 22»
 
-#### Scenario: Назад до читання
-- **WHEN** у режимі порівняння натиснуто Esc
-- **THEN** знову видно текст розділу
+#### Scenario: Back to reading
+- **WHEN** Esc is pressed in comparison mode
+- **THEN** the chapter text is visible again
 
-### Requirement: Вибір перекладів для порівняння
-Вибрані в чекбоксах переклади SHALL зберігатися між запусками; щонайменше один переклад лишається вибраним.
+### Requirement: Choosing translations to compare
+Translations checked in the picker SHALL persist between launches; at least one translation stays selected.
 
-#### Scenario: Вибір переживає перезапуск
-- **WHEN** зняли Kralická і перезапустили додаток
-- **THEN** у вікні вибору Kralická не вибрано, решта вибрані
+#### Scenario: The choice survives a restart
+- **WHEN** Kralická was unchecked and the app restarted
+- **THEN** in the picker Kralická is unchecked, the rest are checked

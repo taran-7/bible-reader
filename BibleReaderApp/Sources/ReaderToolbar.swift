@@ -5,10 +5,10 @@ struct ReaderToolbar: ToolbarContent {
     @Bindable var model: ReaderViewModel
     let userData: UserData
     @Bindable var preferences: PreferencesStore
-    /// Елементи тулбара живуть у `NSToolbar`, тож масштаб задаємо кожному явно.
+    /// Toolbar items live in `NSToolbar`, so the scale is set on each explicitly.
     let scale: InterfaceScale
 
-    /// Паралельний переклад, що збігся з основним, показується як «Вимкнено».
+    /// A parallel translation equal to the main one shows as "Off".
     private var parallel: Binding<BibleCore.Translation?> {
         Binding(
             get: { preferences.preferences.parallelTranslation == model.translation ? nil : preferences.preferences.parallelTranslation },
@@ -30,7 +30,7 @@ struct ReaderToolbar: ToolbarContent {
                 .disabled(!model.canGoNext)
                 .keyboardShortcut("]", modifiers: .command)
                 .controlSize(scale.controlSize)
-            // Назва розділу — кнопка: розділи відкритої книги донизу (FR-37).
+            // The chapter title is a button: the open book's chapters below it (FR-37).
             Button { model.pickCurrentBook() } label: {
                 HStack(spacing: 4) {
                     Text(verbatim: chapterTitle).font(.headline)
@@ -61,7 +61,7 @@ struct ReaderToolbar: ToolbarContent {
                 .controlSize(scale.controlSize)
         }
         ToolbarItem {
-            // Другий переклад поруч (FR-26); вибір зберігається в налаштуваннях.
+            // The second translation alongside (FR-26); the choice is saved in settings.
             Menu {
                 Picker("Паралельно", selection: parallel) {
                     Text("Вимкнено").tag(BibleCore.Translation?.none)
@@ -79,7 +79,7 @@ struct ReaderToolbar: ToolbarContent {
             .controlSize(scale.controlSize)
         }
         ToolbarItem {
-            // Меню, а не сегменти: перекладів чотири й далі більшатиме; у пунктах — мова.
+            // A menu, not segments: there are four translations and there will be more; items show the language.
             Menu {
                 Picker("Переклад", selection: $model.translation) {
                     ForEach(Translation.allCases, id: \.self) { Text($0.menuTitle).tag($0) }
@@ -96,7 +96,7 @@ struct ReaderToolbar: ToolbarContent {
     }
 }
 
-/// «Чорнетки» в тулбарі (FR-38): панель праворуч від тексту.
+/// "Drafts" in the toolbar (FR-38): a panel to the right of the text.
 struct DraftsToolbarButton: View {
     let scale: InterfaceScale
     @Environment(DraftStore.self) private var drafts

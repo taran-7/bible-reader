@@ -1,22 +1,22 @@
 # Bible Reader
 
-Нативний macOS-додаток (SwiftUI) для читання Біблії офлайн. Capstone курсу fwdays «Crash Course: Agentic Engineering» (2026).
+A native macOS app (SwiftUI) for reading the Bible offline. Capstone of the fwdays course "Crash Course: Agentic Engineering" (2026).
 
-## Що вміє
+## Features
 
-- **Чотири переклади:** KJV, Kralická, Огієнко, Синодальний. Меню й ⌘⌥1…4 працюють на будь-якій розкладці. Новий переклад додається рядком маніфесту, без змін коду.
-- **Паралельний перегляд і «Порівняти»:** вірш поруч в іншому перекладі; «Порівняти» показує весь розділ колонками по вибраних перекладах, рядки вирівняні за віршами. Таблиця відповідностей нумерації KJV ↔ Синодальний підтримує й інші системи через маніфест.
-- **Навігація:** клік по книзі або назві розділу відкриває сітку номерів розділів; ◀ ▶ і ⌘[ ⌘] переходять між розділами.
-- **Пошук:** слова в будь-якій формі (стемінг en/ru/uk/cs), точна фраза в лапках, область (Біблія, СЗ, НЗ, книга), лічильник «Знайдено: N» з довантаженням. Посилання (`Ин 3:16`, `Ів 3:16`, `John 3:16`) відкриває місце.
-- **Цитати:** ⌘C або кнопка на виділенні копіює вірші з посиланням мовою перекладу.
-- **Закладки, підсвітки, нотатки** з пошуком і експортом.
-- **Ілюстрації до проповіді:** живий пошук історій до виділених віршів (WordPress-сайти з allowlist, Вікіпедія, Brave Search з власним ключем), «Перекласти» мовою Біблії на екрані. Відбір моделлю: Claude з власним ключем або модель Apple на Mac формулює запити за змістом вірша, відкидає слабкі історії й пояснює «Чому ця історія». Єдина мережева функція, лише після кліку.
-- **Чорнетки проповідей:** редактор Markdown праворуч від тексту, «В чорнетку» для віршів та ілюстрацій, живі посилання на місця, шаблон проповіді, позначки біля віршів, режим «Проповідь» на все вікно, експорт у Markdown, друк / PDF.
-- **Оформлення:** колонка тексту ~75 знаків по центру, п'ять тем (Світла, Темна, Скло, Пастельна, Манускрипт), розмір шрифтів і масштаб інтерфейсу, доступність з VoiceOver і клавіатури.
+- **Four translations:** KJV, Kralická, Ohienko (Огієнко), Synodal (Синодальний). The menu and ⌘⌥1…4 work on any keyboard layout. A new translation is added with one manifest line, no code changes.
+- **Parallel view and "Compare":** a verse side by side in another translation; "Compare" shows the whole chapter in columns for the chosen translations, rows aligned by verse. The KJV ↔ Synodal numbering map also supports other systems via the manifest.
+- **Navigation:** clicking a book or chapter title opens a grid of chapter numbers; ◀ ▶ and ⌘[ ⌘] move between chapters.
+- **Search:** words in any form (stemming en/ru/uk/cs), exact phrase in quotes, scope (Bible, OT, NT, book), a "Found: N" counter with incremental loading. A reference (`Ин 3:16`, `Ів 3:16`, `John 3:16`) opens the passage.
+- **Quotes:** ⌘C or the button on a selection copies verses with a reference in the translation's language.
+- **Bookmarks, highlights, notes** with search and export.
+- **Sermon illustrations:** live search for stories matching the selected verses (allowlisted WordPress sites, Wikipedia, Brave Search with your own key), "Translate" into the Bible's language on screen. Model curation: Claude with your own key, or the Apple on-device model, writes queries from the verse meaning, drops weak stories and explains "Why this story". The only network feature, and only after a click.
+- **Sermon drafts:** a Markdown editor to the right of the text, "To draft" for verses and illustrations, live passage links, a sermon template, markers next to verses, a full-window "Sermon" mode, Markdown export, print / PDF.
+- **Appearance:** a centered ~75-character text column, five themes (Light, Dark, Glass, Pastel, Manuscript), font size and interface scale, accessibility via VoiceOver and keyboard.
 
-Вимоги: macOS 14+, Apple Silicon.
+Requirements: macOS 14+, Apple Silicon.
 
-## Збірка
+## Build
 
 ```bash
 make db
@@ -24,22 +24,22 @@ cd BibleReaderApp && xcodegen generate
 xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build
 ```
 
-Тести: `make test` (Swift Testing), UI-тести і всі гейти — у CI.
+Tests: `make test` (Swift Testing); UI tests and all gates run in CI.
 
-## Як тут застосовано Agentic Engineering
+## How Agentic Engineering is applied here
 
-| Практика | Де подивитися |
+| Practice | Where to look |
 |---|---|
-| Контекст-інженерія | [AGENTS.md](AGENTS.md) — карта, а не енциклопедія. Статичний контекст: [ARCHITECTURE.md](ARCHITECTURE.md), [core-beliefs.md](docs/design-docs/core-beliefs.md). Динамічний: [HANDOFF.md](docs/exec-plans/active/HANDOFF.md) — стан і наступний крок, оновлюється після кожного слайсу |
-| Специфікації наперед (SDD) | [OpenSpec](openspec/specs/): кожен слайс — `proposal` / `tasks` / delta-спека, `openspec validate --strict` у CI, архів у [openspec/changes/archive](openspec/changes/archive/). Вимоги FR/NFR — [docs/requirements.md](docs/requirements.md) |
-| Верифікація | 235 unit-тестів (Swift Testing) і UI-тести (XCUITest) у CI; ratchet покриття (не падає нижче бази); трасування вимога → тест ([traceability-report.md](docs/qa/traceability-report.md)); перевірка ізоляції мережі (NFR-2) |
-| Maker ≠ checker | Окремі агенти-рецензенти в [.claude/agents](.claude/agents/) (code-reviewer, security-reviewer, spec-compliance-auditor, vision-judge…). Знахідки кожного слайсу — `review-findings.json` в архіві OpenSpec |
-| Цикли (loop engineering) | CI + Auto-fix: падіння перевірки будить агента, він виправляє й пушить сам, людина лише вирішує про мерж. Гейти фабрики `npm run qa:verify` / `npm run gate:status` |
-| Project Factory | [docs/project-factory.md](docs/project-factory.md): гейти, траєкторія слайсів ([trajectory-report.md](docs/qa/trajectory-report.md)) |
+| Context engineering | [AGENTS.md](AGENTS.md) is a map, not an encyclopedia. Static context: [ARCHITECTURE.md](ARCHITECTURE.md), [core-beliefs.md](docs/design-docs/core-beliefs.md). Dynamic: [HANDOFF.md](docs/exec-plans/active/HANDOFF.md), the state and next step, updated after every slice |
+| Spec-driven development (SDD) | [OpenSpec](openspec/specs/): every slice is a `proposal` / `tasks` / delta spec, `openspec validate --strict` in CI, archive in [openspec/changes/archive](openspec/changes/archive/). FR/NFR requirements: [docs/requirements.md](docs/requirements.md) |
+| Verification | 235 unit tests (Swift Testing) and UI tests (XCUITest) in CI; a coverage ratchet (never drops below baseline); requirement → test traceability ([traceability-report.md](docs/qa/traceability-report.md)); a network isolation check (NFR-2) |
+| Maker ≠ checker | Separate reviewer agents in [.claude/agents](.claude/agents/) (code-reviewer, security-reviewer, spec-compliance-auditor, vision-judge…). Each slice's findings are in `review-findings.json` in the OpenSpec archive |
+| Loops (loop engineering) | CI + Auto-fix: a failing check wakes the agent, it fixes and pushes on its own, the human only decides on merging. Factory gates: `npm run qa:verify` / `npm run gate:status` |
+| Project Factory | [docs/project-factory.md](docs/project-factory.md): gates, slice trajectory ([trajectory-report.md](docs/qa/trajectory-report.md)) |
 
-## Документація
+## Documentation
 
-- Для агентів і розробників: [AGENTS.md](AGENTS.md), поточний стан — [HANDOFF.md](docs/exec-plans/active/HANDOFF.md)
-- Архітектура: [ARCHITECTURE.md](ARCHITECTURE.md)
-- Продукт: [PRD](docs/product-specs/prd.md), [вимоги](docs/requirements.md)
-- Процес (Project Factory): [docs/project-factory.md](docs/project-factory.md)
+- For agents and developers: [AGENTS.md](AGENTS.md); current state: [HANDOFF.md](docs/exec-plans/active/HANDOFF.md)
+- Architecture: [ARCHITECTURE.md](ARCHITECTURE.md)
+- Product: [PRD](docs/product-specs/prd.md), [requirements](docs/requirements.md)
+- Process (Project Factory): [docs/project-factory.md](docs/project-factory.md)

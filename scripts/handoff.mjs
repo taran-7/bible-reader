@@ -1,18 +1,18 @@
-// HANDOFF.md без застарівання (PD-20). Файл має дві частини:
-//   - ручну («Стан», «Що далі», «Корисне знати») — її пише людина або агент;
-//   - згенерований блок між маркерами — факти з git, їх пише лише цей скрипт.
+// HANDOFF.md that does not go stale (PD-20). The file has two parts:
+//   - the manual part ("State", "Next", "Good to know"), written by a human or an agent;
+//   - a generated block between markers: facts from git, written only by this script.
 //
-//   node scripts/handoff.mjs              — переписати згенерований блок
-//   node scripts/handoff.mjs --check <base> — CI для PR: код змінено → ручна частина теж має змінитись
-//                                           (або трейлер `Handoff: skip` у будь-якому коміті PR)
+//   node scripts/handoff.mjs                — rewrite the generated block
+//   node scripts/handoff.mjs --check <base> — CI for PRs: code changed → the manual part must change too
+//                                             (or a `Handoff: skip` trailer in any PR commit)
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 
 export const HANDOFF = "docs/exec-plans/active/HANDOFF.md";
-export const BEGIN = "<!-- BEGIN GENERATED: не редагувати вручну, оновлює `node scripts/handoff.mjs` -->";
+export const BEGIN = "<!-- BEGIN GENERATED: do not edit by hand, updated by `node scripts/handoff.mjs` -->";
 export const END = "<!-- END GENERATED -->";
 
-/** Шляхи, зміна яких означає нову поведінку продукту. */
+/** Paths whose changes mean new product behavior. */
 const PRODUCT = /^(Sources|Tests|BibleReaderApp)\//;
 const IGNORED = /^BibleReaderApp\/BibleReader\.xcodeproj\//;
 
@@ -23,7 +23,7 @@ export function replaceBlock(text, block) {
   return text.slice(0, start) + wrapped + text.slice(end + END.length);
 }
 
-/** Текст без згенерованого блоку й без рядка «Оновлено…» не рахується як ручна правка. */
+/** The text without the generated block: changes inside the block do not count as a manual edit. */
 export function manualPart(text) {
   const start = text.indexOf(BEGIN), end = text.indexOf(END);
   const body = start === -1 || end === -1 ? text : text.slice(0, start) + text.slice(end + END.length);
@@ -34,26 +34,26 @@ export function touchesProduct(files) {
   return files.some((file) => PRODUCT.test(file) && !IGNORED.test(file));
 }
 
-/** Причина падіння або null. */
+/** The failure reason or null. */
 export function checkPr({ files, before, after, messages }) {
   if (!touchesProduct(files)) return null;
   if (messages.some((message) => /^Handoff:\s*skip\b/im.test(message))) return null;
   if (manualPart(before) !== manualPart(after)) return null;
-  return `PR змінює код продукту, але ручна частина ${HANDOFF} не оновлена.\n` +
-    "Онови «Стан» / «Що далі», або додай трейлер `Handoff: skip` у коміт, якщо стан для наступного агента не змінився.";
+  return `the PR changes product code, but the manual part of ${HANDOFF} is not updated.\n` +
+    "Update \"State\" / \"Next\", or add a `Handoff: skip` trailer to a commit if the state for the next agent did not change.";
 }
 
 export function renderBlock({ merges, branch, changes }) {
-  const lines = ["## Останні зміни (з git)"];
+  const lines = ["## Recent changes (from git)"];
   for (const merge of merges) {
     const refs = merge.refs.length ? ` (${merge.refs.join(", ")})` : "";
     lines.push(`- ${merge.date} PR #${merge.pr}: ${merge.title}${refs}`);
   }
   if (branch.length) {
-    lines.push("", "Ще не в master (поточна гілка):");
+    lines.push("", "Not in master yet (current branch):");
     for (const commit of branch) lines.push(`- ${commit.date} ${commit.subject}`);
   }
-  lines.push("", `Активні зміни openspec: ${changes.length ? changes.map((c) => `\`${c}\``).join(", ") : "немає"}.`);
+  lines.push("", `Active openspec changes: ${changes.length ? changes.map((c) => `\`${c}\``).join(", ") : "none"}.`);
   return lines.join("\n");
 }
 
@@ -91,7 +91,7 @@ function main(argv) {
   const text = readFileSync(HANDOFF, "utf8");
   const next = replaceBlock(text, renderBlock(collect()));
   if (next !== text) writeFileSync(HANDOFF, next);
-  console.log(`handoff: згенерований блок ${next !== text ? "оновлено" : "актуальний"}`);
+  console.log(`handoff: generated block ${next !== text ? "updated" : "up to date"}`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) main(process.argv.slice(2));

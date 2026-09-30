@@ -7,17 +7,17 @@ xcuserdata/
 *.sqlite
 *.sqlite.tmp
 
-# Project Factory: лише тимчасове (docs/qa/** комітимо як доказ)
+# Project Factory: temporary files only (docs/qa/** is committed as evidence)
 node_modules/
 coverage/
 **/raw/
 trace/ledger.jsonl
 trace/ledger-*.jsonl
 
-# Release-збірка для check-platform (NFR-1, NFR-5)
+# Release build for check-platform (NFR-1, NFR-5)
 build/
 
-# Секрети: ключі API лише в Keychain (scripts/check-secrets.mjs, PD-18).
+# Secrets: API keys live only in the Keychain (scripts/check-secrets.mjs, PD-18).
 .env
 .env.*
 !.env.example

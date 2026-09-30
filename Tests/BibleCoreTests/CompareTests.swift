@@ -18,7 +18,7 @@ import Testing
         #expect(panels.visible == [.kjv, .ohienko, .synodal, .bkr])
         panels.add(.bkr)
         #expect(panels.visible.count == 4)
-        // Останню панель не закрити: вікно без перекладів не має сенсу.
+        // The last panel cannot be closed: a window without translations makes no sense.
         for translation in [Translation.kjv, .ohienko, .synodal] { panels.close(translation) }
         #expect(panels.visible == [.bkr])
         #expect(!panels.canClose)
@@ -44,7 +44,7 @@ import Testing
         preferences.comparePanels.close(.synodal)
         let decoded = try JSONDecoder().decode(ReadingPreferences.self, from: JSONEncoder().encode(preferences))
         #expect(decoded.comparePanels.visible == [.kjv, .bkr, .ohienko])
-        // Невідомі й повторені переклади відкидаємо; порожній список — стандартний.
+        // Unknown and repeated translations are dropped; an empty list means the default.
         let odd = try JSONDecoder().decode(ReadingPreferences.self, from: Data(#"{"comparePanels":["kjv","xx","kjv","bkr"]}"#.utf8))
         #expect(odd.comparePanels.visible == [.kjv, .bkr])
         let empty = try JSONDecoder().decode(ReadingPreferences.self, from: Data(#"{"comparePanels":[]}"#.utf8))
@@ -63,13 +63,13 @@ import Testing
     @Test func testWholeChapterInColumnsAlignedByVerse() throws {
         let model = makeModel()
         model.open(Location(book: 19, chapter: 22))
-        // Переклад на екрані — перша колонка, навіть якщо його вибрано ще раз.
+        // The on-screen translation is the first column, even if chosen again.
         model.showComparison(of: [3, 1], with: [.synodal, .kjv, .ohienko])
         let comparison = try #require(model.comparison)
         #expect(comparison.translations == [.kjv, .synodal, .ohienko])
         #expect(comparison.rows.count == model.verses.count)
         #expect(comparison.highlighted == [1, 3])
-        // Пс 22:1 KJV — надпис і Пс 21:2 Синодального; Огієнко — вірш у вірш.
+        // KJV Ps 22:1 is the superscription and Synodal Ps 21:2; Ohienko is verse for verse.
         #expect(comparison.rows[0].others[0].map { "\($0.chapter):\($0.verse)" } == ["21:1", "21:2"])
         #expect(comparison.rows[0].others[1].map(\.verse) == [1])
         #expect(comparison.title(of: .synodal) == "Псалтирь 22")
@@ -87,7 +87,7 @@ import Testing
         #expect(model.comparison == nil)
         model.showComparison(of: [16], with: [.synodal])
         #expect(model.comparison?.rows.first?.id == 1)
-        // Інший розділ — порівняння закривається.
+        // Another chapter closes the comparison.
         model.goNext()
         #expect(model.comparison == nil)
         #expect(ReaderViewModel { throw FakeRepository.Boom() }.comparison == nil)

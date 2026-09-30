@@ -1,41 +1,41 @@
 # parallel-reading Specification
 
 ## Purpose
-Два переклади поруч і таблиця відповідностей нумерації KJV ↔ Синодальний: паралельні рядки, перемикання перекладу зі збереженням вірша, дані користувача на відповідному вірші.
+Two translations side by side and the KJV ↔ Synodal numbering mapping table: parallel rows, switching translation while keeping the verse, user data on the corresponding verse.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-26, FR-27.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-26, FR-27.
 
 ## Requirements
 
-### Requirement: Паралельний перегляд
-Користувач SHALL мати змогу показати поруч другий переклад: кожен рядок містить вірш основного перекладу й відповідні вірші другого, тож прокручування синхронне. Вибір другого перекладу SHALL зберігатися між запусками.
+### Requirement: Parallel view
+The user SHALL be able to show a second translation alongside: each row holds a verse of the main translation and the corresponding verses of the second, so scrolling is synchronized. The choice of the second translation SHALL persist between launches.
 
-#### Scenario: Псалом із надписом
-- **WHEN** у KJV відкрито Пс 22 і поруч обрано Синодальний
-- **THEN** біля Пс 22:1 KJV стоять Пс 21:1 (надпис) і 21:2 Синодального
+#### Scenario: A psalm with a superscription
+- **WHEN** Ps 22 is open in KJV and the Synodal is chosen alongside
+- **THEN** next to KJV Ps 22:1 stand Synodal Ps 21:1 (superscription) and 21:2
 
-#### Scenario: Вірш на межі розділів
-- **WHEN** у KJV відкрито Йону 1 з Синодальним поруч
-- **THEN** біля Йони 1:17 стоїть Йона 2:1 Синодального
+#### Scenario: A verse at a chapter boundary
+- **WHEN** Jonah 1 is open in KJV with the Synodal alongside
+- **THEN** next to Jonah 1:17 stands Synodal Jonah 2:1
 
-### Requirement: Таблиця відповідностей нумерації
-Система SHALL зіставляти вірші KJV (і перекладів з тією ж нумерацією) з віршами Синодального й навпаки: Псалми за Септуагінтою з надписами, межі розділів і злиті вірші в інших книгах. Вірші без відповідника (доповнення Септуагінти) SHALL не мати пари.
+### Requirement: Numbering mapping table
+The system SHALL map verses of KJV (and translations with the same numbering) to Synodal verses and back: Psalms per the Septuagint with superscriptions, chapter boundaries and merged verses in other books. Verses without a counterpart (Septuagint additions) SHALL have no pair.
 
-#### Scenario: Критерій PRD
-- **WHEN** зіставляють Пс 22:1 KJV
-- **THEN** результат — Пс 21:2 Синодального, і навпаки
+#### Scenario: PRD criterion
+- **WHEN** KJV Ps 22:1 is mapped
+- **THEN** the result is Synodal Ps 21:2, and vice versa
 
-#### Scenario: Повнота
-- **WHEN** зіставляють кожен вірш KJV
-- **THEN** кожен має наявний вірш Синодального
+#### Scenario: Completeness
+- **WHEN** every KJV verse is mapped
+- **THEN** each has an existing Synodal verse
 
-### Requirement: Перемикання перекладу зберігає вірш
-Перемикання перекладу SHALL відкривати розділ і вірш з тим самим змістом у нумерації нового перекладу: перший виділений вірш, а без виділення — розділ першого вірша. Нотатки, підсвітки й закладки SHALL показуватися на відповідному вірші в будь-якому перекладі.
+### Requirement: Switching translation keeps the verse
+Switching translation SHALL open the chapter and verse with the same content in the new translation's numbering: the first selected verse, and without a selection, the chapter of the first verse. Notes, highlights and bookmarks SHALL show on the corresponding verse in any translation.
 
-#### Scenario: Пс 22:1 → Синодальний
-- **WHEN** у KJV виділено Пс 22:1 і перемкнуто на Синодальний
-- **THEN** відкрито Пс 21 з виділеним віршем 2
+#### Scenario: Ps 22:1 → Synodal
+- **WHEN** Ps 22:1 is selected in KJV and the Synodal is switched on
+- **THEN** Ps 21 opens with verse 2 selected
 
-#### Scenario: Нотатка в Синодальному
-- **WHEN** до Пс 22:1 KJV є нотатка і відкрито Синодальний Пс 21
-- **THEN** значок нотатки стоїть біля вірша 2
+#### Scenario: A note in the Synodal
+- **WHEN** KJV Ps 22:1 has a note and Synodal Ps 21 is open
+- **THEN** the note icon is next to verse 2

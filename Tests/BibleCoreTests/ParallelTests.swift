@@ -19,12 +19,12 @@ import Testing
         model.translation = .ohienko
         #expect(model.location == Location(book: 19, chapter: 22))
         #expect(model.takeFocus() == 1)
-        // Без виділення — перший вірш розділу, без фокусу.
+        // Without a selection: the first verse of the chapter, no focus.
         model.anchorVerse = nil
         model.translation = .synodal
         #expect(model.location == Location(book: 19, chapter: 21))
         #expect(model.takeFocus() == nil)
-        // Розділ без відповідника (Пс 151) лишається на місці.
+        // A chapter without a counterpart (Ps 151) stays in place.
         model.open(Location(book: 19, chapter: 151))
         model.translation = .kjv
         #expect(model.location == Location(book: 19, chapter: 150))
@@ -47,12 +47,12 @@ import Testing
         model.parallelTranslation = .synodal
         let rows = model.parallelRows
         #expect(rows.count == model.verses.count)
-        // Пс 22:1 KJV поруч з надписом і Пс 21:2 Синодального.
+        // KJV Ps 22:1 next to the superscription and Synodal Ps 21:2.
         #expect(rows[0].primary.verse == 1)
         #expect(rows[0].secondary.map(\.verse) == [1, 2])
         #expect(rows[0].secondary.map(\.chapter) == [21, 21])
         #expect(rows[1].secondary.map(\.verse) == [3])
-        // Однакова нумерація — вірш у вірш.
+        // The same numbering: verse for verse.
         model.parallelTranslation = .ohienko
         #expect(model.parallelRows.allSatisfy { $0.secondary.map(\.verse) == [$0.primary.verse] })
         model.parallelTranslation = nil
@@ -62,16 +62,16 @@ import Testing
     // @trace FR-26
     @Test func testParallelAcrossChapterBoundaryAndMerges() {
         let model = makeModel()
-        // Йона 1:17 KJV = Йона 2:1 Синодального.
+        // KJV Jonah 1:17 = Synodal Jonah 2:1.
         model.open(Location(book: 32, chapter: 1))
         model.parallelTranslation = .synodal
         #expect(model.parallelRows.last?.secondary.map { "\($0.chapter):\($0.verse)" } == ["2:1"])
-        // Дії 19:40–41 KJV — один вірш 19:40: він стоїть біля першого, другий рядок порожній.
+        // KJV Acts 19:40–41 is one verse 19:40: it stands next to the first, the second row is empty.
         model.open(Location(book: 44, chapter: 19))
         let rows = model.parallelRows
         #expect(rows[39].secondary.map(\.verse) == [40])
         #expect(rows[40].secondary.isEmpty)
-        // Синодальний основним: доповнення (Дан 3:24–90) — окремі рядки без пари не губляться.
+        // The Synodal as the main one: additions (Dan 3:24–90) are separate rows, unpaired ones are not lost.
         model.translation = .synodal
         model.open(Location(book: 27, chapter: 3))
         model.parallelTranslation = .kjv
@@ -96,17 +96,17 @@ extension ParallelTests {
         let model = makeModel()
         model.translation = .synodal
         model.open(Location(book: 19, chapter: 21))
-        // Пс 21:2 Синодального — це Пс 22:1 KJV; надпис (21:1) теж веде до 22:1.
+        // Synodal Ps 21:2 is KJV Ps 22:1; the superscription (21:1) also leads to 22:1.
         #expect(model.canonicalKey(2) == VerseKey(book: 19, chapter: 22, verse: 1))
         #expect(model.canonicalChapter == Bookmark.Target(book: 19, chapter: 22, verse: nil))
         #expect(model.localReference(book: 19, chapter: 22, verse: 1).format(in: .synodal) == "Пс. 21:2")
-        // Пс 23 KJV без надпису-вірша: Пс 22:1 Синодального.
+        // KJV Ps 23 without a superscription verse: Synodal Ps 22:1.
         model.openCanonical(book: 19, chapter: 23, verse: 1)
         #expect(model.location == Location(book: 19, chapter: 22))
         #expect(model.takeFocus() == 1)
         model.openNote(VerseKey(book: 19, chapter: 22, verse: 1))
         #expect(model.location == Location(book: 19, chapter: 21))
-        // Доповнення Септуагінти без відповідника — власний номер.
+        // Septuagint additions without a counterpart keep their own number.
         model.open(Location(book: 27, chapter: 3))
         #expect(model.canonicalKey(30) == VerseKey(book: 27, chapter: 3, verse: 30))
     }
@@ -127,21 +127,21 @@ extension ParallelTests {
     // @trace FR-27
     @Test func testRemapFallsBackToPreviousMappedVerseAndMergedMarks() throws {
         let model = makeModel()
-        // Синодальний Дан 3:50 (пісня трьох юнаків) → KJV Дан 3:23, останній вірш із відповідником перед нею.
+        // Synodal Dan 3:50 (the song of the three youths) → KJV Dan 3:23, the last verse with a counterpart before it.
         model.translation = .synodal
         model.open(Location(book: 27, chapter: 3))
         model.anchorVerse = 50
         model.translation = .kjv
         #expect(model.location == Location(book: 27, chapter: 3))
         #expect(model.takeFocus() == 23)
-        // Лев 14:55 Синодального = KJV 14:55–56: позначки обох.
+        // Synodal Lev 14:55 = KJV 14:55–56: the marks of both.
         model.translation = .synodal
         model.open(Location(book: 3, chapter: 14))
         #expect(model.canonicalKeys(55) == [VerseKey(book: 3, chapter: 14, verse: 55), VerseKey(book: 3, chapter: 14, verse: 56)])
         let data = UserData(database: try UserDatabase.inMemory())
         data.setNote("n", for: VerseKey(book: 3, chapter: 14, verse: 56))
         #expect(data.marks(for: model.canonicalKeys(55)).hasNote)
-        // Закладка розділу Чис 13 Синодального — KJV Чис 13, хоч перший вірш — KJV 12:16.
+        // A chapter bookmark on Synodal Num 13 is KJV Num 13, although the first verse is KJV 12:16.
         model.open(Location(book: 4, chapter: 13))
         #expect(model.canonicalChapter == Bookmark.Target(book: 4, chapter: 13, verse: nil))
         model.translation = .kjv
@@ -149,7 +149,7 @@ extension ParallelTests {
     }
 }
 
-/// Другий переклад не читається: паралельна колонка порожня, а не помилка всього розділу.
+/// The second translation cannot be read: the parallel column is empty, not an error for the whole chapter.
 final class FailingSecondRepository: BibleRepository, @unchecked Sendable {
     let base = FakeRepository()
     func books(translation: Translation) throws -> [Book] { try base.books(translation: translation) }

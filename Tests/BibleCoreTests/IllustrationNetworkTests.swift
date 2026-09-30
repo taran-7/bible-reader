@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import BibleCore
 
-/// Підставний `URLProtocol`: відповідає без мережі і запам'ятовує запит.
+/// A stub `URLProtocol`: answers without network and remembers the request.
 final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var result: Result<(Int, Data), URLError> = .success((200, Data()))
     nonisolated(unsafe) static var lastRequest: URLRequest?
@@ -25,7 +25,7 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     }
 }
 
-/// Мережевий файл ілюстрацій (NFR-2) без справжньої мережі; тести послідовні — спільний стан заглушки.
+/// The illustrations network file (NFR-2) without a real network; tests are serialized because of the stub's shared state.
 @Suite(.serialized) struct IllustrationNetworkTests {
     func network() -> IllustrationNetwork {
         let configuration = URLSessionConfiguration.ephemeral
@@ -75,7 +75,7 @@ final class StubURLProtocol: URLProtocol, @unchecked Sendable {
         } catch {
             #expect(error as? IllustrationError != .offline)
         }
-        // Шлях без «/» на початку — URLComponents не збирає адресу.
+        // A path without a leading "/": URLComponents does not build the address.
         await #expect(throws: (any Error).self) {
             try await network().get(host: "www.imb.org", path: "no-slash", query: [], headers: [:])
         }

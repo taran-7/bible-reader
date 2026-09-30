@@ -2,7 +2,7 @@ import Foundation
 import GRDB
 import Observation
 
-/// Чорнетка проповіді чи кількох думок (FR-38): назва і текст Markdown.
+/// A draft of a sermon or a few thoughts (FR-38): a title and Markdown text.
 public struct Draft: Identifiable, Equatable, Codable, Sendable {
     public let id: String
     public var title: String
@@ -18,23 +18,23 @@ public struct Draft: Identifiable, Equatable, Codable, Sendable {
         self.updated = updated
     }
 
-    /// Назва для списку й заголовків; порожня — «Без назви».
+    /// The title for the list and headers; an empty one shows as «Без назви» (Untitled).
     public var displayTitle: String {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? "Без назви" : trimmed
     }
 
-    /// Початок тексту одним рядком для списку.
+    /// The start of the text as one line for the list.
     public var preview: String {
         let line = text.split(whereSeparator: \.isNewline).map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }.joined(separator: " ")
         return line.count > 120 ? String(line.prefix(120)) + "…" : line
     }
 
-    /// Markdown-файл: `# назва`, порожній рядок, текст (FR-40).
+    /// A Markdown file: `# title`, an empty line, the text (FR-40).
     public var markdown: String { "# \(displayTitle)\n\n\(text.trimmingCharacters(in: .whitespacesAndNewlines))\n" }
 
-    /// Шаблон «Нова проповідь» (FR-39).
+    /// The "New sermon" template (FR-39).
     public static let sermonTemplate = """
         ## Тема
 
@@ -57,26 +57,26 @@ public struct Draft: Identifiable, Equatable, Codable, Sendable {
         """
 }
 
-/// Посилання на місце, знайдене в тексті чорнетки.
+/// A passage reference found in the draft text.
 public struct DraftReference: Equatable, Sendable {
     public let range: Range<String.Index>
     public let reference: Reference
     static let maxRange = 200
 
-    /// Вірші посилання в нумерації KJV: діапазон — кожен вірш.
+    /// The reference's verses in KJV numbering: every verse of a range.
     public var keys: [VerseKey] {
-        // `find` повертає лише посилання з віршем.
+        // `find` returns only references with a verse.
         let start = reference.verseStart!
         var end = start
-        // Найдовший розділ — 176 віршів: «Ин 3:1-9999999» не має створювати мільйони ключів на кожен символ.
+        // The longest chapter has 176 verses: «Ин 3:1-9999999» must not create millions of keys on every keystroke.
         if let verseEnd = reference.verseEnd { end = min(verseEnd, start + Self.maxRange) }
         return (start...end).map { VerseKey(book: reference.book, chapter: reference.chapter, verse: $0) }
     }
 }
 
-/// Живі посилання в тексті (FR-38): до трьох слів назви книги, `розділ:вірш`, необов'язковий діапазон.
-/// Кожен кандидат перевіряє `Reference.parse`, від найдовшої назви до найкоротшої: так «див. Ин 3:16» дає «Ин 3:16»,
-/// а «1 Кор 13:4» — не «Кор 13:4». Без вірша (`Ин 3`) не розпізнаємо: забагато хибних збігів у звичайному тексті.
+/// Live references in the text (FR-38): up to three words of a book name, `chapter:verse`, an optional range.
+/// Each candidate is checked by `Reference.parse`, from the longest name to the shortest: so «див. Ин 3:16» gives «Ин 3:16»,
+/// and «1 Кор 13:4» is not «Кор 13:4». Without a verse (`Ин 3`) we do not recognize it: too many false matches in plain text.
 public enum DraftReferences {
     private static var pattern: Regex<(Substring, Substring, Substring, Substring, Substring?)> { #/((?:[1-3]\s?)?\p{L}[\p{L}'’ʼ]*\.?(?:\s+(?:[1-3]\s?)?\p{L}[\p{L}'’ʼ]*\.?){0,2})\s*(\d+)\s*:\s*(\d+)(?:\s*[-–]\s*(\d+))?/# }
 
@@ -84,7 +84,7 @@ public enum DraftReferences {
         var found: [DraftReference] = []
         for match in text.matches(of: pattern) {
             let numbers = text[match.output.1.endIndex..<match.range.upperBound]
-            // Слова назви з їхніми позиціями: пробуємо від найдовшого хвоста до одного слова.
+            // Name words with their positions: try from the longest tail down to one word.
             let prefix = match.output.1
             let starts = prefix.indices.filter { index in
                 index == prefix.startIndex || (!prefix[index].isWhitespace && prefix[prefix.index(before: index)].isWhitespace)
@@ -101,29 +101,29 @@ public enum DraftReferences {
     }
 }
 
-/// Чорнетки в базі користувача (FR-38…FR-40): кожна зміна одразу пишеться; активна чорнетка і стан панелі — для SwiftUI.
+/// Drafts in the user database (FR-38…FR-40): every change is written immediately; the active draft and panel state are for SwiftUI.
 @MainActor @Observable
 public final class DraftStore {
-    /// Найновіші першими.
+    /// Newest first.
     public private(set) var drafts: [Draft] = []
     public private(set) var lastError: String?
-    /// Чорнетка в редакторі; «В чорнетку» дописує саме в неї.
+    /// The draft in the editor; "To draft" appends to exactly this one.
     public var activeID: String?
-    /// Панель «Чорнетки» праворуч від тексту.
+    /// The "Drafts" panel to the right of the text.
     public var isOpen = false
-    /// Режим «Проповідь»: активна чорнетка на все вікно (FR-40).
+    /// "Sermon" mode: the active draft across the whole window (FR-40).
     public var isPresenting = false
-    /// Розмір шрифту режиму «Проповідь»: ⌘+ / ⌘− меню «Вигляд» змінюють його, поки режим відкритий.
+    /// The "Sermon" mode font size: ⌘+ / ⌘− in the View menu change it while the mode is open.
     public private(set) var sermonFontSize = 30.0
 
-    /// Крок ⌘+ / ⌘− у режимі «Проповідь»; межі 16…72 pt.
+    /// The ⌘+ / ⌘− step in "Sermon" mode; limits 16…72 pt.
     public func changeSermonFont(by delta: Double) {
         sermonFontSize = min(max(sermonFontSize + delta, 16), 72)
     }
-    /// Список лише чорнеток, що згадують цей вірш (клік по позначці біля вірша, FR-39); `nil` — усі.
+    /// The list shows only drafts mentioning this verse (a click on the marker next to the verse, FR-39); `nil` means all.
     public var mentionFilter: VerseKey?
-    /// Вірш KJV → чорнетки, що на нього посилаються. Спостережуваний: позначки біля віршів (FR-39)
-    /// мають з'явитися, щойно посилання потрапило в чорнетку, а не при наступному перемальовуванні.
+    /// KJV verse → drafts referencing it. Observable: markers next to verses (FR-39)
+    /// must appear as soon as a reference lands in a draft, not on the next redraw.
     private var mentions: [VerseKey: Set<String>] = [:]
 
     @ObservationIgnored private let database: UserDatabase?
@@ -140,7 +140,7 @@ public final class DraftStore {
 
     public var active: Draft? { drafts.first { $0.id == activeID } }
 
-    /// Список для панелі: пошук за назвою і текстом (без регістру й «ё»), фільтр за віршем.
+    /// The panel list: search by title and text (ignoring case and «ё»), filter by verse.
     public func list(matching query: String) -> [Draft] {
         let needle = SearchText.fold(query.trimmingCharacters(in: .whitespacesAndNewlines)).lowercased()
         return drafts.filter { draft in
@@ -149,7 +149,7 @@ public final class DraftStore {
         }
     }
 
-    /// Нова чорнетка стає активною і першою в списку.
+    /// A new draft becomes active and first in the list.
     @discardableResult
     public func create(title: String = "", text: String = "") -> Draft {
         let date = now()
@@ -162,11 +162,11 @@ public final class DraftStore {
         return draft
     }
 
-    /// «Нова проповідь» (FR-39).
+    /// "New sermon" (FR-39).
     @discardableResult
     public func createSermon() -> Draft { create(text: Draft.sermonTemplate) }
 
-    /// Зміна назви чи тексту; чорнетка піднімається нагору списку.
+    /// A title or text change; the draft moves to the top of the list.
     public func update(_ id: String, title: String? = nil, text: String? = nil) {
         guard let position = drafts.firstIndex(where: { $0.id == id }) else { return }
         var draft = drafts[position]
@@ -191,7 +191,7 @@ public final class DraftStore {
         unindex(id)
     }
 
-    /// «В чорнетку»: абзацом у кінець активної чорнетки; без активної — нова (FR-38, FR-39).
+    /// "To draft": a paragraph at the end of the active draft; without an active one, a new draft (FR-38, FR-39).
     public func append(_ snippet: String) {
         let snippet = snippet.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !snippet.isEmpty else { return }
@@ -203,12 +203,12 @@ public final class DraftStore {
         update(draft.id, text: (body.isEmpty ? "" : body + "\n\n") + snippet + "\n")
     }
 
-    /// Хоч одна чорнетка посилається на один із цих віршів KJV (злитий вірш Синодального — кілька ключів).
+    /// At least one draft references one of these KJV verses (a merged Synodal verse has several keys).
     public func isMentioned(_ keys: [VerseKey]) -> Bool {
         keys.contains { !(mentions[$0]?.isEmpty ?? true) }
     }
 
-    /// Клік по позначці біля вірша: панель зі списком чорнеток, що його згадують.
+    /// A click on the marker next to a verse: the panel with the list of drafts mentioning it.
     public func showMentions(of keys: [VerseKey]) {
         mentionFilter = keys.first { !(mentions[$0]?.isEmpty ?? true) }
         activeID = nil
@@ -217,7 +217,7 @@ public final class DraftStore {
 
     public func dismissError() { lastError = nil }
 
-    // MARK: Індекс і база
+    // MARK: Index and database
 
     private func index(_ draft: Draft) {
         unindex(draft.id)
@@ -245,7 +245,7 @@ public final class DraftStore {
         }
     }
 
-    /// `false` — запис не вдався, стан у пам'яті не міняємо. Без бази — лише пам'ять.
+    /// `false`: the write failed, the in-memory state is not changed. Without a database, memory only.
     private func write(_ sql: String, _ arguments: StatementArguments) -> Bool {
         guard let database else { return true }
         do {
@@ -258,8 +258,8 @@ public final class DraftStore {
     }
 }
 
-/// Блок чорнетки для перегляду, режиму «Проповідь» і друку (FR-38, FR-40). Рядок `inline` — Markdown
-/// лише з виділенням і посиланнями: заголовки й списки SwiftUI `Text` сам не малює, тож блоки розбираємо тут.
+/// A draft block for the preview, "Sermon" mode and printing (FR-38, FR-40). An `inline` string is Markdown
+/// with emphasis and links only: SwiftUI `Text` does not draw headings and lists itself, so blocks are parsed here.
 public enum DraftBlock: Equatable, Sendable {
     case heading(level: Int, inline: String)
     case bullet(inline: String)
@@ -268,7 +268,7 @@ public enum DraftBlock: Equatable, Sendable {
 }
 
 public enum DraftRendering {
-    /// Схема посилань на місця в перегляді; обробляє `OpenURLAction` додатка.
+    /// The URL scheme for passage links in the preview; handled by the app's `OpenURLAction`.
     public static let linkScheme = "biblereader"
 
     public static func blocks(_ text: String) -> [DraftBlock] {
@@ -290,7 +290,7 @@ public enum DraftRendering {
         return blocks
     }
 
-    /// Посилання на місця → Markdown-посилання `[Ин 3:16](biblereader:43/3/16-16)`.
+    /// Passage references → Markdown links `[Ин 3:16](biblereader:43/3/16-16)`.
     static func linked(_ line: String) -> String {
         var result = ""
         var cursor = line.startIndex
@@ -304,7 +304,7 @@ public enum DraftRendering {
         return result + line[cursor...]
     }
 
-    /// Посилання з перегляду назад у місце; `nil` — чуже посилання (відкриється браузером).
+    /// A link from the preview back to a passage; `nil` means a foreign link (opens in the browser).
     public static func reference(fromLink link: String) -> Reference? {
         let prefix = linkScheme + ":"
         guard link.hasPrefix(prefix) else { return nil }

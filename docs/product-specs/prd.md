@@ -1,158 +1,158 @@
-# PRD: Bible Reader для macOS
+# PRD: Bible Reader for macOS
 
-Статус: чернетка, 2026-09-25. Власник: Олександр Таранюк.
-Формальні вимоги кожного етапу ведуться як OpenSpec change (`openspec/changes/`); цей документ описує продукт для людини і задає пріоритети.
+Status: draft, 2026-09-25. Owner: Oleksandr Taraniuk.
+The formal requirements of each stage live as an OpenSpec change (`openspec/changes/`); this document describes the product for humans and sets priorities.
 
-## 1. Проблема
-Людина, яка читає і вивчає Біблію на Mac, має два погані варіанти. Вебсайти потребують інтернету, повні реклами і повільні. BibleQuote та аналоги застарілі або не працюють на macOS. Бракує легкого нативного читача, у якому можна за секунди знайти місце, прочитати його в кількох перекладах і процитувати з правильним посиланням.
+## 1. Problem
+A person who reads and studies the Bible on a Mac has two bad options. Websites need internet, are full of ads and are slow. BibleQuote and similar tools are outdated or do not work on macOS. What is missing is a lightweight native reader where you can find a passage in seconds, read it in several translations and quote it with a correct reference.
 
-## 2. Користувачі
-- **Читач.** Щодня читає по розділу; важливі зручний шрифт і швидке повернення до місця, де зупинився.
-- **Той, хто вивчає і готує проповіді чи уроки.** Шукає слова й теми, порівнює переклади, робить нотатки, копіює цитати в документи.
-- **Той, хто цитує.** Пише тексти чи пости; йому потрібна цитата з точним посиланням в один клік.
+## 2. Users
+- **Reader.** Reads a chapter a day; a comfortable font and quickly returning to where they stopped matter.
+- **Student and preacher preparing sermons or lessons.** Searches for words and topics, compares translations, takes notes, copies quotes into documents.
+- **Quoter.** Writes texts or posts; needs a quote with an exact reference in one click.
 
-Мова інтерфейсу: українська. Тексти: англійська (KJV), російська (Синодальний); далі українська (Огієнко) і чеська (Біблія Кралицька 1613).
+Interface language: Ukrainian. Texts: English (KJV), Russian (Synodal); later Ukrainian (Ohienko) and Czech (Bible kralická 1613).
 
-## 3. Цілі і метрики
-| Ціль | Як міряємо |
+## 3. Goals and metrics
+| Goal | How we measure |
 |---|---|
-| Знайти місце швидко | від відкриття додатка до потрібного вірша ≤ 5 с (посилання в пошуку) |
-| Процитувати без помилок | цитата завжди з коректною повною назвою книги і номерами; 0 ручних правок |
-| Працювати офлайн | 100 % функцій без мережі |
-| Бути швидким | запуск < 1 с, пошук < 200 мс на всій Біблії |
-| Якість | `swift test` зелений; кожна фіча має OpenSpec change з тестами |
+| Find a passage fast | from opening the app to the verse ≤ 5 s (reference in search) |
+| Quote without errors | a quote always has the correct full book name and numbers; 0 manual fixes |
+| Work offline | 100 % of features without network |
+| Be fast | launch < 1 s, search < 200 ms over the whole Bible |
+| Quality | `swift test` green; every feature has an OpenSpec change with tests |
 
-## 4. Принципи
-- Нативний macOS, без акаунтів і мережі. Дані користувача лишаються на його Mac. Єдиний виняток: ілюстрації (6.17), лише сайти з allowlist.
-- Текст головний: мінімум хрому, читабельна типографіка.
-- Тексти лише суспільного надбання або з явною ліцензією.
-- Логіка в `BibleCore` і покрита тестами; UI лише відображає стан (див. [core-beliefs](../design-docs/core-beliefs.md)).
+## 4. Principles
+- Native macOS, no accounts and no network. User data stays on their Mac. The only exception: illustrations (6.17), allowlisted sites only.
+- Text comes first: minimal chrome, readable typography.
+- Only public domain texts or texts with an explicit license.
+- Logic lives in `BibleCore` and is covered by tests; the UI only renders state (see [core-beliefs](../design-docs/core-beliefs.md)).
 
-## 5. Що вже є (v1.0, MVP)
-Деталі: [bible-reader-mvp.md](bible-reader-mvp.md).
-- KJV і Синодальний, один переклад на екрані, перемикач у тулбарі.
-- Навігація книга → розділ, ◀ ▶ з переходом між книгами.
-- Пошук: посилання (`Ин 3:16`, `John 3`) веде до місця, інакше повнотекстовий пошук з підсвіткою (до 200 результатів).
-- Копіювання виділених віршів: ⌘C і контекстне меню, формат `«текст» (От Иоанна 3:16-18)`.
-- v1.1: масштаб шрифтів (6.1), масштаб інтерфейсу (6.2), кнопка копіювання (6.3), теми (6.18).
-- v2.1 (частково): Огієнко (6.14; джерело — bolls.life `UBIO`, видання 1962, нумерація вирівняна з KJV вірш у вірш) і Біблія Кралицька (6.15); формат модулів (6.16) — ні.
+## 5. What exists (v1.0, MVP)
+Details: [bible-reader-mvp.md](bible-reader-mvp.md).
+- KJV and Synodal, one translation on screen, a switcher in the toolbar.
+- Navigation book → chapter, ◀ ▶ crossing between books.
+- Search: a reference (`Ин 3:16`, `John 3`) leads to the passage, otherwise full-text search with highlighting (up to 200 results).
+- Copying selected verses: ⌘C and a context menu, format `«текст» (От Иоанна 3:16-18)`.
+- v1.1: font scale (6.1), interface scale (6.2), copy button (6.3), themes (6.18).
+- v2.1 (partly): Ohienko (6.14; source bolls.life `UBIO`, 1962 edition, numbering aligned with KJV verse by verse) and Bible kralická (6.15); module format (6.16) not yet.
 
-## 6. Роадмап
-Пріоритет: спершу дешеве, що покращує щоденне читання, потім великі фічі з новими даними.
+## 6. Roadmap
+Priority: cheap things that improve daily reading first, then big features with new data.
 
-### v1.1 Зручність читання
-**6.1 Масштаб шрифтів.** Окремі розміри для тексту віршів і для списку книг. ⌘+ / ⌘− / ⌘0 для тексту віршів; налаштування в Settings (⌘,). Значення зберігаються між запусками.
-Критерій: після перезапуску розміри ті самі; ⌘0 повертає стандарт; довгі вірші переносяться без обрізання.
+### v1.1 Reading comfort
+**6.1 Font scale.** Separate sizes for verse text and the book list. ⌘+ / ⌘− / ⌘0 for verse text; settings in Settings (⌘,). Values persist between launches.
+Criterion: after a restart the sizes are the same; ⌘0 restores the default; long verses wrap without clipping.
 
-**6.2 Масштаб інтерфейсу.** Загальний масштаб (тулбар, бічна панель, результати пошуку) у Settings: «Малий / Стандарт / Великий / Дуже великий». Має поважати системний розмір тексту macOS.
-Критерій: усі елементи читабельні на кожному рівні, нічого не обрізається при ширині вікна 800 pt.
+**6.2 Interface scale.** An overall scale (toolbar, sidebar, search results) in Settings: "Small / Standard / Large / Extra large". Must respect the macOS system text size.
+Criterion: all elements are readable at every level, nothing is clipped at a window width of 800 pt.
 
-**6.3 Кнопка копіювання.** Коли виділено один чи кілька віршів, у правому верхньому куті виділення (над першим виділеним віршем) з'являється напівпрозора кнопка копіювання. Клік копіює цитату в тому самому форматі, що й ⌘C; на місці кнопки на ~1,5 с з'являється напис «Скопійовано», потім кнопка повертається. Кнопка не перекриває текст вірша і стає непрозорою при наведенні. «Копіювати лише посилання» поки не робимо.
-Критерій: без виділення кнопки немає; з виділенням один клік дає той самий текст, що й ⌘C.
+**6.3 Copy button.** When one or more verses are selected, a semi-transparent copy button appears in the top right corner of the selection (above the first selected verse). A click copies the quote in the same format as ⌘C; for ~1.5 s the button is replaced by a "Copied" label, then it comes back. The button does not cover verse text and becomes opaque on hover. "Copy reference only" is not done for now.
+Criterion: no button without a selection; with a selection one click gives the same text as ⌘C.
 
-**6.18 Теми оформлення.** Вибір теми в Settings (⌘,) і в меню View; тема змінює весь інтерфейс (текст віршів, бічна панель, тулбар, пошук, вікна 6.17), зберігається між запусками. Пункт «Як у системі» перемикає Світлу/Темну за macOS. П'ять тем:
+**6.18 Themes.** Theme choice in Settings (⌘,) and the View menu; a theme changes the whole interface (verse text, sidebar, toolbar, search, 6.17 windows) and persists between launches. "System" switches Light/Dark following macOS. Five themes:
 
-| Тема | Фон | Текст | Другорядний текст | Акцент (виділення, посилання) | Шрифт тексту віршів |
+| Theme | Background | Text | Secondary text | Accent (selection, links) | Verse text font |
 |---|---|---|---|---|---|
-| Світла | `#FFFFFF` | `#1C1C1E` (17:1) | `#6E6E73` (5,1:1) | `#0A66C2` (5,7:1) | New York (системний serif) |
-| Темна | `#121214` (не чистий чорний, менше «ореолу» навколо літер) | `#E8E6E3` (15:1) | `#9A9AA0` (6,7:1) | `#6CB4FF` (8,6:1) | New York |
-| Скло (у стилі Liquid Glass з iOS 26/27, macOS 26) | напівпрозорі панелі поверх розмитих шпалер; підкладка під текстом `#F2F4F8` з непрозорістю ≥ 90 % | `#101218` (17:1) | `#5A5F6B` (5,8:1) | `#1F57C8` (5,9:1) | SF Pro Text |
-| Пастельна | `#FFE9F3` (Lavender Blush); панелі: `#F4BFDB` (Pastel Petal), результати `#FFF5F9`, підсвітка пошуку м'ятна `#D6EDDD`; палітра coolors.co/512d38-b27092-f4bfdb-ffe9f3 | `#512D38` (≥ 7,4:1) | `#7A3E5E` (≥ 4,9:1) | `#8C4A6E` (≥ 5,4:1) | New York |
-| Манускрипт | пергамент `#EFE4CC` з текстурою: тонкі волокна, ледь помітні тріщини й потемніння по краях | чорнило `#3B2A1A` (10,9:1) | `#6B5238` (5,8:1) | «кіновар» `#8B2E1F` (6,6:1) для номерів віршів і заголовків, як рубрики в рукописах | serif під старовину з кирилицею (кандидат EB Garamond, ліцензія OFL, вшивається в додаток) |
+| Light | `#FFFFFF` | `#1C1C1E` (17:1) | `#6E6E73` (5.1:1) | `#0A66C2` (5.7:1) | New York (system serif) |
+| Dark | `#121214` (not pure black, less "halo" around letters) | `#E8E6E3` (15:1) | `#9A9AA0` (6.7:1) | `#6CB4FF` (8.6:1) | New York |
+| Glass (Liquid Glass style from iOS 26/27, macOS 26) | semi-transparent panels over blurred wallpaper; the backing under text `#F2F4F8` with ≥ 90 % opacity | `#101218` (17:1) | `#5A5F6B` (5.8:1) | `#1F57C8` (5.9:1) | SF Pro Text |
+| Pastel | `#FFE9F3` (Lavender Blush); panels: `#F4BFDB` (Pastel Petal), results `#FFF5F9`, mint search highlight `#D6EDDD`; palette coolors.co/512d38-b27092-f4bfdb-ffe9f3 | `#512D38` (≥ 7.4:1) | `#7A3E5E` (≥ 4.9:1) | `#8C4A6E` (≥ 5.4:1) | New York |
+| Manuscript | parchment `#EFE4CC` with texture: fine fibers, faint cracks and darkening at the edges | ink `#3B2A1A` (10.9:1) | `#6B5238` (5.8:1) | "cinnabar" `#8B2E1F` (6.6:1) for verse numbers and headings, like rubrics in manuscripts | an old-style serif with Cyrillic (candidate EB Garamond, OFL license, bundled with the app) |
 
-У дужках контраст до фону за WCAG; для всіх тем основний текст ≥ 7:1 (AAA), другорядний і акцент ≥ 4,5:1 (AA).
-Правила читабельності:
-- Прозорість і розмиття лише для «хрому» (тулбар, бічна панель, спливні кнопки 6.3/6.17); під текстом віршів майже непрозора підкладка, щоб шпалери не знижували контраст.
-- Текстура манускрипту дуже бліда (непрозорість ~5–10 %), без дрібних деталей під рядками; у меню й списках текстура вимкнена. Буквиця (велика декоративна літера на початку розділу) опційно.
-- Пастельні кольори лише для фонів і панелей; текст завжди темний, не пастельний.
-- Висота рядка 1,4–1,6, ширина колонки тексту 60–80 знаків; масштаб шрифтів (6.1) працює в усіх темах.
-- Підсвітка пошуку й виділення віршів мають свій колір у кожній темі і лишаються помітними.
-- Системні налаштування доступності: «Зменшити прозорість» робить Скло непрозорим, «Збільшити контраст» посилює кольори в усіх темах.
-Логіка: тема як набір токенів (кольори, шрифти, прозорість, текстура) у `BibleCore`; SwiftUI лише застосовує токени. Тест перевіряє контраст кожної пари «текст/фон» кожної теми.
-Критерій: перемикання теми змінює весь інтерфейс без перезапуску; вибір переживає перезапуск; усі пари кольорів проходять тест контрасту; VoiceOver і клавіатура працюють однаково в усіх темах.
+Parentheses show WCAG contrast against the background; for all themes body text ≥ 7:1 (AAA), secondary and accent ≥ 4.5:1 (AA).
+Readability rules:
+- Transparency and blur only for "chrome" (toolbar, sidebar, 6.3/6.17 pop-up buttons); verse text sits on an almost opaque backing so the wallpaper does not reduce contrast.
+- The manuscript texture is very faint (opacity ~5–10 %), with no fine detail under lines; menus and lists have no texture. A drop cap (a large decorative letter at the start of a chapter) is optional.
+- Pastel colors only for backgrounds and panels; text is always dark, never pastel.
+- Line height 1.4–1.6, text column width 60–80 characters; font scale (6.1) works in all themes.
+- Search highlight and verse selection have their own color in every theme and stay visible.
+- System accessibility settings: "Reduce transparency" makes Glass opaque, "Increase contrast" strengthens colors in all themes.
+Logic: a theme is a set of tokens (colors, fonts, transparency, texture) in `BibleCore`; SwiftUI only applies the tokens. A test checks the contrast of every text/background pair of every theme.
+Criterion: switching the theme changes the whole interface without a restart; the choice survives a restart; all color pairs pass the contrast test; VoiceOver and keyboard work the same in all themes.
 
-### v1.2 Кращий пошук
-**6.4 Морфологія.** Пошук `любовь` знаходить `любви`, `любовью`; `love` знаходить `loved`, `loveth`. Стемер у `BibleCore`: Snowball для en/ru (KJV-форми `-eth`/`-est` теж), легкі стемери для uk/cs (у Snowball їх немає); індекс за основами.
-**6.5 Фільтри.** Область пошуку: уся Біблія / СЗ / НЗ / поточна книга.
-**6.6 Усі результати.** Замість межі 200 показувати загальну кількість і довантажувати при прокручуванні; напис «Знайдено: N».
-**6.7 Фраза.** Запит у лапках шукає точну фразу.
-Критерій етапу: tech debt #3 закрито; пошук < 200 мс на всій Біблії.
+### v1.2 Better search
+**6.4 Morphology.** Searching `любовь` finds `любви`, `любовью`; `love` finds `loved`, `loveth`. A stemmer in `BibleCore`: Snowball for en/ru (KJV forms `-eth`/`-est` too), light stemmers for uk/cs (Snowball has none); a stem index.
+**6.5 Filters.** Search scope: whole Bible / OT / NT / current book.
+**6.6 All results.** Instead of the 200 limit, show the total count and load more on scroll; the label "Found: N".
+**6.7 Phrase.** A quoted query searches for the exact phrase.
+Stage criterion: tech debt #3 closed; search < 200 ms over the whole Bible.
 
-### v1.3 Закладки, підсвітки, нотатки
-**6.8 Закладки.** Зберегти вірш чи розділ; список закладок у бічній панелі; перехід одним кліком.
-**6.9 Підсвітка віршів.** Кілька кольорів, видно в тексті.
-**6.10 Нотатки.** Текстова нотатка до вірша; іконка біля вірша; пошук по нотатках.
-**6.11 Останнє місце.** Додаток відкривається там, де користувач зупинився.
-Дані користувача зберігаються в окремій локальній базі (не в `bible.sqlite`, яка read-only), прив'язка до книги/розділу/вірша, щоб переживали оновлення текстів. Експорт в JSON/Markdown.
-Критерій: закладки й нотатки переживають перезапуск і перебудову `bible.sqlite`.
+### v1.3 Bookmarks, highlights, notes
+**6.8 Bookmarks.** Save a verse or chapter; a bookmark list in the sidebar; jump in one click.
+**6.9 Verse highlights.** Several colors, visible in the text.
+**6.10 Notes.** A text note on a verse; an icon next to the verse; search over notes.
+**6.11 Last position.** The app opens where the user stopped.
+User data is stored in a separate local database (not in the read-only `bible.sqlite`), tied to book/chapter/verse so it survives text updates. Export to JSON/Markdown.
+Criterion: bookmarks and notes survive a restart and a rebuild of `bible.sqlite`.
 
-### v2.2 Ілюстрації (останнім)
-**6.17 Кнопка «Пошук ілюстрацій».** «Ілюстрація» тут у значенні проповідницької ілюстрації: коротка історія з реального життя (біографія, історична подія, свідчення), яка пояснює або підтверджує думку виділених віршів. Не картинки.
-Поруч із кнопкою копіювання (6.3) на виділенні одного чи кількох віршів з'являється друга напівпрозора кнопка «Пошук ілюстрацій». Клік відкриває окреме вікно з історіями до цих віршів: до 7 штук, найрелевантніші першими.
-Під капотом: пошук безкоштовний, без платних API і без керування сторонніми браузерами. З тексту віршів і посилання (`Ин 3:16-18`) будуємо англійські пошукові запити (ключові слова, тема, персонажі). Умови відбору: лише задокументовані події з реальними людьми, місцем і часом; без вигаданих притч і анекдотів; кожна історія з посиланням на джерело; дублікати відкидаємо.
-Пошук (рішення власника 2026-09-28):
-- **Живий пошук під час кліку, без локального індексу.** Історії не зберігаються: закрили вікно — зникли; щоб зберегти, «Скопіювати» і вставити в нотатку. Без мережі — повідомлення «Немає підключення до мережі» і «Повторити».
-- **Джерела:** WordPress REST (`/wp-json/wp/v2/search`) там, де він відкритий (Christianity Today, IMB); Вікіпедія (API MediaWiki, лише біографії — категорії «… births/deaths», без католицьких і православних категорій); з ключем користувача — Brave Search API (безкоштовний план) з `site:` по всьому allowlist, зокрема по сайтах, закритих від ботів (Cloudflare). Ключ Brave вводиться в Settings і зберігається в Keychain, у `.app` його немає.
-- Партії по 7, найрелевантніші першими; «Отримати ще» продовжує пошук (далі сторінки, джерела, ширші запити).
-- Текст на картці: статті під авторським правом — початок ≤ 1500 символів і «Читати на сайті»; Вікіпедія (CC BY-SA) — вступ статті; Brave — уривок пошуковика.
-- Відхилено: скрейпінг Google і сторінки DuckDuckGo (умови використання, захист від ботів), обхід Cloudflare, керування браузерами, прихований `WKWebView`; локальний індекс (власник: без збереження).
-- Відбір і переказ історій моделлю не робимо (рішення власника 2026-09-28): історія — текст зі сторінки. Відбір «реальні люди, місце, час» — лише наскільки дозволяють джерела (Вікіпедія: біографії).
-Правила джерел:
-- Шукаємо лише на англомовних ресурсах баптистського або протестантського (євангельського) напрямку: сайти церков, семінарій, місій, видавництв, збірки проповідницьких ілюстрацій, біографії місіонерів.
-- Православні й католицькі ресурси заборонені: не шукаємо на них і не цитуємо їх як джерело.
-- Реалізація: allowlist доменів у конфігурації (`Resources/illustration-sources.json`) плюс blocklist православних і католицьких доменів як запасна перевірка ([illustration-sources.md](illustration-sources.md)); `BibleCore` відкидає будь-яку історію з адресою поза allowlist. Вікіпедія нейтральна, тож для неї додатково — фільтр категорій.
-- Пошук англійською за ключовими словами тексту KJV тих самих віршів (для Синодального — через таблицю відповідностей); історії англійською.
-Панель праворуч від тексту в тому самому вікні (текст 35 %, ілюстрації 65 %, межа тягнеться; рішення власника 2026-09-28): список карток. На картці заголовок, сайт і дата, текст, посилання на джерело («Читати на сайті» для уривка). Кнопка «Скопіювати» на картці копіює історію разом із джерелом. Під час пошуку індикатор; без мережі «Немає підключення до мережі», при помилці «Не вдалося знайти ілюстрації», обидва з «Повторити». Внизу «Отримати ще».
-Мова історій — англійська (джерела англомовні). На картці «Перекласти» — мовою Біблії на екрані системним перекладачем Apple (Translation, на пристрої, macOS 15+, рішення власника 2026-09-28); переказ не робимо.
-Логіка (побудова запитів, розбір відповідей джерел, allowlist, фільтр Вікіпедії, дедуплікація, партії по 7) живе в `BibleCore` за протоколами `IllustrationProvider` / `IllustrationHTTP` і тестується без мережі на фікстурах; мережа — лише `IllustrationNetwork.swift`.
-Критерій: без виділення кнопки немає; на Ин 3:16 і Рим 8:28 не більше 7 історій, у кожної є реальні люди, дата чи період і щонайменше одне робоче посилання на джерело з allowlist; жодного православного чи католицького джерела; жодних вигаданих історій у вибірці перевірки; жодних мережевих запитів до кліку, крім оновлення індексу; без мережі пошук по вже збудованому індексу працює.
+### v2.2 Illustrations (last)
+**6.17 "Find illustrations" button.** "Illustration" here means a sermon illustration: a short true story (a biography, a historical event, a testimony) that explains or supports the point of the selected verses. Not pictures.
+Next to the copy button (6.3), a second semi-transparent "Find illustrations" button appears on a selection of one or more verses. A click opens a separate window with stories for these verses: up to 7, most relevant first.
+Under the hood: search is free, with no paid APIs and no control of third-party browsers. From the verse text and reference (`Ин 3:16-18`) we build English search queries (keywords, theme, people). Selection criteria: only documented events with real people, place and time; no invented parables or anecdotes; every story links to its source; duplicates are dropped.
+Search (owner decision 2026-09-28):
+- **Live search on click, no local index.** Stories are not stored: close the window and they are gone; to keep one, "Copy" and paste it into a note. Offline: the message "No network connection" and "Retry".
+- **Sources:** WordPress REST (`/wp-json/wp/v2/search`) where it is open (Christianity Today, IMB); Wikipedia (MediaWiki API, biographies only: categories "… births/deaths", no Catholic or Orthodox categories); with the user's key, the Brave Search API (free plan) with `site:` over the whole allowlist, including sites closed to bots (Cloudflare). The Brave key is entered in Settings and stored in the Keychain; the `.app` does not contain it.
+- Batches of 7, most relevant first; "Get more" continues the search (further pages, sources, broader queries).
+- Card text: for copyrighted articles the first ≤ 1500 characters and "Read on site"; Wikipedia (CC BY-SA): the article intro; Brave: the search engine snippet.
+- Rejected: scraping Google and DuckDuckGo pages (terms of use, bot protection), bypassing Cloudflare, controlling browsers, a hidden `WKWebView`; a local index (owner: no storage).
+- No model-based selection or retelling of stories (owner decision 2026-09-28): a story is text from the page. Selection by "real people, place, time" only as far as the sources allow (Wikipedia: biographies).
+Source rules:
+- Search only English-language Baptist or Protestant (evangelical) resources: sites of churches, seminaries, missions, publishers, sermon illustration collections, missionary biographies.
+- Orthodox and Catholic resources are forbidden: we do not search them or cite them as a source.
+- Implementation: a domain allowlist in configuration (`Resources/illustration-sources.json`) plus a blocklist of Orthodox and Catholic domains as a fallback check ([illustration-sources.md](illustration-sources.md)); `BibleCore` drops any story with an address outside the allowlist. Wikipedia is neutral, so it additionally gets a category filter.
+- Search in English by keywords from the KJV text of the same verses (for the Synodal, via the mapping table); stories are in English.
+A panel to the right of the text in the same window (text 35 %, illustrations 65 %, draggable divider; owner decision 2026-09-28): a list of cards. A card has a title, site and date, text, a source link ("Read on site" for an excerpt). The "Copy" button on a card copies the story together with its source. During search an indicator; offline "No network connection", on error "Could not find illustrations", both with "Retry". "Get more" at the bottom.
+The stories' language is English (the sources are English). The card has "Translate" into the on-screen Bible's language via Apple's system translator (Translation, on-device, macOS 15+, owner decision 2026-09-28); no retelling.
+The logic (query building, parsing source responses, allowlist, Wikipedia filter, deduplication, batches of 7) lives in `BibleCore` behind the `IllustrationProvider` / `IllustrationHTTP` protocols and is tested without network on fixtures; network only in `IllustrationNetwork.swift`.
+Criterion: no button without a selection; for John 3:16 and Rom 8:28 at most 7 stories, each with real people, a date or period and at least one working source link from the allowlist; no Orthodox or Catholic source; no invented stories in the check sample; no network requests before the click except index updates; offline, search over the already built index works.
 
-### v1.5 Порівняння вірша
-**6.19 «Порівняти».** Поруч із кнопкою копіювання на виділенні — кнопка «Порівняти»: вікно з виділеним віршем (або віршами) в усіх перекладах, кожен переклад — окрема панель поруч з назвою перекладу і посиланням мовою перекладу; клік по перекладу відкриває це місце в ньому. Непотрібну панель можна закрити (×) і повернути через «+ Переклад»; панелі переставляються ліворуч / праворуч (перетягуванням або ◀ ▶). Набір і порядок панелей зберігаються між запусками. KJV, Kralická й Огієнко нумеровані однаково, тож зіставляються за номером; для Синодального — позначка «нумерація може відрізнятися», доки немає таблиці відповідностей (6.13).
-Критерій: для John 3:16 вікно показує 4 переклади; для Пс 23:1 — KJV, Kralická, Огієнко з тим самим віршем і Синодальний з позначкою; закрита чи переставлена панель лишається такою після перезапуску.
+### v1.5 Verse comparison
+**6.19 "Compare".** Next to the copy button on a selection: a "Compare" button: a window with the selected verse (or verses) in all translations, each translation a separate panel side by side with the translation name and a reference in its language; clicking a translation opens that passage in it. An unneeded panel can be closed (×) and brought back via "+ Translation"; panels can be reordered left / right (by dragging or ◀ ▶). The set and order of panels persist between launches. KJV, Kralická and Ohienko share numbering, so they are matched by number; the Synodal gets a "numbering may differ" mark until the mapping table exists (6.13).
+Criterion: for John 3:16 the window shows 4 translations; for Ps 23:1, KJV, Kralická, Ohienko with the same verse and the Synodal with the mark; a closed or reordered panel stays so after a restart.
 
-### v2.0 Паралельний перегляд
-**6.12 Два переклади поруч.** Колонки з синхронним прокручуванням по віршах.
-**6.13 Таблиця відповідностей нумерації.** KJV ↔ Синодальний (Псалми, Йов, Малахія, Римлян 16 тощо), щоб паралельні рядки і перемикання перекладу вели до того самого вірша. Закриває tech debt #1 і #4.
-Критерій: Пс 22:1 KJV стоїть поруч з Пс 21:2 Синодального; перемикання перекладу зберігає вірш.
+### v2.0 Parallel view
+**6.12 Two translations side by side.** Columns with verse-synchronized scrolling.
+**6.13 Numbering mapping table.** KJV ↔ Synodal (Psalms, Job, Malachi, Romans 16 etc.), so parallel rows and translation switching lead to the same verse. Closes tech debt #1 and #4.
+Criterion: KJV Ps 22:1 stands next to Synodal Ps 21:2; switching translation keeps the verse.
 
-### v2.1 Більше перекладів
-**6.14 Український переклад Огієнка.** Джерело: getBible, код `ukrogienko` (https://api.getbible.net/v2/ukrogienko.json), позначено Public Domain, «Переклад Івана Огієнка 1930», формат OSIS. Нумерація православна (як у Синодальному), тож паралельний перегляд з KJV спирається на таблицю відповідностей (6.13).
+### v2.1 More translations
+**6.14 Ukrainian Ohienko translation.** Source: getBible, code `ukrogienko` (https://api.getbible.net/v2/ukrogienko.json), marked Public Domain, "Ivan Ohienko translation 1930", OSIS format. Orthodox numbering (like the Synodal), so the parallel view with KJV relies on the mapping table (6.13).
 
-**6.15 Чеська Біблія Кралицька (BKR, 1613).** Джерело: getBible, код `bkr` (https://api.getbible.net/v2/bkr.json), Public Domain, OSIS, нумерація KJV: зіставлення BKR ↔ KJV за ключем книга:розділ:вірш без таблиці відповідностей. Резерв: eBible.org `ces1613` (USFX/VPL). Потрібні чеські назви і скорочення 66 книг (`Gn`, `Ex`, `J`…) для розбору посилань і цитат.
+**6.15 Czech Bible kralická (BKR, 1613).** Source: getBible, code `bkr` (https://api.getbible.net/v2/bkr.json), Public Domain, OSIS, KJV numbering: BKR ↔ KJV matched by book:chapter:verse key without a mapping table. Fallback: eBible.org `ces1613` (USFX/VPL). Czech names and abbreviations of the 66 books (`Gn`, `Ex`, `J`…) are needed for parsing references and quotes.
 
-**6.16 Модулі.** Формат, у якому новий переклад додається даними, без змін коду: JSON + опис книг + таблиця відповідностей.
-Критерій: новий переклад додається одним файлом у `data/raw` і рядком конфігурації; 66 книг, контрольні вірші в тестах (Быт 1:1 / Буття 1:1 / Genesis 1:1 / Gn 1:1, Ин 3:16 / Ів. 3:16 / J 3:16).
-Порядок: BKR першим (нумерація KJV, найдешевше), потім Огієнко (після 6.13).
+**6.16 Modules.** A format in which a new translation is added as data, without code changes: JSON + book descriptions + mapping table.
+Criterion: a new translation is added with one file in `data/raw` and one configuration line; 66 books, control verses in tests (Быт 1:1 / Буття 1:1 / Genesis 1:1 / Gn 1:1, Ин 3:16 / Ів. 3:16 / J 3:16).
+Order: BKR first (KJV numbering, cheapest), then Ohienko (after 6.13).
 
-### v2.3 Чорнетки проповідей
-**6.20 Чорнетки.** Місце для чорнетки проповіді чи кількох думок поруч із текстом: список і редактор Markdown праворуч, вірш у чорнетку одним кліком, живі посилання на місця, шаблон проповіді, ілюстрації в чорнетку, позначки біля віршів, режим «Проповідь» і експорт (Markdown, друк / PDF). Запит власника 2026-09-28.
-Критерій: чорнетка з віршем John 3:16 переживає перезапуск; «1 Кор 13:4-7» у тексті позначає вірші 4–7 і відкриває місце кліком.
+### v2.3 Sermon drafts
+**6.20 Drafts.** A place for a sermon draft or a few thoughts next to the text: a list and a Markdown editor on the right, a verse into the draft in one click, live passage links, a sermon template, illustrations into the draft, markers next to verses, a "Sermon" mode and export (Markdown, print / PDF). Owner request 2026-09-28.
+Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the text marks verses 4–7 and opens the passage on click.
 
-## 7. Нефункціональні вимоги
-- macOS 14+, лише Apple Silicon. Intel поза обсягом: проєкт open source, хто потребує — збере сам.
-- Офлайн; жодної телеметрії. Мережа лише для ілюстрацій (6.17): оновлення індексу й живий пошук, тільки на домени з allowlist; у запит іде лише текст пошукових запитів.
-- Доступність: VoiceOver читає номери і тексти віршів; повна робота з клавіатури; контраст за WCAG AA у світлій і темній темі.
-- Розмір додатка < 100 МБ (60 МБ не мали технічної причини; кожен переклад додає ~8–10 МБ бази).
+## 7. Non-functional requirements
+- macOS 14+, Apple Silicon only. Intel is out of scope: the project is open source, whoever needs it can build it.
+- Offline; no telemetry. Network only for illustrations (6.17): index updates and live search, only to allowlisted domains; the request carries only the search query text.
+- Accessibility: VoiceOver reads verse numbers and texts; full keyboard operation; WCAG AA contrast in the light and dark themes.
+- App size < 100 MB (60 MB had no technical reason; each translation adds ~8–10 MB of database).
 
-## 8. Поза обсягом
-- Синхронізація між пристроями, акаунти, iOS-версія.
-- Аудіо-Біблія, коментарі, словники Стронга (можливо, після v2).
-- Соціальні функції.
+## 8. Out of scope
+- Sync between devices, accounts, an iOS version.
+- Audio Bible, commentaries, Strong's dictionaries (maybe after v2).
+- Social features.
 
-## 9. Ризики і відкриті питання
-- **Права на Огієнка.** getBible позначає текст як Public Domain, але Огієнко помер 1972 р., а в Україні строк авторського права 70 років після смерті автора. Перед релізом перевірити, яке видання (1930 чи 1962) і чий текст; запасний варіант: Куліш–Пулюй–Нечуй-Левицький (1905).
-- **Формат getBible відрізняється від нинішнього** (`thiagobodruk`): потрібен конвертер у `scripts/` або імпорт OSIS; KJV з getBible містить номери Стронга, наш KJV лишаємо з `thiagobodruk`.
-- **Таблиця відповідностей** складна і має готові відкриті джерела лише частково; можливо, доведеться збирати вручну для спірних місць.
-- **Стемінг** може давати шум (зайві збіги); потрібен перемикач «точна форма».
-- **Ілюстрації (6.17): вигадки.** Якщо відбір чи переказ робить модель, вона може «придумати» історію чи джерело. Переказуємо лише з тексту знайденої сторінки, посилання завжди на неї; позначка «перевірте джерело» в UI. Відомі «проповідницькі» історії часто апокрифічні; такі відсіюємо.
-- **Ілюстрації: allowlist джерел.** Вузький список доменів може давати мало результатів для рідкісних уривків; тоді показуємо скільки знайшли (менше 7), а не розширюємо пошук. Конфесійну належність сайту визначаємо вручну при додаванні в список, автоматично не вгадуємо.
-- **Ілюстрації: адаптери сайтів і індекс.** Зміна верстки чи API сайту ламає адаптер; ловимо нічним Playwright-моніторингом у CI і фікстурами в тестах. Обхід sitemap має поважати `robots.txt` і не навантажувати сайти (пауза між запитами). Розмір індексу і частоту оновлення визначаємо перед реалізацією.
-- **Ілюстрації: відбір і переказ.** Apple Foundation Models потребує macOS 26+ і Apple Intelligence, а PRD вимагає macOS 14+; для старіших систем показувати знайдені історії без переказу (заголовок, уривок, посилання).
-- **Ілюстрації: авторські права.** Показуємо власний короткий переказ і посилання, а не повні тексти статей.
-- **Теми (6.18): Скло.** Справжній Liquid Glass (`glassEffect`) є лише з macOS 26; на macOS 14–15 замінюємо системними матеріалами (`.ultraThinMaterial`), вигляд буде простішим. Контраст на прозорих панелях залежить від шпалер, тому текст лише на майже непрозорих підкладках.
-- **Теми: Манускрипт.** Треба вільна текстура пергаменту (власна або з ліцензією CC0) і шрифт з кирилицею й латиницею під ліцензією OFL; перевірити, що текстура й шрифт вкладаються в ліміт розміру додатка (< 100 МБ).
-- **Порядок етапів.** v1.3 і v2.0 можна поміняти місцями, якщо паралельний перегляд важливіший за нотатки.
+## 9. Risks and open questions
+- **Rights to Ohienko.** getBible marks the text as Public Domain, but Ohienko died in 1972, and in Ukraine copyright lasts 70 years after the author's death. Before release, check which edition (1930 or 1962) and whose text; fallback: Kulish–Puluj–Nechuy-Levytsky (1905).
+- **The getBible format differs from the current one** (`thiagobodruk`): a converter in `scripts/` or an OSIS import is needed; getBible's KJV contains Strong's numbers, so we keep our KJV from `thiagobodruk`.
+- **The mapping table** is complex and only partly available from open sources; disputed places may have to be assembled by hand.
+- **Stemming** can add noise (extra matches); an "exact form" switch is needed.
+- **Illustrations (6.17): fabrication.** If a model does the selection or retelling, it may "invent" a story or a source. Retell only from the text of the found page, always link to it; a "check the source" mark in the UI. Well-known "sermon" stories are often apocryphal; such stories are filtered out.
+- **Illustrations: source allowlist.** A narrow domain list may yield few results for rare passages; then we show what was found (fewer than 7) rather than widening the search. A site's denomination is determined manually when adding it to the list, never guessed automatically.
+- **Illustrations: site adapters and index.** A change in a site's layout or API breaks the adapter; caught by nightly Playwright monitoring in CI and fixtures in tests. A sitemap crawl must respect `robots.txt` and not load the sites (a pause between requests). Index size and update frequency are decided before implementation.
+- **Illustrations: selection and retelling.** Apple Foundation Models needs macOS 26+ and Apple Intelligence, while the PRD requires macOS 14+; older systems show found stories without retelling (title, excerpt, link).
+- **Illustrations: copyright.** We show our own short retelling and a link, not full article texts.
+- **Themes (6.18): Glass.** Real Liquid Glass (`glassEffect`) exists only since macOS 26; on macOS 14–15 it is replaced with system materials (`.ultraThinMaterial`), and the look is simpler. Contrast on transparent panels depends on the wallpaper, so text sits only on almost opaque backings.
+- **Themes: Manuscript.** Needs a free parchment texture (our own or CC0) and a font with Cyrillic and Latin under the OFL; check that the texture and font fit into the app size limit (< 100 MB).
+- **Stage order.** v1.3 and v2.0 can be swapped if the parallel view matters more than notes.
 
-## 10. Як працюємо
-Кожен пункт роадмапу стає окремим OpenSpec change (`/opsx:propose`), гілка `feature/NN-<change>`, TDD, ручна перевірка UI за чеклістом, рецензія diff перед PR.
+## 10. How we work
+Every roadmap item becomes a separate OpenSpec change (`/opsx:propose`), a `feature/NN-<change>` branch, TDD, a manual UI check against a checklist, a diff review before the PR.

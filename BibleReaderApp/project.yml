@@ -23,7 +23,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.taraniuk.BibleReader
-        # NFR-1: лише Apple Silicon (Intel поза обсягом, рішення власника 2026-09-27).
+        # NFR-1: Apple Silicon only (Intel out of scope, owner decision 2026-09-27).
         ARCHS: arm64
         PRODUCT_NAME: Bible Reader
         GENERATE_INFOPLIST_FILE: YES
@@ -33,9 +33,9 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "6.0"
         ENABLE_APP_SANDBOX: YES
-        # Експорт нотаток у файл, обраний користувачем (FR-24).
+        # Exporting notes to a file chosen by the user (FR-24).
         ENABLE_USER_SELECTED_FILES: readwrite
-        # Ілюстрації (FR-33…FR-35): єдиний мережевий доступ, після кліку, лише allowlist.
+        # Illustrations (FR-33…FR-35): the only network access, after a click, allowlist only.
         ENABLE_OUTGOING_NETWORK_CONNECTIONS: YES
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         CODE_SIGN_IDENTITY: "-"
@@ -43,8 +43,8 @@ targets:
       - name: Generate bible.sqlite
         basedOnDependencyAnalysis: false
         script: |
-          # База не комітиться: make перебудовує її, якщо її немає або змінилися
-          # data/raw чи код імпорту (інакше стара схема тихо лишається в додатку).
+          # The database is not committed: make rebuilds it if it is missing or if
+          # data/raw or the import code changed (otherwise an old schema silently stays in the app).
           cd "$SRCROOT/.." && make db
   BibleReaderUITests:
     type: bundle.ui-testing

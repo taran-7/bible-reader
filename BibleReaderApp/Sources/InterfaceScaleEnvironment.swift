@@ -3,7 +3,7 @@ import BibleCore
 import SwiftUI
 
 extension InterfaceScale {
-    /// Базовий розмір тексту інтерфейсу: системний розмір шрифту macOS × масштаб (FR-16).
+    /// The base interface text size: the macOS system font size × scale (FR-16).
     var systemFontSize: CGFloat { fontSize(base: NSFont.systemFontSize) }
     var controlSize: ControlSize {
         switch self {
@@ -19,7 +19,7 @@ extension EnvironmentValues {
     @Entry var interfaceScale: InterfaceScale = .standard
 }
 
-/// Екран-повідомлення з явними шрифтами: `ContentUnavailableView` сам шрифт з оточення не бере.
+/// A message screen with explicit fonts: `ContentUnavailableView` does not take the font from the environment.
 struct MessageView: View {
     let title: String
     let systemImage: String

@@ -1,23 +1,23 @@
-# Модулі перекладів (FR-30)
+# Translation modules (FR-30)
 
-Новий переклад додається даними, без змін коду:
+A new translation is added as data, with no code changes:
 
-1. Файл `data/raw/<код>.json` у форматі `thiagobodruk`: масив із 66 книг `{"chapters": [["вірш 1", "вірш 2", …], …]}`.
-   Порожній рядок — пропущений у джерелі вірш (номери наступних зберігаються). Конвертер для getBible і bolls.life —
+1. A `data/raw/<code>.json` file in the `thiagobodruk` format: an array of 66 books `{"chapters": [["verse 1", "verse 2", …], …]}`.
+   An empty string is a verse missing in the source (following verse numbers are kept). A converter for getBible and bolls.life:
    `scripts/convert_getbible.py`.
-2. Рядок у маніфесті `Sources/BibleCore/Resources/translations.json`:
+2. A line in the manifest `Sources/BibleCore/Resources/translations.json`:
 
    ```json
    {"code": "web", "title": "WEB", "language": "en", "languageTitle": "English", "numbering": "kjv", "file": "en_web.json"}
    ```
 
-   - `code` — ключ у базі й налаштуваннях (унікальний);
-   - `language` — `en`, `ru`, `uk`, `cs` (вбудовані назви книг і стемер) або інший код; тоді обов'язковий `books` —
-     66 об'єктів `{"name": …, "abbreviation": …}` у порядку канону, а пошук іде за точними словоформами;
-   - `numbering` — `kjv` (як KJV, Kralická, Огієнко), `synodal` (як Синодальний; вбудована таблиця відповідностей) або нова система, наприклад `vulgate`;
-   - `versification` — для нової системи: `{"segments": [{"book": 19, "chapter": 10, "from": 1, "to": 18, "localChapter": 9, "localVerse": 22}]}` — лише відмінності від KJV (`merge: true` — кілька віршів KJV в одному). Досить в одному модулі цієї системи; між двома не-KJV системами вірш іде через KJV;
-   - порядок рядків — порядок у меню; перші дев'ять мають ⌘⌥1…9;
-   - коди `kjv`, `bkr`, `ohienko`, `synodal` обов'язкові (на них спирається код).
-3. `make db` — база перебудовується; додаток показує переклад у меню, пошуку, «Порівняти» й паралельному перегляді.
+   - `code`: the key in the database and settings (unique);
+   - `language`: `en`, `ru`, `uk`, `cs` (built-in book names and stemmer) or another code; then `books` is required:
+     66 objects `{"name": …, "abbreviation": …}` in canonical order, and search matches exact word forms;
+   - `numbering`: `kjv` (like KJV, Kralická, Ohienko), `synodal` (like the Synodal; built-in mapping table) or a new system, e.g. `vulgate`;
+   - `versification`: for a new system, `{"segments": [{"book": 19, "chapter": 10, "from": 1, "to": 18, "localChapter": 9, "localVerse": 22}]}`, only the differences from KJV (`merge: true` means several KJV verses in one). One module of that system is enough; between two non-KJV systems a verse is mapped through KJV;
+   - line order is menu order; the first nine get ⌘⌥1…9;
+   - the codes `kjv`, `bkr`, `ohienko`, `synodal` are required (the code relies on them).
+3. `make db` rebuilds the database; the app shows the translation in the menu, search, "Compare" and the parallel view.
 
-Маніфест перевіряється при завантаженні: повторний код, нова нумерація без таблиці `versification`, мова без назв книг — помилка.
+The manifest is validated on load: a duplicate code, a new numbering without a `versification` table, or a language without book names is an error.

@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// Стан читача для SwiftUI: переклад, місце, вірші, пошук, помилка бази.
+/// Reader state for SwiftUI: translation, position, verses, search, database error.
 @MainActor @Observable
 public final class ReaderViewModel {
     public var translation: Translation = .kjv {
@@ -11,7 +11,7 @@ public final class ReaderViewModel {
             if !keepLocationOnSwitch { remap(from: oldValue) }
             reload()
             savePosition()
-            // Той самий запит, що дав результати, а не недописаний текст у полі.
+            // The same query that produced the results, not the half-typed text in the field.
             if results != nil || searchError != nil { runSearch(submittedQuery) }
         }
     }
@@ -19,47 +19,47 @@ public final class ReaderViewModel {
     public private(set) var books: [Book] = []
     public private(set) var chapterCount = 0
     public private(set) var verses: [Verse] = [] {
-        // Інший розділ чи переклад — порівняння й ілюстрації попереднього вже не про те, що на екрані.
+        // Another chapter or translation: the previous comparison and illustrations are no longer about what is on screen.
         didSet { rebuildParallel(); comparison = nil; illustrations = nil }
     }
-    /// Перший виділений вірш (з `ChapterView`): при перемиканні перекладу відкривається саме він (FR-27).
+    /// The first selected verse (from `ChapterView`): switching translation opens exactly this one (FR-27).
     public var anchorVerse: Int?
-    /// Esc у меню «Правка» (FR-17): лічильник, бо виділення живе в `ChapterView`.
+    /// Esc in the Edit menu (FR-17): a counter, because the selection lives in `ChapterView`.
     public private(set) var clearSelectionRequest = 0
 
-    /// Зняти виділення віршів; має сенс, лише коли щось виділено і праворуч немає панелі, яку закриває Esc.
+    /// Clear the verse selection; makes sense only when something is selected and there is no panel on the right for Esc to close.
     public var canClearSelection: Bool { anchorVerse != nil && illustrations == nil && comparison == nil }
 
     public func clearSelection() {
         clearSelectionRequest += 1
     }
-    /// Другий переклад поруч (FR-26); `nil` — паралельний перегляд вимкнено.
+    /// The second translation alongside (FR-26); `nil` means the parallel view is off.
     public var parallelTranslation: Translation? {
         didSet { if parallelTranslation != oldValue { rebuildParallel() } }
     }
-    /// Рядки паралельного перегляду: вірш основного перекладу і відповідні вірші другого.
+    /// Parallel view rows: a verse of the main translation and the corresponding verses of the second.
     public private(set) var parallelRows: [ParallelRow] = []
-    /// Таблиці відповідностей нумерацій (KJV — вузол); будуються при першій потребі з реальної бази.
+    /// Numbering mapping tables (KJV is the hub); built on first need from the real database.
     @ObservationIgnored private lazy var versification: Versification? =
         (repository as? SQLiteBibleRepository).flatMap { try? Versification.load(from: $0) }
     @ObservationIgnored private var keepLocationOnSwitch = false
-    /// Вікно з номерами розділів книги, по якій клікнули в списку (FR-37); `nil` — закрито.
+    /// The window with chapter numbers of the book clicked in the list (FR-37); `nil` means closed.
     public private(set) var chapterPicker: ChapterPicker?
-    /// Вірш, до якого треба прокрутити і який підсвітити.
+    /// The verse to scroll to and highlight.
     public var focusedVerse: Int?
-    /// Змінюється на кожен запит фокусу, навіть якщо номер вірша той самий
-    /// (Ин 3:16 → Рим 3:16), щоб SwiftUI `onChange` спрацював.
+    /// Changes on every focus request, even if the verse number is the same
+    /// (Ин 3:16 → Рим 3:16), so SwiftUI `onChange` fires.
     public private(set) var focusRequest = 0
     private var takenFocusRequest = 0
     public var query = ""
-    /// `nil`, коли пошук не активний; порожній масив означає «Нічого не знайдено».
-    /// Містить завантажені сторінки; решту довантажує `loadMore()` (FR-20).
+    /// `nil` when search is not active; an empty array means "Nothing found".
+    /// Holds the loaded pages; `loadMore()` loads the rest (FR-20).
     public private(set) var results: [SearchResult]?
-    /// Загальна кількість збігів в області, для напису «Знайдено: N».
+    /// The total match count in the scope, for the "Found: N" label.
     public private(set) var resultTotal = 0
-    /// Помилка довантаження наступної сторінки: вже завантажені результати лишаються на екрані.
+    /// An error loading the next page: already loaded results stay on screen.
     public private(set) var pageError: String?
-    /// Область пошуку (FR-19); зміна перезапускає активний пошук.
+    /// Search scope (FR-19); changing it reruns the active search.
     public var searchScope: SearchScope = .bible {
         didSet {
             guard searchScope != oldValue else { return }
@@ -67,26 +67,26 @@ public final class ReaderViewModel {
         }
     }
     public static let pageSize = 100
-    /// Запит, за яким отримано `results` (поле пошуку могли вже змінити).
+    /// The query that produced `results` (the search field may have changed since).
     public private(set) var submittedQuery = ""
     public private(set) var loadError: String?
-    /// NFR-3: мілісекунди від старту процесу до першого показаного розділу з віршами (записує `ChapterView`).
+    /// NFR-3: milliseconds from process start to the first shown chapter with verses (recorded by `ChapterView`).
     public private(set) var launchMilliseconds: Int?
 
-    /// Перший виклик із непорожнім розділом фіксує час запуску; наступні ігноруються.
+    /// The first call with a non-empty chapter records the launch time; later ones are ignored.
     public func markFirstChapterShown(now: Date = Date()) {
         guard launchMilliseconds == nil, !verses.isEmpty else { return }
         launchMilliseconds = LaunchClock.millisecondsSinceStart(now: now)
     }
-    /// Помилка пошуку (не плутати з «Нічого не знайдено»).
+    /// A search error (not to be confused with "Nothing found").
     public private(set) var searchError: String?
 
     private let repository: BibleRepository?
-    /// Режим «Порівняти» замість тексту розділу (FR-36); `nil` — звичайне читання.
+    /// "Compare" mode instead of the chapter text (FR-36); `nil` means normal reading.
     public private(set) var comparison: Comparison?
 
-    /// Порівнює розділ на екрані з вибраними перекладами (переклад на екрані — перша колонка).
-    /// Без виділення нема чого підсвічувати — режим не відкривається.
+    /// Compares the on-screen chapter with the chosen translations (the on-screen translation is the first column).
+    /// Without a selection there is nothing to highlight, so the mode does not open.
     public func showComparison(of selectedVerses: Set<Int>, with chosen: [Translation]) {
         guard let repository, !selectedVerses.isEmpty, !verses.isEmpty else { return }
         let others = chosen.filter { $0 != translation }
@@ -102,7 +102,7 @@ public final class ReaderViewModel {
 
     @ObservationIgnored private let positionStore: KeyValueStore?
 
-    /// Останнє місце читання (FR-25): переклад, книга, розділ.
+    /// The last reading position (FR-25): translation, book, chapter.
     struct Position: Codable {
         let translation: Translation
         let book: Int
@@ -111,7 +111,7 @@ public final class ReaderViewModel {
 
     public static let positionKey = "lastPosition"
 
-    /// `positionStore` зберігає останнє місце; без нього додаток відкривається на Бутті 1.
+    /// `positionStore` keeps the last position; without it the app opens at Genesis 1.
     public init(positionStore: KeyValueStore? = nil, openRepository: () throws -> BibleRepository) {
         self.positionStore = positionStore
         do {
@@ -124,12 +124,12 @@ public final class ReaderViewModel {
         if let data = positionStore?.data(forKey: Self.positionKey),
            let position = try? JSONDecoder().decode(Position.self, from: data),
            Book(number: position.book) != nil, position.chapter > 0 {
-            // Присвоєння в init не викликає didSet; розділ поза книгою обріже `reload`.
+            // Assignment in init does not trigger didSet; `reload` clamps a chapter outside the book.
             translation = position.translation
             location = Location(book: position.book, chapter: position.chapter)
         }
         reload()
-        // `reload` міг обрізати розділ — зберігаємо вже дійсне місце.
+        // `reload` may have clamped the chapter, so save the now valid position.
         if positionStore != nil { savePosition() }
     }
 
@@ -140,11 +140,11 @@ public final class ReaderViewModel {
         positionStore.set(data, forKey: Self.positionKey)
     }
 
-    /// Сусідні розділи рахуються при завантаженні розділу, а не на кожен рендер тулбара.
+    /// Neighboring chapters are computed when a chapter loads, not on every toolbar render.
     public private(set) var canGoPrevious = false
     public private(set) var canGoNext = false
 
-    /// ◀ ▶ закривають результати пошуку, як і вибір розділу.
+    /// ◀ ▶ close search results, like choosing a chapter.
     public func goPrevious() {
         if let target = navigator.previous(from: location) { closeSearch(); open(target) }
     }
@@ -167,7 +167,7 @@ public final class ReaderViewModel {
         savePosition()
     }
 
-    /// Клік по книзі: показує її розділи поверх тексту, поточний розділ лишається відкритим (FR-37).
+    /// A click on a book: shows its chapters over the text, the current chapter stays open (FR-37).
     public func pickBook(_ book: Int, from origin: ChapterPicker.Origin = .sidebar) {
         guard let count = try? repository?.chapterCount(book: book, translation: translation), count > 0 else {
             chapterPicker = nil
@@ -177,12 +177,12 @@ public final class ReaderViewModel {
                                       current: book == location.book ? location.chapter : nil, origin: origin)
     }
 
-    /// Клік по назві розділу в тулбарі: розділи відкритої книги донизу від назви.
+    /// A click on the chapter title in the toolbar: the open book's chapters below the title.
     public func pickCurrentBook() {
         pickBook(location.book, from: .title)
     }
 
-    /// Клік по номеру розділу у вікні: відкриває розділ і закриває вікно та результати пошуку.
+    /// A click on a chapter number in the window: opens the chapter and closes the window and search results.
     public func pickChapter(_ chapter: Int) {
         guard let picker = chapterPicker else { return }
         chapterPicker = nil
@@ -190,7 +190,7 @@ public final class ReaderViewModel {
         open(Location(book: picker.book, chapter: chapter))
     }
 
-    /// База відкрита, а зламалося лише читання: «Спробувати ще раз» має сенс.
+    /// The database is open and only a read failed: "Try again" makes sense.
     public var canRetryLoad: Bool { repository != nil && loadError != nil }
 
     public func retryLoad() {
@@ -201,22 +201,22 @@ public final class ReaderViewModel {
         chapterPicker = nil
     }
 
-    /// Відкриває вірш, до якого знайдено нотатку, і закриває результати.
+    /// Opens the verse a note was found for and closes the results.
     public func openNote(_ key: VerseKey) {
         results = nil
         openCanonical(book: key.book, chapter: key.chapter, verse: key.verse)
     }
 
-    // MARK: Нумерація KJV для даних користувача (tech debt #24)
+    // MARK: KJV numbering for user data (tech debt #24)
 
-    /// Ключ вірша поточного розділу в нумерації KJV: так зберігаються нотатки, підсвітки й закладки,
-    /// тож у Синодальному вони стоять на тому самому змісті. Вірш без відповідника — власний номер.
+    /// The key of a current-chapter verse in KJV numbering: notes, highlights and bookmarks are stored this way,
+    /// so in the Synodal they sit on the same content. A verse without a counterpart uses its own number.
     public func canonicalKey(_ verse: Int) -> VerseKey {
         let key = VerseKey(book: location.book, chapter: location.chapter, verse: verse)
         return mapped(key, from: translation, to: .kjv) ?? key
     }
 
-    /// Усі ключі KJV вірша поточного розділу: злитий вірш Синодального показує позначки всіх своїх частин.
+    /// All KJV keys of a current-chapter verse: a merged Synodal verse shows the marks of all its parts.
     public func canonicalKeys(_ verse: Int) -> [VerseKey] {
         let key = VerseKey(book: location.book, chapter: location.chapter, verse: verse)
         guard !translation.sharesKJVNumbering, let all = versification?.allKJV(from: translation.numbering, key), !all.isEmpty
@@ -224,8 +224,8 @@ public final class ReaderViewModel {
         return all
     }
 
-    /// Закладка на поточний розділ у нумерації KJV: розділ KJV, куди потрапляє більшість віршів
-    /// (Чис 13 Синодального починається з KJV 12:16, але це Чис 13).
+    /// A bookmark on the current chapter in KJV numbering: the KJV chapter where most verses land
+    /// (Synodal Num 13 starts with KJV 12:16, but it is Num 13).
     public var canonicalChapter: Bookmark.Target {
         let chapters = verses.map { canonicalKey($0.verse) }
         let counts = Dictionary(chapters.map { ($0.chapter, 1) }, uniquingKeysWith: +)
@@ -233,26 +233,26 @@ public final class ReaderViewModel {
         return Bookmark.Target(book: location.book, chapter: chapter, verse: nil)
     }
 
-    /// Місце, збережене в нумерації KJV, у нумерації поточного перекладу.
+    /// A position stored in KJV numbering, in the current translation's numbering.
     public func localReference(book: Int, chapter: Int, verse: Int?) -> Reference {
         let key = VerseKey(book: book, chapter: chapter, verse: verse ?? 1)
         let target = mapped(key, from: .kjv, to: translation) ?? key
         return Reference(book: target.book, chapter: target.chapter, verseStart: verse == nil ? nil : target.verse)
     }
 
-    /// Відкриває місце, збережене в нумерації KJV.
+    /// Opens a position stored in KJV numbering.
     public func openCanonical(book: Int, chapter: Int, verse: Int?) {
         let reference = localReference(book: book, chapter: chapter, verse: verse)
         open(Location(book: reference.book, chapter: reference.chapter), focus: reference.verseStart)
     }
 
-    /// Відкриває вірш і закриває список результатів.
+    /// Opens a verse and closes the result list.
     public func open(_ result: SearchResult) {
         results = nil
         open(Location(book: result.verse.book, chapter: result.verse.chapter), focus: result.verse.verse)
     }
 
-    /// Посилання веде до місця, інакше повнотекстовий пошук в активному перекладі.
+    /// A reference leads to the passage, otherwise full-text search in the active translation.
     public func submitSearch() {
         guard let repository else { return }
         let text = query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -268,7 +268,7 @@ public final class ReaderViewModel {
         }
     }
 
-    /// Область «поточна книга» для панелі над результатами; якщо вже шукаємо в книзі — саме вона.
+    /// The "current book" scope for the bar above the results; if already searching in a book, that one.
     public var currentBookScope: SearchScope {
         if case .book = searchScope { return searchScope }
         return .book(location.book)
@@ -279,14 +279,14 @@ public final class ReaderViewModel {
         return results.count < resultTotal
     }
 
-    /// Наступна сторінка результатів (прокручування до кінця списку).
+    /// The next page of results (scrolling to the end of the list).
     public func loadMore() {
         guard let repository, let loaded = results, canLoadMore else { return }
         do {
             let page = try repository.searchPage(submittedQuery, translation: translation, scope: searchScope,
                                                  offset: loaded.count, limit: Self.pageSize)
             results = loaded + page.results
-            // Коротка сторінка — кінець списку, навіть якщо лічильник обіцяв більше: інакше індикатор висів би вічно.
+            // A short page is the end of the list, even if the counter promised more: otherwise the indicator would spin forever.
             resultTotal = page.results.count < Self.pageSize ? loaded.count + page.results.count : page.total
             pageError = nil
         } catch {
@@ -310,18 +310,18 @@ public final class ReaderViewModel {
         }
     }
 
-    /// Вірш для фокусу, один раз на кожен запит: повторне відображення розділу
-    /// (після очищення пошуку) не забирає фокус у поля пошуку.
+    /// The verse to focus, once per request: redisplaying the chapter
+    /// (after clearing search) does not steal focus from the search field.
     public func takeFocus() -> Int? {
         guard focusRequest != takenFocusRequest, let focusedVerse else { return nil }
         takenFocusRequest = focusRequest
         return focusedVerse
     }
 
-    /// Панель ілюстрацій праворуч від тексту (FR-33); `nil` — закрита. Новий запит замінює попередній.
+    /// The illustrations panel to the right of the text (FR-33); `nil` means closed. A new request replaces the previous one.
     public private(set) var illustrations: IllustrationRequest?
 
-    /// Відкриває панель ілюстрацій до виділених віршів; нема що шукати — панель не змінюється.
+    /// Opens the illustrations panel for the selected verses; if there is nothing to search, the panel does not change.
     public func showIllustrations(for selectedVerses: Set<Int>) {
         if let request = illustrationRequest(for: selectedVerses) { illustrations = request }
     }
@@ -330,8 +330,8 @@ public final class ReaderViewModel {
         illustrations = nil
     }
 
-    /// Запит на ілюстрації (FR-33): посилання мовою екрана і текст тих самих віршів у KJV — пошук англійською.
-    /// Вірш без відповідника в KJV (доповнення Септуагінти) пропускається; без жодного — `nil`.
+    /// An illustrations request (FR-33): the reference in the screen language and the text of the same verses in KJV, for English search.
+    /// A verse without a KJV counterpart (Septuagint additions) is skipped; with none at all, `nil`.
     public func illustrationRequest(for selectedVerses: Set<Int>) -> IllustrationRequest? {
         let chosen = verses.filter { selectedVerses.contains($0.verse) }
         guard let repository, !chosen.isEmpty else { return nil }
@@ -343,28 +343,28 @@ public final class ReaderViewModel {
             texts += kjv.filter { wanted.contains($0.verse) }.map(\.text)
         }
         guard !texts.isEmpty else { return nil }
-        // `location` завжди в межах канону (його обрізають `open` і `reload`).
+        // `location` is always within the canon (`open` and `reload` clamp it).
         let book = Book.all[location.book - 1].name(in: translation)
         let reference = "\(book) \(location.chapter):\(Quote.verseList(chosen.map(\.verse)))"
         return IllustrationRequest(reference: reference, kjvText: texts, language: translation.language.code)
     }
 
-    /// Текст місця з чорнетки (нумерація KJV) у перекладі на екрані — підказка до живого посилання (FR-38).
+    /// The text of a draft passage (KJV numbering) in the on-screen translation: the tooltip of a live reference (FR-38).
     public func text(of reference: Reference) -> String? {
         guard let repository, let start = reference.verseStart else { return nil }
         let first = localReference(book: reference.book, chapter: reference.chapter, verse: start)
         let last = localReference(book: reference.book, chapter: reference.chapter, verse: reference.verseEnd ?? start)
-        // `localReference` з віршем завжди повертає вірш.
+        // `localReference` with a verse always returns a verse.
         let from = first.verseStart!
         guard let verses = try? repository.verses(book: first.book, chapter: first.chapter, translation: translation)
         else { return nil }
-        // Діапазон, що переходить у наступний розділ іншої нумерації, — до кінця розділу.
+        // A range that runs into the next chapter of another numbering goes to the end of the chapter.
         let to = last.chapter == first.chapter ? last.verseStart! : Int.max
         let texts = verses.filter { (from...max(from, to)).contains($0.verse) }.map(\.text)
         return texts.isEmpty ? nil : texts.joined(separator: " ")
     }
 
-    /// Цитата виділених віршів для «В чорнетку» — та сама, що й копіювання (FR-38).
+    /// The quote of the selected verses for "To draft": the same as copying (FR-38).
     public func quote(for selectedVerses: Set<Int>) -> String? {
         Quote.format(verses.filter { selectedVerses.contains($0.verse) })
     }
@@ -375,10 +375,10 @@ public final class ReaderViewModel {
         }
     }
 
-    /// Вірш під тим самим змістом в іншій нумерації; без виділення — розділ за першим віршем.
+    /// The verse with the same content in another numbering; without a selection, the chapter of the first verse.
     private func remap(from old: Translation) {
         let verse = anchorVerse ?? 1
-        // Вірш без відповідника (доповнення Септуагінти) — найближчий попередній, що його має.
+        // A verse without a counterpart (Septuagint additions) maps to the nearest previous one that has it.
         var found: VerseKey?
         for candidate in stride(from: verse, through: 1, by: -1) {
             found = mapped(VerseKey(book: location.book, chapter: location.chapter, verse: candidate), from: old, to: translation)
@@ -398,8 +398,8 @@ public final class ReaderViewModel {
         return versification?.map(key, from: source, to: target)
     }
 
-    /// Вірші другого перекладу розкладаються по рядках основного: кожен стає біля вірша, у який
-    /// відображається назад; вірш без відповідника (доповнення Септуагінти) — біля попереднього.
+    /// Verses of the second translation are laid out over the main one's rows: each goes next to the verse it
+    /// maps back to; a verse without a counterpart (Septuagint additions) goes next to the previous one.
     private func rebuildParallel() {
         guard let other = parallelTranslation, other != translation, let repository, !verses.isEmpty else {
             parallelRows = []
@@ -408,7 +408,7 @@ public final class ReaderViewModel {
         parallelRows = zip(verses, alignedVerses(of: other, in: repository)).map { ParallelRow(primary: $0, secondary: $1) }
     }
 
-    /// Вірші іншого перекладу по рядках розділу на екрані (FR-26, FR-36).
+    /// Another translation's verses over the rows of the on-screen chapter (FR-26, FR-36).
     private func alignedVerses(of other: Translation, in repository: BibleRepository) -> [[Verse]] {
         var secondary: [[Verse]] = Array(repeating: [], count: verses.count)
         let book = location.book
@@ -442,7 +442,7 @@ public final class ReaderViewModel {
                 location = Location(book: location.book, chapter: chapterCount)
             }
             verses = try repository.verses(book: location.book, chapter: location.chapter, translation: translation)
-            // Разова помилка читання не лишає екран помилки назавжди (tech debt #11).
+            // A one-off read error does not leave the error screen forever (tech debt #11).
             loadError = nil
             let navigator = navigator
             canGoPrevious = navigator.previous(from: location) != nil
@@ -453,22 +453,22 @@ public final class ReaderViewModel {
     }
 }
 
-/// Рядок паралельного перегляду (FR-26).
+/// A parallel view row (FR-26).
 public struct ParallelRow: Identifiable, Sendable {
     public let primary: Verse
     public let secondary: [Verse]
     public var id: Int { primary.verse }
 }
 
-/// Вміст вікна вибору розділу: книга, кількість розділів і поточний розділ, якщо це відкрита книга.
+/// The chapter picker contents: the book, its chapter count and the current chapter if this is the open book.
 public struct ChapterPicker: Equatable, Sendable {
     public let book: Int
     public let chapterCount: Int
     public let current: Int?
-    /// Звідки відкрито: від книги в бічній панелі чи від назви розділу в тулбарі.
+    /// Where it was opened from: a book in the sidebar or the chapter title in the toolbar.
     public let origin: Origin
     public enum Origin: Sendable { case sidebar, title }
-    /// Стовпців у сітці: стрілки ↑ ↓ переходять на рядок, тобто на стільки розділів.
+    /// Grid columns: the ↑ ↓ arrows move by a row, that is by this many chapters.
     public static let columns = 10
 
     public init(book: Int, chapterCount: Int, current: Int?, origin: Origin = .sidebar) {
@@ -478,10 +478,10 @@ public struct ChapterPicker: Equatable, Sendable {
         self.origin = origin
     }
 
-    /// Розділ під курсором клавіатури, коли вікно відкрилося: поточний або перший.
+    /// The chapter under the keyboard cursor when the window opened: the current one or the first.
     public var initialCursor: Int { current ?? 1 }
 
-    /// Курсор після стрілки; не виходить за межі книги.
+    /// The cursor after an arrow; it does not leave the book.
     public func move(_ cursor: Int, by delta: Int) -> Int {
         min(max(cursor + delta, 1), chapterCount)
     }

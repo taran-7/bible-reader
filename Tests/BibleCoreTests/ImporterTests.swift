@@ -18,7 +18,7 @@ import Testing
     // @trace FR-3
     @Test func testTruncatedSourceFailsWithoutOutput() throws {
         let dir = try TestSupport.tempDirectory()
-        try TestSupport.writeFixture(to: dir)  // по 2 книги в кожному файлі
+        try TestSupport.writeFixture(to: dir)  // 2 books in each file
         let out = dir.appendingPathComponent("bible.sqlite")
 
         #expect(throws: ImportError.incomplete(Translation.kjv.sourceFileName, books: 2, expected: 66)) {
@@ -152,7 +152,7 @@ import Testing
         let out = dir.appendingPathComponent("bible.sqlite")
         try BibleImporter.run(rawDirectory: dir, output: out)
         #expect(try TestSupport.count("SELECT COUNT(DISTINCT translation) FROM verses", in: out) == 4)
-        // Чеська діакритика згортається: «buh» знаходить «Bůh».
+        // Czech diacritics are folded: «buh» finds «Bůh».
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses_fts WHERE verses_fts MATCH 'buh'", in: out) == 1)
     }
 }

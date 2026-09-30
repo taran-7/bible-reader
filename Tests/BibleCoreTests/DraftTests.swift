@@ -21,7 +21,7 @@ import Testing
         let second = store.create()
         #expect(store.drafts.map(\.id) == [second.id, first.id])
         #expect(second.displayTitle == "Без назви")
-        // Зміна піднімає чорнетку нагору; та сама — нічого не пише.
+        // A change moves the draft to the top; the same text writes nothing.
         clock.now += 60
         store.update(first.id, text: "Бог є любов")
         store.update(first.id, text: "Бог є любов")
@@ -44,7 +44,7 @@ import Testing
         let love = store.create(title: "Про любов", text: "1 Кор 13")
         store.create(title: "Віра", text: "Євр 11:1 — вірою ЛЮБОВ'ю")
         store.create(title: "Надія", text: "Рим 5:5")
-        // Шукаємо в назві й тексті, без регістру: «ЛЮБОВ'ю» теж містить «любов».
+        // Search in title and text, case-insensitive: «ЛЮБОВ'ю» also contains «любов».
         #expect(Set(store.list(matching: " любов ").map(\.title)) == ["Про любов", "Віра"])
         #expect(store.list(matching: "").count == 3)
         store.activeID = love.id
@@ -96,7 +96,7 @@ import Testing
         store.mentionFilter = VerseKey(book: 1, chapter: 1, verse: 1)
         #expect(store.list(matching: "").isEmpty)
         store.mentionFilter = nil
-        // Посилання прибрали — позначки зникають; видалена чорнетка теж не лишає позначок.
+        // The reference was removed, so the marks disappear; a deleted draft leaves no marks either.
         store.update(love.id, text: "текст")
         #expect(!store.isMentioned([key(5)]))
         store.update(other.id, text: "Ин 3:16")
@@ -127,7 +127,7 @@ import Testing
         store.dismissError()
         #expect(store.lastError == nil)
         #expect(makeStore(database).lastError != nil)
-        // Без бази — лише пам'ять; стандартні годинник та ідентифікатори.
+        // Without a database, memory only; default clock and identifiers.
         let plain = DraftStore(database: nil)
         let made = plain.create()
         #expect(!made.id.isEmpty && abs(made.created.timeIntervalSinceNow) < 60)
@@ -192,7 +192,7 @@ import Testing
         let model = ReaderViewModel { try SQLiteBibleRepository(path: TestSupport.realDatabase) }
         #expect(model.text(of: Reference(book: 43, chapter: 3, verseStart: 16))?.hasPrefix("For God so loved") == true)
         model.translation = .synodal
-        // Пс 23:1 KJV — Пс 22:1 Синодального.
+        // KJV Ps 23:1 is Synodal Ps 22:1.
         #expect(model.text(of: Reference(book: 19, chapter: 23, verseStart: 1, verseEnd: 2))?.hasPrefix("псалом Давида. Господь - Пастырь мой") == true)
         #expect(model.text(of: Reference(book: 43, chapter: 3)) == nil)
         #expect(model.text(of: Reference(book: 43, chapter: 99, verseStart: 1)) == nil)

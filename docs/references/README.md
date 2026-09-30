@@ -1,3 +1,3 @@
 # References
 
-Сюди кладемо llms.txt-довідки для агента (GRDB, FTS5, SwiftUI), коли вони знадобляться. Кожен файл має містити посилання на джерело.
+llms.txt references for the agent (GRDB, FTS5, SwiftUI) go here when needed. Every file must link to its source.

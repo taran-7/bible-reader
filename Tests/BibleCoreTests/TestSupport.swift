@@ -14,7 +14,7 @@ enum TestSupport {
         return url
     }
 
-    /// Дві книги в кожному з чотирьох перекладів у форматі thiagobodruk.
+    /// Two books in each of the four translations in the thiagobodruk format.
     static func writeFixture(to dir: URL, kjv: String? = nil, synodal: String? = nil, ohienko: String? = nil, bkr: String? = nil) throws {
         let kjvJSON = kjv ?? """
         [{"abbrev":"gn","name":"Genesis","chapters":[["In the beginning God created the heaven and the earth.","And the earth was {without} form."]]},
@@ -43,7 +43,7 @@ enum TestSupport {
         }
     }
 
-    /// Усі вірші перекладу в порядку книг.
+    /// All verses of a translation in book order.
     static func keys(_ translation: Translation, in db: URL) throws -> [VerseKey] {
         let queue = try DatabaseQueue(path: db.path)
         return try queue.read { db in
@@ -61,7 +61,7 @@ enum TestSupport {
         try DatabaseQueue(path: db.path).read { try String.fetchOne($0, sql: sql) }
     }
 
-    /// База з реальних даних, імпортується один раз на прогін тестів.
+    /// A database from real data, imported once per test run.
     static let realDatabase: URL = {
         let out = try! tempDirectory().appendingPathComponent("bible.sqlite")
         try! BibleImporter.run(rawDirectory: rawData, output: out)

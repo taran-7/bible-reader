@@ -8,9 +8,9 @@ struct SearchResultsView: View {
     @Environment(\.theme) private var theme
 
     var body: some View {
-        // Нотатки з текстом запиту (FR-24) — над віршами; рахуємо один раз.
+        // Notes with the query text (FR-24) above the verses; computed once.
         let notes = userData.searchNotes(model.submittedQuery)
-        // Панель області видно й на екрані помилки: інакше область, з якою пошук упав, не змінити.
+        // The scope bar is visible on the error screen too: otherwise the scope search failed with could not be changed.
         VStack(spacing: 0) {
             header
             if let error = model.searchError {
@@ -42,7 +42,7 @@ struct SearchResultsView: View {
         }
     }
 
-    /// Область пошуку (FR-19) і лічильник (FR-20).
+    /// Search scope (FR-19) and counter (FR-20).
     private var header: some View {
         HStack(spacing: 12) {
             Picker("Де шукати", selection: $model.searchScope) {
@@ -122,7 +122,7 @@ struct SearchResultsView: View {
                 .listRowBackground(Color(theme.results))
                 .listRowSeparator(.hidden)
             } else if model.canLoadMore {
-                // Довантаження, коли прокрутили до кінця (FR-20).
+                // Load more when scrolled to the end (FR-20).
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .onAppear { model.loadMore() }

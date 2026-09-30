@@ -1,5 +1,5 @@
 # Reliability
 
-- БД відкривається read-only з бандла; якщо не відкрилась, показуємо екран помилки.
-- FTS-запит екранується, тому некоректний ввід (`"`, `*`) не призводить до падіння.
-- Порожній результат пошуку: «Нічого не знайдено».
+- The database is opened read-only from the bundle; if it fails to open, an error screen is shown.
+- The FTS query is escaped, so malformed input (`"`, `*`) does not crash the app.
+- Empty search result: "Nothing found".

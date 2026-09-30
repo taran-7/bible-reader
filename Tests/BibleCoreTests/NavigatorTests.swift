@@ -39,7 +39,7 @@ import Testing
 
     // @trace FR-6
     @Test func testPreviousIntoEmptyBookIsNil() {
-        // Зіпсована база: у попередньої книги 0 розділів — не «розділ 0» (tech debt #11).
+        // A corrupted database: the previous book has 0 chapters, which must not give "chapter 0" (tech debt #11).
         let broken = Navigator { $0 == 1 ? 0 : 10 }
         #expect(broken.previous(from: Location(book: 2, chapter: 1)) == nil)
         #expect(broken.previous(from: Location(book: 2, chapter: 2)) == Location(book: 2, chapter: 1))

@@ -1,45 +1,45 @@
-# Джерела для пошуку ілюстрацій (6.17)
+# Illustration search sources (6.17)
 
-Стартовий список доменів для пошуку реальних історій-ілюстрацій. Чернетка: конфесійну належність і актуальність кожного сайту перевіряємо вручну перед релізом (колонка «Перевірено»).
+The starting list of domains for finding real illustration stories. Draft: each site's denomination and relevance are checked manually before release (the "Verified" column).
 
-Правила (див. [PRD 6.17](prd.md)):
-- Пошук лише в allowlist; англомовні баптистські або протестантські (євангельські) ресурси.
-- Blocklist православних і католицьких доменів як запасна перевірка в `BibleCore`.
-- Живий пошук під час кліку (без індексу) ходить лише на домени з allowlist, API Вікіпедії і, з ключем користувача, Brave Search; blocklist перевіряє `BibleCore`.
+Rules (see [PRD 6.17](prd.md)):
+- Search only within the allowlist; English-language Baptist or Protestant (evangelical) resources.
+- A blocklist of Orthodox and Catholic domains as a fallback check in `BibleCore`.
+- Live search on click (no index) goes only to allowlisted domains, the Wikipedia API and, with the user's key, Brave Search; `BibleCore` checks the blocklist.
 
-## Як шукаємо (перевірено 2026-09-28)
-- **WordPress REST, повний текст (початок ≤ 1500 символів):** `christianitytoday.com` (туди ж переадресовує `preachingtoday.com`), `imb.org`.
-- **Закриті перевіркою Cloudflare для ботів** (`bible.org`, `desiringgod.org`, `founders.org`, `baptistpress.com`, `vom.org`, `thegospelcoalition.org`, `ligonier.org`) і без відкритого API (`sermonillustrations.com`, `sermoncentral.com`, `christianhistoryinstitute.org`, `spurgeon.org`, `wholesomewords.org`, `billygraham.org`, `moodybible.org`): лише через Brave Search `site:` — заголовок, уривок, посилання. Захист не обходимо.
-- **Вікіпедія** (`en.wikipedia.org`, CC BY-SA): вступ статті; лише біографії (категорії «… births/deaths»), без категорій зі словами catholic, orthodox, pope, saint, cardinal, monk, nun, monastery, patriarch, jesuit, franciscan, dominican, benedictine, beatified, canonized, venerated.
+## How we search (verified 2026-09-28)
+- **WordPress REST, full text (first ≤ 1500 characters):** `christianitytoday.com` (`preachingtoday.com` redirects there), `imb.org`.
+- **Behind a Cloudflare bot check** (`bible.org`, `desiringgod.org`, `founders.org`, `baptistpress.com`, `vom.org`, `thegospelcoalition.org`, `ligonier.org`) and without an open API (`sermonillustrations.com`, `sermoncentral.com`, `christianhistoryinstitute.org`, `spurgeon.org`, `wholesomewords.org`, `billygraham.org`, `moodybible.org`): only via Brave Search `site:` (title, snippet, link). We do not bypass the protection.
+- **Wikipedia** (`en.wikipedia.org`, CC BY-SA): the article intro; biographies only (categories "… births/deaths"), excluding categories with the words catholic, orthodox, pope, saint, cardinal, monk, nun, monastery, patriarch, jesuit, franciscan, dominican, benedictine, beatified, canonized, venerated.
 
 ## Allowlist
 
-| Домен | Що там | Напрям | Перевірено |
+| Domain | What is there | Tradition | Verified |
 |---|---|---|---|
-| `sermonillustrations.com` | збірка проповідницьких ілюстрацій за темами | протестантський | ні |
-| `preachingtoday.com` | ілюстрації й проповіді (Christianity Today) | євангельський | ні |
-| `sermoncentral.com` | ілюстрації, проповіді | євангельський | ні |
-| `bible.org` | ілюстрації, статті (Dallas Theological Seminary) | євангельський | ні |
-| `christianitytoday.com` | статті, розділ Christian History | євангельський | ні |
-| `christianhistoryinstitute.org` | журнал Christian History, біографії | протестантський | ні |
-| `desiringgod.org` | біографії, статті (John Piper) | реформатський баптистський | ні |
-| `spurgeon.org` | Spurgeon Center, Midwestern Baptist Seminary | баптистський | ні |
-| `founders.org` | історія баптистів, біографії | реформатський баптистський | ні |
-| `baptistpress.com` | новини й свідчення (Southern Baptist Convention) | баптистський | ні |
-| `imb.org` | історії місіонерів (International Mission Board, SBC) | баптистський | ні |
-| `wholesomewords.org` | біографії місіонерів і проповідників | євангельський | ні |
-| `vom.org` | свідчення переслідуваних християн (Voice of the Martyrs) | протестантський | ні |
-| `billygraham.org` | свідчення, історії навернення | євангельський | ні |
-| `thegospelcoalition.org` | статті, біографії | реформатський євангельський | ні |
-| `ligonier.org` | церковна історія, біографії | реформатський | ні |
-| `moodybible.org` | статті, історія (Moody Bible Institute) | євангельський | ні |
-| `en.wikipedia.org` | біографії (фільтр категорій) | нейтральний | так (рішення власника 2026-09-28) |
+| `sermonillustrations.com` | a collection of sermon illustrations by topic | Protestant | no |
+| `preachingtoday.com` | illustrations and sermons (Christianity Today) | evangelical | no |
+| `sermoncentral.com` | illustrations, sermons | evangelical | no |
+| `bible.org` | illustrations, articles (Dallas Theological Seminary) | evangelical | no |
+| `christianitytoday.com` | articles, Christian History section | evangelical | no |
+| `christianhistoryinstitute.org` | Christian History magazine, biographies | Protestant | no |
+| `desiringgod.org` | biographies, articles (John Piper) | Reformed Baptist | no |
+| `spurgeon.org` | Spurgeon Center, Midwestern Baptist Seminary | Baptist | no |
+| `founders.org` | Baptist history, biographies | Reformed Baptist | no |
+| `baptistpress.com` | news and testimonies (Southern Baptist Convention) | Baptist | no |
+| `imb.org` | missionary stories (International Mission Board, SBC) | Baptist | no |
+| `wholesomewords.org` | biographies of missionaries and preachers | evangelical | no |
+| `vom.org` | testimonies of persecuted Christians (Voice of the Martyrs) | Protestant | no |
+| `billygraham.org` | testimonies, conversion stories | evangelical | no |
+| `thegospelcoalition.org` | articles, biographies | Reformed evangelical | no |
+| `ligonier.org` | church history, biographies | Reformed | no |
+| `moodybible.org` | articles, history (Moody Bible Institute) | evangelical | no |
+| `en.wikipedia.org` | biographies (category filter) | neutral | yes (owner decision 2026-09-28) |
 
-Ризик: навіть протестантські сайти (особливо `christianitytoday.com`, `christianhistoryinstitute.org`) іноді пишуть про католицьких чи православних персоналій. Allowlist гарантує джерело, а не тему; промпт додатково просить історії про протестантських героїв віри або нейтральні історичні події.
+Risk: even Protestant sites (especially `christianitytoday.com`, `christianhistoryinstitute.org`) sometimes write about Catholic or Orthodox figures. The allowlist guarantees the source, not the topic; the prompt additionally asks for stories about Protestant heroes of faith or neutral historical events.
 
-## Blocklist (запасна перевірка)
+## Blocklist (fallback check)
 
 `vatican.va`, `catholic.com`, `catholicculture.org`, `catholicnewsagency.com`, `ewtn.com`, `newadvent.org`, `franciscanmedia.org`, `aleteia.org`, `oca.org`, `goarch.org`, `orthodoxwiki.org`, `orthochristian.com`, `antiochian.org`, `pravoslavie.ru`, `azbyka.ru`.
 
-## Як оновлювати
-Список живе в конфігурації додатка (один файл, без змін коду). Новий домен додаємо з позначкою «Перевірено: ні», після ручної перевірки (сторінка «About/Beliefs» сайту) ставимо «так».
+## How to update
+The list lives in the app configuration (one file, no code changes). A new domain is added marked "Verified: no"; after a manual check (the site's "About/Beliefs" page) it is set to "yes".

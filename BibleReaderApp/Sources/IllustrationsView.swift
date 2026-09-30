@@ -9,8 +9,8 @@ import SwiftUI
 import FoundationModels
 #endif
 
-/// Панель «Ілюстрації» праворуч від тексту (FR-33): до 7 історій до виділених віршів, «Отримати ще»,
-/// «Перекласти» і «Скопіювати» на картці. Нічого не зберігається: закрили панель — історії зникли.
+/// The "Illustrations" panel to the right of the text (FR-33): up to 7 stories for the selected verses, "Get more",
+/// "Translate" and "Copy" on the card. Nothing is stored: close the panel and the stories are gone.
 struct IllustrationsView: View {
     let request: IllustrationRequest
     let close: () -> Void
@@ -57,7 +57,7 @@ struct IllustrationsView: View {
             failure("Не вдалося знайти ілюстрації", detail: message)
         case .idle:
             if model.stories.isEmpty {
-                // Модель відкинула всіх переглянутих кандидатів, але шукати ще є де.
+                // The model rejected all reviewed candidates, but there is more to search.
                 Text(model.hasMore ? "Поки нічого доречного — «Отримати ще» шукає далі" : "Нічого не знайдено").foregroundStyle(Color(theme.secondaryText))
                     .accessibilityIdentifier("illustrations-empty")
             }
@@ -97,12 +97,12 @@ struct IllustrationsView: View {
     }
 }
 
-/// Картка історії: заголовок, джерело й дата, текст, «Читати на сайті» для уривка, «Перекласти», «Скопіювати».
-/// «Перекласти» — мовою Біблії на екрані системним перекладачем Apple (офлайн, macOS 15+); «Скопіювати» бере те,
-/// що зараз на картці.
+/// A story card: title, source and date, text, "Read on site" for an excerpt, "Translate", "Copy".
+/// "Translate" into the on-screen Bible's language via Apple's system translator (offline, macOS 15+); "Copy" takes what
+/// is currently on the card.
 struct IllustrationCard: View {
     let story: Illustration
-    /// Мова перекладу Біблії на екрані; `nil` — англійська, кнопки немає.
+    /// The on-screen Bible translation's language; `nil` means English, no button.
     let targetLanguage: String?
     @State private var copied = false
     @State private var translated: (title: String, text: String)?
@@ -126,7 +126,7 @@ struct IllustrationCard: View {
                 .font(.system(size: scale.systemFontSize * 0.9))
                 .foregroundStyle(Color(theme.secondaryText))
             if let reason = story.reason {
-                // Пояснення моделі вже мовою перекладу на екрані (FR-41).
+                // The model's explanation is already in the on-screen translation's language (FR-41).
                 (Text("Чому ця історія: ").bold() + Text(reason))
                     .font(.system(size: scale.systemFontSize * 0.95))
                     .foregroundStyle(Color(theme.accent))
@@ -152,7 +152,7 @@ struct IllustrationCard: View {
                     .accessibilityIdentifier("illustration-translate")
                 }
                 Button {
-                    // Те, що зараз на картці (оригінал чи переклад), з джерелом (FR-39).
+                    // What is currently on the card (original or translation), with the source (FR-39).
                     drafts.append("### " + story.copyText(title: shown.title, text: shown.text))
                     addedToDraft = true
                 } label: {
@@ -199,8 +199,8 @@ struct IllustrationCard: View {
     }
 }
 
-/// Системний перекладач Apple (Translation, macOS 15+): англійська → мова Біблії на екрані, на пристрої.
-/// Мовний пакет система завантажує сама при першому перекладі; на macOS 14 кнопки немає.
+/// Apple's system translator (Translation, macOS 15+): English → the on-screen Bible's language, on-device.
+/// The system downloads the language pack itself on the first translation; on macOS 14 there is no button.
 struct TranslationSupport: ViewModifier {
     let request: Int
     let target: String?
@@ -235,7 +235,7 @@ struct TranslationSupport: ViewModifier {
         let started: () -> Void
         @State private var configuration: TranslationSession.Configuration?
 
-        /// Сесія перекладу не `Sendable`: працюємо з нею на тому самому акторі, що й `translationTask`.
+        /// The translation session is not `Sendable`: work with it on the same actor as `translationTask`.
         @MainActor private static func translate(_ texts: [String], with session: TranslationSession) async -> Result<[String], Error> {
             do {
                 var translated: [String] = []
@@ -266,7 +266,7 @@ struct TranslationSupport: ViewModifier {
     #endif
 }
 
-/// Стан вікна: історії, «Шукаю…», помилки. Пошук і фільтри — у `IllustrationSearch` (BibleCore).
+/// Window state: stories, "Searching…", errors. Search and filters are in `IllustrationSearch` (BibleCore).
 @MainActor @Observable
 final class IllustrationsModel {
     enum State: Equatable { case idle, loading, offline, failed(String) }
@@ -275,7 +275,7 @@ final class IllustrationsModel {
     private(set) var state: State = .idle
     private(set) var hasMore = false
     private(set) var hasBraveKey = false
-    /// Хто відібрав історії (FR-41) і чому відбір моделлю не спрацював.
+    /// Who curated the stories (FR-41) and why model curation did not work.
     private(set) var curatorName: String?
     private(set) var curatorProblem: String?
     @ObservationIgnored private var search: IllustrationSearch?
@@ -317,13 +317,13 @@ final class IllustrationsModel {
         }
     }
 
-    /// «Повторити»: з нуля, якщо ще нічого не показано, інакше — та сама партія ще раз.
+    /// "Retry": from scratch if nothing is shown yet, otherwise the same batch again.
     func retry() async {
         if stories.isEmpty, let request { await start(request) } else { await loadMore() }
     }
 }
 
-/// Ключі API користувача в Keychain (Brave Search, Claude): у `.app` ключів немає (їх витягнув би будь-хто).
+/// The user's API keys in the Keychain (Brave Search, Claude): the `.app` has no keys (anyone could extract them).
 struct KeychainKey {
     static let brave = KeychainKey(service: "dev.taraniuk.BibleReader.brave-search")
     static let claude = KeychainKey(service: "dev.taraniuk.BibleReader.claude")
@@ -339,7 +339,7 @@ struct KeychainKey {
         return key
     }
 
-    /// Порожній рядок видаляє ключ. `false` — Keychain не прийняв запис.
+    /// An empty string deletes the key. `false` means the Keychain did not accept the write.
     @discardableResult
     func save(_ key: String) -> Bool {
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service]
@@ -352,20 +352,20 @@ struct KeychainKey {
         if SecItemUpdate(base as CFDictionary, [kSecValueData as String: data] as CFDictionary) == errSecSuccess { return true }
         var item = base
         item[kSecValueData as String] = data
-        // Лише на цьому Mac і лише коли він розблокований: ключ не синхронізується й не мігрує.
+        // Only on this Mac and only while it is unlocked: the key does not sync or migrate.
         item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
     }
 }
 
-/// Модель для відбору (FR-41): Claude, якщо є ключ; інакше модель Apple на Mac, якщо доступна; інакше без моделі.
+/// The curation model (FR-41): Claude if there is a key; otherwise the Apple on-device model if available; otherwise no model.
 enum Curators {
     static func preferred(http: IllustrationHTTP) -> IllustrationCurator? {
         if let key = KeychainKey.claude.load() { return ClaudeCurator(key: key, http: http) }
         return appleCurator
     }
 
-    /// Назва моделі, що відбиратиме, для Налаштувань.
+    /// The name of the model that will curate, for Settings.
     static var activeName: String? {
         KeychainKey.claude.load() != nil ? "Claude (твій ключ)" : appleCurator.map { _ in "модель Apple на цьому Mac" }
     }
@@ -379,11 +379,11 @@ enum Curators {
 }
 
 #if canImport(FoundationModels)
-/// Модель Apple на пристрої (Apple Intelligence, macOS 26+): без ключа і без мережі.
+/// The Apple on-device model (Apple Intelligence, macOS 26+): no key and no network.
 @available(macOS 26.0, *)
 struct AppleCurator: IllustrationCurator {
     let name = "Apple Intelligence"
-    /// Контекст моделі на Mac ~4 тис. токенів: менший пул і коротші уривки, ніж для Claude.
+    /// The on-device model context is ~4k tokens: a smaller pool and shorter excerpts than for Claude.
     let candidatePool = 7
     let excerptLength = 300
 
@@ -395,7 +395,7 @@ struct AppleCurator: IllustrationCurator {
 }
 #endif
 
-/// «Ілюстрації» поруч із «Порівняти» на виділенні (FR-33).
+/// "Illustrations" next to "Compare" on the selection (FR-33).
 struct IllustrationsButton: View {
     let action: () -> Void
 

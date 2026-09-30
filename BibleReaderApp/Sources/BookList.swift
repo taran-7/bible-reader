@@ -4,16 +4,16 @@ import SwiftUI
 struct BookList: View {
     let model: ReaderViewModel
     let fontSize: Double
-    /// Розмір шрифту віршів — для номерів у вікні розділів.
+    /// The verse font size, for numbers in the chapter window.
     let verseFontSize: Double
     @Environment(\.theme) private var theme
     @Environment(UserData.self) private var userData
 
-    /// Підсвічено книгу з відкритим вікном розділів, інакше — поточну.
+    /// The book with an open chapter window is highlighted, otherwise the current one.
     private var highlighted: Int { model.chapterPicker?.book ?? model.location.book }
 
-    /// Вибір у `List` — це книга з відкритим вікном розділів; без вікна нічого не вибрано,
-    /// тож і клік по поточній книзі, і стрілки ↑ ↓ відкривають вікно (FR-37, NFR-4).
+    /// The `List` selection is the book with an open chapter window; without a window nothing is selected,
+    /// so both a click on the current book and the ↑ ↓ arrows open the window (FR-37, NFR-4).
     private var selection: Binding<Int?> {
         Binding(
             get: { model.chapterPicker?.book },
@@ -55,13 +55,13 @@ struct BookList: View {
     private func section(_ title: String, _ testament: Testament) -> some View {
         Section {
             ForEach(model.books.filter { $0.testament == testament }) { book in
-                // Клік показує розділи книги поверх тексту (FR-37), а не відкриває одразу перший.
+                // A click shows the book's chapters over the text (FR-37) instead of opening the first one right away.
                 Text(book.name(in: model.translation))
                     .font(.system(size: fontSize))
                     .foregroundStyle(Color(theme.text))
                     .accessibilityIdentifier("book-\(book.number)")
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    // Вікно розділів прикріплене збоку до цієї книги.
+                    // The chapter window is attached to the side of this book.
                     .popover(isPresented: model.chapterPickerBinding(book: book.number, origin: .sidebar),
                              arrowEdge: .trailing) {
                         if let picker = model.chapterPicker {

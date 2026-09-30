@@ -1,55 +1,55 @@
 # user-notes Specification
 
 ## Purpose
-Закладки, підсвітки й нотатки користувача в окремій локальній базі, пошук і експорт нотаток, відкриття на останньому місці читання.
+User bookmarks, highlights and notes in a separate local database, note search and export, opening at the last reading position.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-22, FR-23, FR-24, FR-25.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-22, FR-23, FR-24, FR-25.
 
 ## Requirements
 
-### Requirement: Закладки
-Користувач SHALL мати змогу додати й прибрати закладку на вірш (контекстне меню) і на розділ (кнопка в тулбарі, ⌘D). Закладки SHALL показуватися секцією «Закладки» у бічній панелі в порядку книг, і клік SHALL відкривати місце закладки.
+### Requirement: Bookmarks
+The user SHALL be able to add and remove a bookmark on a verse (context menu) and on a chapter (toolbar button, ⌘D). Bookmarks SHALL show as a «Закладки» (Bookmarks) section in the sidebar in book order, and a click SHALL open the bookmarked place.
 
-#### Scenario: Закладка на вірш
-- **WHEN** на Ин 3:16 обирають «Додати закладку»
-- **THEN** біля вірша з'являється значок закладки, а в бічній панелі — рядок «John 3:16», клік по якому відкриває John 3 з віршем 16 у фокусі
+#### Scenario: A verse bookmark
+- **WHEN** «Додати закладку» (Add bookmark) is chosen on Ин 3:16
+- **THEN** a bookmark icon appears next to the verse, and the sidebar gets a "John 3:16" row whose click opens John 3 with verse 16 in focus
 
-#### Scenario: Закладка на розділ
-- **WHEN** у John 3 натискають ⌘D
-- **THEN** у бічній панелі з'являється «John 3»; повторне ⌘D прибирає її
+#### Scenario: A chapter bookmark
+- **WHEN** ⌘D is pressed in John 3
+- **THEN** "John 3" appears in the sidebar; pressing ⌘D again removes it
 
-### Requirement: Підсвітка віршів
-Виділені вірші SHALL підсвічуватися одним з кольорів (жовтий, зелений, блакитний, рожевий) або прибиратися; підсвітка SHALL бути видно фоном рядка, а VoiceOver SHALL читати її колір.
+### Requirement: Verse highlights
+Selected verses SHALL be highlighted in one of the colors (yellow, green, blue, pink) or cleared; the highlight SHALL be visible as the row background, and VoiceOver SHALL read its color.
 
-#### Scenario: Колір
-- **WHEN** Ин 3:16–17 підсвічують жовтим, а потім 16 — зеленим
-- **THEN** 16 зелений, 17 жовтий; «Прибрати підсвітку» знімає колір
+#### Scenario: Color
+- **WHEN** Ин 3:16–17 are highlighted yellow, and then 16 green
+- **THEN** 16 is green, 17 is yellow; «Прибрати підсвітку» (Remove highlight) clears the color
 
-### Requirement: Нотатки
-Користувач SHALL мати змогу написати, змінити й видалити текстову нотатку до вірша; біля вірша з нотаткою SHALL бути значок, клік по якому відкриває нотатку. Пошук SHALL знаходити нотатки за текстом (без регістру) і показувати їх над віршами.
+### Requirement: Notes
+The user SHALL be able to write, edit and delete a text note on a verse; a verse with a note SHALL have an icon whose click opens the note. Search SHALL find notes by text (case-insensitive) and show them above verses.
 
-#### Scenario: Нотатка і пошук
-- **WHEN** до Ин 3:16 додають нотатку «Центральний вірш» і шукають `центральний`
-- **THEN** у результатах є нотатка до John 3:16, клік відкриває вірш
+#### Scenario: A note and search
+- **WHEN** the note «Центральний вірш» is added to Ин 3:16 and `центральний` is searched
+- **THEN** the results include the note on John 3:16, a click opens the verse
 
-#### Scenario: Порожня нотатка
-- **WHEN** текст нотатки стерли й зберегли
-- **THEN** нотатку видалено, значок зник
+#### Scenario: An empty note
+- **WHEN** the note text is erased and saved
+- **THEN** the note is deleted, the icon is gone
 
-### Requirement: Окреме сховище й експорт
-Закладки, підсвітки й нотатки SHALL зберігатися в окремій локальній базі користувача, прив'язаними до книги, розділу й вірша, і SHALL переживати перезапуск додатка й перебудову `bible.sqlite`. Їх SHALL можна експортувати в JSON і Markdown.
+### Requirement: Separate storage and export
+Bookmarks, highlights and notes SHALL be stored in a separate local user database, tied to book, chapter and verse, and SHALL survive an app restart and a rebuild of `bible.sqlite`. They SHALL be exportable to JSON and Markdown.
 
-#### Scenario: Перезапуск
-- **WHEN** після додавання закладки, підсвітки й нотатки додаток перезапускають
-- **THEN** усі вони на місці
+#### Scenario: Restart
+- **WHEN** the app is restarted after adding a bookmark, a highlight and a note
+- **THEN** all of them are in place
 
-#### Scenario: Експорт
-- **WHEN** обирають «Експортувати нотатки в Markdown…»
-- **THEN** файл містить розділи «Закладки», «Підсвітки», «Нотатки» з посиланнями мовою перекладу на екрані
+#### Scenario: Export
+- **WHEN** «Експортувати нотатки в Markdown…» (Export notes to Markdown…) is chosen
+- **THEN** the file contains the sections «Закладки», «Підсвітки», «Нотатки» with references in the on-screen translation's language
 
-### Requirement: Останнє місце читання
-Додаток SHALL відкриватися на перекладі, книзі й розділі, де користувач зупинився; пошкоджений або недійсний запис SHALL давати Буття 1 у KJV, а розділ поза книгою — останній розділ книги.
+### Requirement: Last reading position
+The app SHALL open at the translation, book and chapter where the user stopped; a corrupted or invalid record SHALL give Genesis 1 in KJV, and a chapter outside the book gives the book's last chapter.
 
-#### Scenario: Продовження читання
-- **WHEN** користувач відкрив Синодальний, Ин 3 і перезапустив додаток
-- **THEN** відкрито Синодальний, Ин 3
+#### Scenario: Continue reading
+- **WHEN** the user opened the Synodal, Ин 3 and restarted the app
+- **THEN** the Synodal, Ин 3 is open

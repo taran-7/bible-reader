@@ -5,7 +5,7 @@ import { scan, addedLines } from "./check-secrets.mjs";
 
 const read = (files) => (file) => files[file];
 
-test("знаходить ключі Claude, Brave, GitHub і файли з секретами", () => {
+test("finds Claude, Brave, GitHub keys and secrets files", () => {
   const files = {
     "a.swift": 'let k = "sk-ant-api03-' + "A".repeat(40) + '"',
     "b.md": "BSA" + "x".repeat(25),
@@ -15,11 +15,11 @@ test("знаходить ключі Claude, Brave, GitHub і файли з се�
   };
   const found = scan(Object.keys(files), read(files));
   assert.equal(found.length, 5);
-  assert.match(found[0], /a\.swift:1: схоже на Anthropic API key/);
-  assert.ok(found.some((f) => f.startsWith(".env: файл")));
+  assert.match(found[0], /a\.swift:1: looks like Anthropic API key/);
+  assert.ok(found.some((f) => f.startsWith(".env: a secrets file")));
 });
 
-test("вигадані тестові ключі й звичайний код — чисто", () => {
+test("made-up test keys and plain code are clean", () => {
   const files = {
     "t.swift": 'ClaudeCurator(key: "sk-test", http: http)\nlet header = "x-api-key"',
     ".env.example": "CLAUDE_KEY=",
@@ -28,7 +28,7 @@ test("вигадані тестові ключі й звичайний код �
   assert.deepEqual(scan(Object.keys(files), read(files)), []);
 });
 
-test("ключ без префікса в присвоєнні, інші БД, зашифрований ключ", () => {
+test("a key without a prefix in an assignment, other DBs, an encrypted key", () => {
   const files = {
     "a.swift": 'let braveKey = "' + "Q".repeat(30) + '"',
     "b.env.txt": "mongodb+srv://user" + ":pa55@cluster0.example.net/db",
@@ -40,7 +40,7 @@ test("ключ без префікса в присвоєнні, інші БД, �
   assert.ok(!found.some((f) => f.startsWith("d.swift")));
 });
 
-test("історія: додані рядки з назвою файлу", () => {
+test("history: added lines with the file name", () => {
   const patch = "commit 1\n+++ b/k.swift\n+let k = 1\n-removed\n+++ b/i.png\n+binary";
   assert.deepEqual(addedLines(patch), [["k.swift", "let k = 1"]]);
 });

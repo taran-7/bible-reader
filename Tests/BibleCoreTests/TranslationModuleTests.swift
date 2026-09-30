@@ -12,12 +12,12 @@ import Testing
         #expect(Translation.kjv.numbering == .kjv)
     }
 
-    /// Новий переклад існуючою мовою: лише рядок маніфесту.
+    /// A new translation in an existing language: only a manifest line.
     static let webModule = """
     [{"code": "web", "title": "WEB", "language": "en", "languageTitle": "English", "numbering": "kjv", "file": "en_web.json"}]
     """
 
-    /// Нова мова: маніфест дає назви й скорочення 66 книг.
+    /// A new language: the manifest gives the names and abbreviations of the 66 books.
     static func polishModule() -> String {
         let books = (1...66).map { #"{"name": "Księga \#($0)", "abbreviation": "Ks\#($0)"}"# }.joined(separator: ",")
         return """
@@ -41,7 +41,7 @@ import Testing
         #expect(polish.language == .other("pl"))
         #expect(Book(number: 43)?.name(in: polish) == "Księga 43")
         #expect(Reference(book: 43, chapter: 3, verseStart: 16).format(in: polish) == "Ks43 3:16")
-        // Мова без стемера: слова лише в нижньому регістрі.
+        // A language without a stemmer: words only lowercased.
         #expect(Stemmer(language: polish.language).stem("Bóg") == "bóg")
     }
 
@@ -97,7 +97,7 @@ extension TranslationModuleTests {
 
     // @trace FR-30
     @Test func testShortcutByPhysicalKeyIgnoresLayout() {
-        // Клавіші 1 і 9 цифрового ряду — будь-яка розкладка (чеська дає «+» і «í»).
+        // Digit-row keys 1 and 9 on any layout (Czech gives «+» and «í»).
         #expect(TranslationShortcut.index(forKeyCode: 18) == 0)
         #expect(TranslationShortcut.index(forKeyCode: 21) == 3)
         #expect(TranslationShortcut.index(forKeyCode: 25) == 8)
@@ -109,7 +109,7 @@ extension TranslationModuleTests {
     @Test func testRequiredBuiltInCodesInBundledManifest() throws {
         let codes = try TranslationCatalog.load(from: TranslationCatalog.bundledManifest).map(\.rawValue)
         #expect(Set(["kjv", "bkr", "ohienko", "synodal"]).isSubset(of: codes))
-        // Налаштування з кодом, якого вже немає в маніфесті, губить лише цей код.
+        // Settings with a code no longer in the manifest lose only that code.
         let panels = try JSONDecoder().decode(ComparePanels.self, from: Data(#"["synodal","gone","kjv"]"#.utf8))
         #expect(panels.visible == [.synodal, .kjv])
     }

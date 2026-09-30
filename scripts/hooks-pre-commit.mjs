@@ -30,11 +30,11 @@ const staged = capture("git diff --cached --name-only --diff-filter=ACM")
   .split("\n")
   .filter(Boolean);
 
-// 1 — secret hygiene: спільний сканер (scripts/check-secrets.mjs) — той самий, що в CI.
+// 1 — secret hygiene: the shared scanner (scripts/check-secrets.mjs), the same as in CI.
 {
   const secrets = spawnSync(process.execPath, ["scripts/check-secrets.mjs", "--staged"], { stdio: "inherit" });
   if (secrets.status !== 0) {
-    console.error("pre-commit: possible secret staged — ключі API лише в Keychain, не в git.");
+    console.error("pre-commit: possible secret staged — API keys belong only in the Keychain, not in git.");
     process.exit(1);
   }
 }
@@ -58,7 +58,7 @@ run('git add docs/qa/traceability-report.md trace/trace.json');
 run("node scripts/check-trajectory.mjs");
 run('git add docs/qa/trajectory-report.md trace/trajectory.json');
 
-// 6 — HANDOFF (PD-20): якщо ручну частину оновлено, освіжити згенерований блок з git.
+// 6 — HANDOFF (PD-20): if the manual part was updated, refresh the generated block from git.
 if (staged.includes("docs/exec-plans/active/HANDOFF.md")) {
   run("node scripts/handoff.mjs");
   run("git add docs/exec-plans/active/HANDOFF.md");

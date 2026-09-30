@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import XCTest
 
-/// NFR-3 (запуск < 1 с) і NFR-4 (VoiceOver, клавіатура): реальний додаток, без миші.
+/// NFR-3 (launch < 1 s) and NFR-4 (VoiceOver, keyboard): the real app, no mouse.
 @MainActor
 final class AccessibilityUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -23,7 +23,7 @@ final class AccessibilityUITests: XCTestCase {
         XCTAssertTrue(app.windows.firstMatch.waitForExistence(timeout: 10))
     }
 
-    /// Символ фізичної клавіші в поточній розкладці, щоб тест не залежав від неї.
+    /// The physical key's character in the current layout, so the test does not depend on it.
     private func physicalKey(_ keyCode: Int, fallback: String) -> String {
         guard let source = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue(),
               let data = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
@@ -44,7 +44,7 @@ final class AccessibilityUITests: XCTestCase {
         XCTAssertTrue(window.waitForExistence(timeout: 5), "вікно «\(title)»", file: file, line: line)
     }
 
-    /// Число з елемента `launch-time`; перечитуємо, поки текст не з'явиться (елемент буває порожнім мить).
+    /// The number from the `launch-time` element; re-read until the text appears (the element is empty for a moment).
     private func launchMilliseconds() -> Int {
         let report = app.staticTexts["launch-time"]
         XCTAssertTrue(report.waitForExistence(timeout: 10))
@@ -60,18 +60,18 @@ final class AccessibilityUITests: XCTestCase {
 
     // @trace NFR-3
     func testLaunchUnderOneSecond() {
-        // NFR-3 — теплий запуск: перший прогріває кеш диска (його число лише записуємо), перевіряємо другий.
+        // NFR-3 is a warm launch: the first one warms the disk cache (its number is only recorded), the second is checked.
         launch()
         let cold = launchMilliseconds()
         app.terminate()
         launch()
         let milliseconds = launchMilliseconds()
-        // Число записано лише після показу віршів, а не екрана помилки бази.
+        // The number is recorded only after verses are shown, not the database error screen.
         XCTAssertTrue(app.descendants(matching: .any)["verse-1"].firstMatch.exists)
         let attachment = XCTAttachment(string: "launch: first \(cold) ms, second \(milliseconds) ms")
         attachment.lifetime = .keepAlways
         add(attachment)
-        // NFR-3: 1000 мс на Mac; CI передає більшу межу для своєї VM (PD-14, TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS).
+        // NFR-3: 1000 ms on a Mac; CI passes a larger limit for its VM (PD-14, TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS).
         let budget = ProcessInfo.processInfo.environment["BIBLE_LAUNCH_BUDGET_MS"].flatMap(Int.init) ?? 1000
         XCTAssertLessThan(milliseconds, budget, "запуск \(milliseconds) мс, межа \(budget) мс")
     }
@@ -81,13 +81,13 @@ final class AccessibilityUITests: XCTestCase {
         launch()
         let verse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(verse.waitForExistence(timeout: 5))
-        // VoiceOver читає номер і текст вірша.
+        // VoiceOver reads the verse number and text.
         XCTAssertTrue(verse.label.hasPrefix("1 In the beginning God created"), verse.label)
-        // Кнопки тулбара мають назви, а не лише іконки.
+        // Toolbar buttons have names, not just icons.
         for id in ["bookmark-chapter", "translation"] {
             let element = app.descendants(matching: .any)[id].firstMatch
             XCTAssertTrue(element.waitForExistence(timeout: 5), id)
-            // Кнопка-меню на новіших macOS віддає назву в AXTitle, а не в AXDescription; VoiceOver читає обидва.
+            // A menu button on newer macOS gives its name in AXTitle, not AXDescription; VoiceOver reads both.
             XCTAssertFalse(element.label.isEmpty && element.title.isEmpty, id)
         }
         XCTAssertTrue(app.buttons["Наступний розділ"].exists)
@@ -98,17 +98,17 @@ final class AccessibilityUITests: XCTestCase {
     func testKeyboardOnlyReading() {
         launch()
         expectTitle("Genesis 1")
-        // ⌘F → поле пошуку, посилання з клавіатури, Return.
+        // ⌘F → the search field, a reference from the keyboard, Return.
         let field = app.searchFields.firstMatch
         app.typeKey(physicalKey(kVK_ANSI_F, fallback: "f"), modifierFlags: .command)
         wait(for: [expectation(for: NSPredicate(format: "hasKeyboardFocus == true"), evaluatedWith: field)], timeout: 5)
-        // Вставка ⌘V, а не набір: у кириличній розкладці XCUI не синтезує латиницю.
+        // Pasting with ⌘V, not typing: in a Cyrillic layout XCUI does not synthesize Latin.
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString("John 3:16", forType: .string)
         app.typeKey(physicalKey(kVK_ANSI_V, fallback: "v"), modifierFlags: .command)
         app.typeKey(.return, modifierFlags: [])
         expectTitle("John 3")
-        // Після переходу за посиланням фокус іде в список віршів: ↓ виділяє наступний, ⌘C копіює цитату.
+        // After jumping to a reference, focus goes to the verse list: ↓ selects the next one, ⌘C copies the quote.
         wait(for: [expectation(for: NSPredicate(format: "hasKeyboardFocus == false"), evaluatedWith: field)], timeout: 5)
         app.typeKey(.downArrow, modifierFlags: [])
         let saved = NSPasteboard.general.string(forType: .string)
@@ -119,18 +119,18 @@ final class AccessibilityUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.1))
         }
         let copied = NSPasteboard.general.string(forType: .string)
-        // Повертаємо буфер розробника.
+        // Restore the developer's clipboard.
         NSPasteboard.general.clearContents()
         if let saved { NSPasteboard.general.setString(saved, forType: .string) }
         XCTAssertTrue(copied?.contains("(John 3:17)") == true, copied ?? "буфер порожній")
-        // ⌘D — закладка на розділ; ⌘] / ⌘[ — розділи; ⌘⌥3 — Огієнко.
+        // ⌘D is a chapter bookmark; ⌘] / ⌘[ are chapters; ⌘⌥3 is Ohienko.
         app.typeKey(physicalKey(kVK_ANSI_D, fallback: "d"), modifierFlags: .command)
         XCTAssertTrue(app.descendants(matching: .any)["bookmark-row"].firstMatch.waitForExistence(timeout: 5))
         app.typeKey(physicalKey(kVK_ANSI_RightBracket, fallback: "]"), modifierFlags: .command)
         expectTitle("John 4")
         app.typeKey(physicalKey(kVK_ANSI_LeftBracket, fallback: "["), modifierFlags: .command)
         expectTitle("John 3")
-        // Цифровий ряд однаковий у латинській і кириличній розкладках (на чеській — tech debt #23).
+        // The digit row is the same in Latin and Cyrillic layouts (on Czech, tech debt #23).
         app.typeKey("3", modifierFlags: [.command, .option])
         expectTitle("Від Івана 3")
     }

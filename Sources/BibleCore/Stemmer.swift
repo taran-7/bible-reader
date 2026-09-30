@@ -1,13 +1,13 @@
 import CSnowball
 import Foundation
 
-/// Основа слова для морфологічного пошуку (FR-18). Той самий стемер застосовується до тексту
-/// при імпорті (`verses_stem_fts`) і до запиту, тож важливо лише, щоб форми одного слова
-/// давали однакову основу.
-/// - англійська, російська: Snowball; для KJV спершу `-eth`/`-est` → `-es` (`loveth` → `loves`);
-/// - українська: легке відтинання закінчень (Snowball не має українського стемера);
-/// - чеська: легкий стемер Dolamic & Savoy (як `CzechStemmer` у Lucene).
-/// Не потокобезпечний: Snowball тримає стан; створюйте по екземпляру на операцію.
+/// A word stem for morphological search (FR-18). The same stemmer is applied to the text
+/// at import (`verses_stem_fts`) and to the query, so all that matters is that forms of one word
+/// give the same stem.
+/// - English, Russian: Snowball; for KJV first `-eth`/`-est` → `-es` (`loveth` → `loves`);
+/// - Ukrainian: light suffix stripping (Snowball has no Ukrainian stemmer);
+/// - Czech: the Dolamic & Savoy light stemmer (like `CzechStemmer` in Lucene).
+/// Not thread-safe: Snowball keeps state; create one instance per operation.
 public final class Stemmer {
     public let language: Language
     private let env: OpaquePointer?
@@ -34,7 +34,7 @@ public final class Stemmer {
         public let range: Range<String.Index>
     }
 
-    /// Слова як їх бачить `unicode61`: послідовності літер і цифр; апостроф та інше — роздільники.
+    /// Words as `unicode61` sees them: runs of letters and digits; an apostrophe and the rest are separators.
     public static func words(in text: String) -> [Word] {
         var result: [Word] = []
         var start: String.Index?
@@ -53,7 +53,7 @@ public final class Stemmer {
         return result
     }
 
-    /// Текст для індексу основ: основи слів через пробіл.
+    /// Text for the stem index: word stems separated by spaces.
     public func stemmed(_ text: String) -> String {
         Self.words(in: text).map { stem($0.text) }.joined(separator: " ")
     }
@@ -64,9 +64,9 @@ public final class Stemmer {
         case .english: return snowball(Self.kjvVerbForm(word), stem: english_UTF_8_stem)
         case .russian: return Self.russianFleetingVowel(snowball(word, stem: russian_UTF_8_stem))
         case .ukrainian: return Self.ukrainian(word)
-        // Мова без стемера: шукаємо точні словоформи (як до FR-18).
+        // A language without a stemmer: match exact word forms (as before FR-18).
         case .other: return word
-        // Без діакритики: індекс її згортає, а запит `buh` має дати ту саму основу, що й `bůh`.
+        // Without diacritics: the index folds them, and the query `buh` must give the same stem as `bůh`.
         case .czech: return Self.czech(word.folding(options: .diacriticInsensitive, locale: nil))
         }
     }
@@ -79,27 +79,27 @@ public final class Stemmer {
         return String(decoding: UnsafeBufferPointer(start: result, count: Int(length)), as: UTF8.self)
     }
 
-    // MARK: - Англійська (KJV)
+    // MARK: - English (KJV)
 
-    /// Слова на -est, що не є формами дієслова 2-ї особи (priest, beast…).
+    /// Words ending in -est that are not 2nd person verb forms (priest, beast…).
     private static let notVerbForms: Set<String> = [
         "priest", "beast", "feast", "east", "west", "rest", "best", "nest", "breast", "chest", "guest",
         "harvest", "forest", "honest", "earnest", "tempest", "request", "conquest", "manifest", "interest",
         "lest", "jest", "test", "quest", "crest", "pest", "vest", "zest", "least", "midst", "modest",
     ]
 
-    /// `loveth`, `lovest` → `loves`: далі Snowball дає ту саму основу, що й для `loved`, `loving`.
+    /// `loveth`, `lovest` → `loves`: then Snowball gives the same stem as for `loved`, `loving`.
     static func kjvVerbForm(_ word: String) -> String {
         guard word.count >= 5, !notVerbForms.contains(word),
               word.hasSuffix("eth") || word.hasSuffix("est") else { return word }
         return String(word.dropLast(3)) + "es"
     }
 
-    // MARK: - Російська
+    // MARK: - Russian
 
     private static let russianVowels = Set("аеиоуыэюяё")
 
-    /// Біглий голосний: `любви` → `любв`, а `любовь` → `любов`; основу на приголосний+«в» доповнюємо «о».
+    /// A fleeting vowel: `любви` → `любв`, but `любовь` → `любов`; a stem ending in consonant+«в» gets «о» added.
     static func russianFleetingVowel(_ stem: String) -> String {
         let letters = Array(stem)
         guard letters.count >= 3, letters.last == "в", !russianVowels.contains(letters[letters.count - 2]),
@@ -107,12 +107,12 @@ public final class Stemmer {
         return String(letters.dropLast()) + "ов"
     }
 
-    // MARK: - Українська
+    // MARK: - Ukrainian
 
     private static let ukrainianVowels = Set("аеєиіїоуюя")
 
-    /// Закінчення, приблизно від довших до коротших; відтинається перше, після якого в основі лишається
-    /// щонайменше одна літера після першої голосної і всього ≥ 2 літери.
+    /// Endings, roughly from longer to shorter; the first one is stripped after which the stem keeps
+    /// at least one letter after the first vowel and ≥ 2 letters in total.
     private static let ukrainianEndings: [String] = [
         "ювали", "ували", "ившись", "увшись",
         "ачи", "ячи", "учи", "ючи", "вши", "ись", "ися",
@@ -139,18 +139,18 @@ public final class Stemmer {
         return word
     }
 
-    // MARK: - Чеська (Dolamic & Savoy, light)
-    // Слово приходить уже без діакритики (див. `stem`), тож правила з ě, ů, č, ž тут не спрацьовують, а
-    // `z` → `h` зачіпає і справжнє `z`. Свідомо: інакше запит без діакритики (`buh`) не знаходив би `Bůh`;
-    // точність стемера трохи нижча, але індекс і запит завжди дають однакову основу. Правила лишаємо як в
-    // оригіналі, щоб звіряти з Lucene `CzechStemmer`.
+    // MARK: - Czech (Dolamic & Savoy, light)
+    // The word arrives already without diacritics (see `stem`), so the rules with ě, ů, č, ž do not fire here, and
+    // `z` → `h` also hits a genuine `z`. Deliberately: otherwise a query without diacritics (`buh`) would not find `Bůh`;
+    // the stemmer is slightly less precise, but the index and the query always give the same stem. The rules stay as in
+    // the original, to compare against Lucene `CzechStemmer`.
 
     static func czech(_ word: String) -> String {
         var s = Array(word)
         func ends(_ suffixes: String...) -> Bool {
             suffixes.contains { suffix in s.count >= suffix.count && s.suffix(suffix.count).elementsEqual(suffix) }
         }
-        // Відмінкові закінчення.
+        // Case endings.
         if s.count > 7, ends("atech") {
             s.removeLast(5)
         } else if s.count > 6, ends("ětem", "etem", "atům") {
@@ -164,9 +164,9 @@ public final class Stemmer {
         } else if s.count > 3, ends("a", "e", "i", "o", "u", "ů", "y", "á", "é", "í", "ý", "ě") {
             s.removeLast(1)
         }
-        // Присвійні.
+        // Possessives.
         if s.count > 5, ends("ov", "in", "ův") { s.removeLast(2) }
-        // Нормалізація чергувань.
+        // Normalizing alternations.
         if ends("čt") {
             s.replaceSubrange((s.count - 2)..., with: "ck")
         } else if ends("št") {

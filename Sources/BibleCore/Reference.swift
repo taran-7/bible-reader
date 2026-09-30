@@ -1,6 +1,6 @@
 import Foundation
 
-/// Посилання на місце Писання: `Ин 3:16`, `John 3`, `1 Кор 13:4-7`.
+/// A scripture reference: `Ин 3:16`, `John 3`, `1 Кор 13:4-7`.
 public struct Reference: Hashable, Sendable {
     public let book: Int
     public let chapter: Int
@@ -14,7 +14,7 @@ public struct Reference: Hashable, Sendable {
         self.verseEnd = verseStart == nil || verseEnd == verseStart ? nil : verseEnd
     }
 
-    /// `nil`, якщо рядок не є посиланням.
+    /// `nil` if the string is not a reference.
     public static func parse(_ input: String) -> Reference? {
         let pattern = /^\s*(.*?\p{L}.*?)\s*(\d+)(?:\s*:\s*(\d+)(?:\s*[-–]\s*(\d+))?)?\s*$/
         guard let match = input.wholeMatch(of: pattern),
@@ -29,21 +29,21 @@ public struct Reference: Hashable, Sendable {
         return Reference(book: book, chapter: chapter, verseStart: start, verseEnd: end)
     }
 
-    /// `Ин. 3:16-18` для Синодального, `John 3:16-18` для KJV, `Ів. 3:16` для Огієнка, `J 3:16` для BKR.
+    /// `Ин. 3:16-18` for the Synodal, `John 3:16-18` for KJV, `Ів. 3:16` for Ohienko, `J 3:16` for BKR.
     public func format(in translation: Translation) -> String {
         "\(Reference.bookLabel(book, in: translation)) \(chapter)" + (verseStart.map { ":\($0)" + (verseEnd.map { "-\($0)" } ?? "") } ?? "")
     }
 
     static func bookLabel(_ number: Int, in translation: Translation) -> String {
         let abbreviation = Book(number: number)?.abbreviation(in: translation) ?? "\(number)"
-        // Кириличні скорочення з крапкою (`Ин. 3:16`, `Ів. 3:16`), латинські — без.
+        // Cyrillic abbreviations with a period (`Ин. 3:16`, `Ів. 3:16`), Latin ones without.
         switch translation.language {
         case .russian, .ukrainian: return abbreviation + "."
         case .english, .czech, .other: return abbreviation
         }
     }
 
-    /// Нижній регістр, без крапок і пробілів, ё → е, типографські апострофи → '.
+    /// Lowercase, no periods or spaces, ё → е, typographic apostrophes → '.
     static func normalize(_ spelling: String) -> String {
         spelling.lowercased()
             .replacingOccurrences(of: "ё", with: "е")
@@ -63,10 +63,10 @@ public struct Reference: Hashable, Sendable {
     }()
 }
 
-/// Цитата для буфера обміну з повною назвою книги: `«текст» (От Иоанна 3:16)`;
-/// кілька віршів — `«16 текст⏎17 текст»⏎(От Иоанна 3:16-17)`.
+/// A clipboard quote with the full book name: `«текст» (От Иоанна 3:16)`;
+/// several verses: `«16 текст⏎17 текст»⏎(От Иоанна 3:16-17)`.
 public enum Quote {
-    /// Вірші одного розділу; непослідовні номери записуються як `16-17,19`.
+    /// Verses of one chapter; non-consecutive numbers are written as `16-17,19`.
     public static func format(_ verses: [Verse]) -> String? {
         let sorted = verses.sorted { $0.verse < $1.verse }
         guard let first = sorted.first else { return nil }
@@ -75,12 +75,12 @@ public enum Quote {
         let label = Book(number: first.book)?.name(in: first.translation) ?? "\(first.book)"
         let reference = "(\(label) \(first.chapter):\(verseList))"
         guard sorted.count > 1 else { return "«\(first.text)» \(reference)" }
-        // Кілька віршів: номер перед кожним, кожен з нового рядка, посилання окремим рядком.
+        // Several verses: a number before each, each on a new line, the reference on a separate line.
         let lines = sorted.map { "\($0.verse) \($0.text)" }.joined(separator: "\n")
         return "«\(lines)»\n\(reference)"
     }
 
-    /// Номери віршів одного розділу: `[16, 17, 19]` → `16-17,19`.
+    /// Verse numbers of one chapter: `[16, 17, 19]` → `16-17,19`.
     static func verseList(_ numbers: [Int]) -> String {
         var runs: [(Int, Int)] = []
         for number in numbers.sorted() {

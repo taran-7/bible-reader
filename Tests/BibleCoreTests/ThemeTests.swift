@@ -9,7 +9,7 @@ import Testing
         #expect(abs(black.contrast(with: white) - 21) < 0.01)
         #expect(abs(white.contrast(with: black) - 21) < 0.01)
         #expect(abs(white.contrast(with: white) - 1) < 0.001)
-        // Сірий #767676 на білому — класична межа AA (4,54:1).
+        // Gray #767676 on white is the classic AA boundary (4.54:1).
         #expect(abs(ThemeColor(hex: 0x767676).contrast(with: white) - 4.54) < 0.01)
     }
 
@@ -27,7 +27,7 @@ import Testing
         let grey = ThemeColor(hex: 0x888888)
         let white = ThemeColor(hex: 0xFFFFFF), black = ThemeColor(hex: 0x000000)
         #expect(grey.strengthened(toContrast: 7, against: [white]).contrast(with: white) >= 7)
-        // Недосяжна ціль (понад 21:1) — чистий полюс, далі тест контрасту покаже провал.
+        // An unreachable target (above 21:1) gives the pure pole; then the contrast test shows the failure.
         #expect(grey.strengthened(toContrast: 30, against: [white]) == black)
         #expect(grey.strengthened(toContrast: 30, against: [black]) == white)
     }
@@ -69,7 +69,7 @@ import Testing
         for flag in Self.flags {
             let t = Theme.tokens(for: id, reduceTransparency: flag.reduceTransparency, increaseContrast: flag.increaseContrast)
             let context = "\(id) \(flag)"
-            // Підкладка під віршами: гірший випадок з чорним і білим тлом під нею.
+            // The backing under verses: the worst case with black and white backgrounds under it.
             for plate in t.effectiveBackgrounds {
                 #expect(t.text.contrast(with: plate) >= 7, "\(context): текст/фон")
                 #expect(t.secondaryText.contrast(with: plate) >= 4.5, "\(context): другорядний/фон")
@@ -78,10 +78,10 @@ import Testing
             }
             #expect(t.text.contrast(with: t.selection) >= 7, "\(context): текст/виділення")
             #expect(t.verseNumber.contrast(with: t.selection) >= 4.5, "\(context): номер вірша/виділення")
-            // Кнопка копіювання стоїть на виділеному рядку: підкладка 0,6 на виділенні, іконка непрозора.
+            // The copy button sits on a selected row: a 0.6 backing on the selection, the icon opaque.
             let button = t.copyButton.composited(over: t.selection, opacity: 0.6)
             #expect(t.accent.contrast(with: button) >= 4.5, "\(context): кнопка копіювання")
-            // Бічна панель і тулбар: для Скла — колір панелі з непрозорістю хрому на чорному і білому тлі.
+            // Sidebar and toolbar: for Glass, the panel color with chrome opacity on black and white backgrounds.
             for sidebar in t.effectiveSidebars {
                 #expect(t.text.contrast(with: sidebar) >= 7, "\(context): текст/бічна панель")
                 #expect(t.secondaryText.contrast(with: sidebar) >= 4.5, "\(context): другорядний/бічна панель")
@@ -91,7 +91,7 @@ import Testing
             #expect(t.secondaryText.contrast(with: t.results) >= 4.5, "\(context): другорядний/результати")
             #expect(t.accent.contrast(with: t.results) >= 4.5, "\(context): посилання/результати")
             #expect(t.text.contrast(with: t.searchHighlight) >= 4.5, "\(context): текст/підсвітка")
-            // Підсвітка помітна на фоні результатів.
+            // The highlight is visible on the results background.
             #expect(t.searchHighlight != t.results, "\(context): підсвітка видима")
         }
     }
@@ -149,7 +149,7 @@ extension ThemeTests {
             let style = SearchFieldStyle(theme: theme, fontSize: InterfaceScale.extraLarge.fontSize(base: 13))
             #expect(style.text == theme.text)
             #expect(style.colorScheme == theme.colorScheme)
-            // Текст у полі читається на його фоні (AA для звичайного тексту).
+            // The field text is readable on its background (AA for normal text).
             #expect(style.text.contrast(with: style.background) >= 4.5, "\(id)")
         }
         #expect(SearchFieldStyle(theme: Theme.tokens(for: .light), fontSize: InterfaceScale.large.fontSize(base: 13)).fontSize > 13)

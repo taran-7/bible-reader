@@ -1,4 +1,4 @@
-/// Місце читання: книга і розділ.
+/// A reading position: book and chapter.
 public struct Location: Hashable, Sendable {
     public let book: Int
     public let chapter: Int
@@ -9,7 +9,7 @@ public struct Location: Hashable, Sendable {
     }
 }
 
-/// Сусідні розділи з переходом між книгами; `nil` на межах Біблії.
+/// Neighboring chapters, crossing between books; `nil` at the ends of the Bible.
 public struct Navigator {
     private let chapterCount: (Int) -> Int
 
@@ -30,7 +30,7 @@ public struct Navigator {
             return Location(book: location.book, chapter: location.chapter - 1)
         }
         guard location.book > 1 else { return nil }
-        // Книга без розділів (зіпсована база) дала б «розділ 0».
+        // A book without chapters (a corrupted database) would give "chapter 0".
         let count = chapterCount(location.book - 1)
         guard count > 0 else { return nil }
         return Location(book: location.book - 1, chapter: count)

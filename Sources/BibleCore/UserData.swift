@@ -2,8 +2,8 @@ import Foundation
 import GRDB
 import Observation
 
-/// Вірш без перекладу: закладки, підсвітки й нотатки прив'язані до книги, розділу й вірша,
-/// тож переживають перебудову `bible.sqlite` і спільні для перекладів з однаковою нумерацією.
+/// A verse without a translation: bookmarks, highlights and notes are tied to book, chapter and verse,
+/// so they survive a rebuild of `bible.sqlite` and are shared by translations with the same numbering.
 public struct VerseKey: Hashable, Comparable, Codable, Sendable {
     public let book: Int
     public let chapter: Int
@@ -22,7 +22,7 @@ public struct VerseKey: Hashable, Comparable, Codable, Sendable {
     public var reference: Reference { Reference(book: book, chapter: chapter, verseStart: verse) }
 }
 
-/// Кольори підсвітки віршів (FR-23).
+/// Verse highlight colors (FR-23).
 public enum HighlightColor: String, CaseIterable, Codable, Sendable {
     case yellow, green, blue, pink
 
@@ -36,7 +36,7 @@ public enum HighlightColor: String, CaseIterable, Codable, Sendable {
     }
 }
 
-/// Закладка на вірш або на весь розділ (`verse == nil`), FR-22.
+/// A bookmark on a verse or a whole chapter (`verse == nil`), FR-22.
 public struct Bookmark: Hashable, Codable, Sendable, Identifiable {
     public struct Target: Hashable, Comparable, Codable, Sendable {
         public let book: Int
@@ -61,7 +61,7 @@ public struct Bookmark: Hashable, Codable, Sendable, Identifiable {
     public var id: Target { target }
 }
 
-/// Нотатка до вірша (FR-24).
+/// A verse note (FR-24).
 public struct Note: Hashable, Codable, Sendable, Identifiable {
     public let key: VerseKey
     public let text: String
@@ -69,7 +69,7 @@ public struct Note: Hashable, Codable, Sendable, Identifiable {
     public var id: VerseKey { key }
 }
 
-/// Що показати біля вірша в тексті.
+/// What to show next to a verse in the text.
 public struct VerseMarks: Equatable, Sendable {
     public var highlight: HighlightColor?
     public var hasNote = false
@@ -82,7 +82,7 @@ public struct VerseMarks: Equatable, Sendable {
     }
 }
 
-/// Формат експорту в JSON.
+/// The JSON export format.
 public struct UserDataExport: Codable, Equatable, Sendable {
     public struct Highlight: Codable, Equatable, Sendable {
         public let key: VerseKey
@@ -112,7 +112,7 @@ extension JSONDecoder {
     }
 }
 
-/// Окрема локальна база користувача (не `bible.sqlite`, яка read-only).
+/// A separate local user database (not the read-only `bible.sqlite`).
 public final class UserDatabase: Sendable {
     let queue: DatabaseQueue
 
@@ -131,8 +131,8 @@ public final class UserDatabase: Sendable {
         try UserDatabase(queue: DatabaseQueue())
     }
 
-    /// Стандартне місце: Application Support додатка (у пісочниці — контейнер додатка).
-    /// `profile` — окрема підтека (UI-тести беруть свіжу на кожен запуск).
+    /// The default location: the app's Application Support (in the sandbox, the app container).
+    /// `profile` is a separate subfolder (UI tests take a fresh one on every run).
     public static func defaultURL(profile: String? = nil) throws -> URL {
         var folder = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             .appendingPathComponent("Bible Reader", isDirectory: true)
@@ -143,7 +143,7 @@ public final class UserDatabase: Sendable {
     private static var migrator: DatabaseMigrator {
         var migrator = DatabaseMigrator()
         migrator.registerMigration("v1") { db in
-            // verse = 0 — закладка на весь розділ.
+            // verse = 0 means a bookmark on the whole chapter.
             try db.execute(sql: """
                 CREATE TABLE bookmark (
                   book INTEGER NOT NULL, chapter INTEGER NOT NULL, verse INTEGER NOT NULL,
@@ -164,7 +164,7 @@ public final class UserDatabase: Sendable {
                 CREATE TABLE state (key TEXT PRIMARY KEY, value BLOB NOT NULL);
                 """)
         }
-        // Чорнетки проповідей (FR-38).
+        // Sermon drafts (FR-38).
         migrator.registerMigration("v2") { db in
             try db.execute(sql: """
                 CREATE TABLE draft (
@@ -177,8 +177,8 @@ public final class UserDatabase: Sendable {
     }
 }
 
-/// Стан у тій самій базі, щоб останнє місце жило поруч із нотатками (і в UI-тестах скидалося разом із ними).
-/// Помилки читання дають `nil`, помилки запису ігноруються: це лише зручність.
+/// State in the same database, so the last position lives next to the notes (and in UI tests resets together with them).
+/// Read errors give `nil`, write errors are ignored: this is only a convenience.
 extension UserDatabase: KeyValueStore {
     public func data(forKey key: String) -> Data? {
         try? queue.read { try Data.fetchOne($0, sql: "SELECT value FROM state WHERE key = ?", arguments: [key]) }
@@ -193,13 +193,13 @@ extension UserDatabase: KeyValueStore {
     }
 }
 
-/// Закладки, підсвітки й нотатки для SwiftUI: усе в пам'яті, кожна зміна одразу пишеться в базу.
+/// Bookmarks, highlights and notes for SwiftUI: everything in memory, every change is written to the database immediately.
 @MainActor @Observable
 public final class UserData {
     public private(set) var bookmarks: [Bookmark] = []
     public private(set) var highlights: [VerseKey: HighlightColor] = [:]
     public private(set) var notes: [VerseKey: Note] = [:]
-    /// Остання помилка запису або читання бази; дані в пам'яті лишаються.
+    /// The last database write or read error; the data in memory stays.
     public private(set) var lastError: String?
 
     @ObservationIgnored private let database: UserDatabase?
@@ -211,13 +211,13 @@ public final class UserData {
         load()
     }
 
-    /// Базу не вдалося відкрити: працюємо в пам'яті й показуємо причину.
+    /// The database could not be opened: work in memory and show the reason.
     public convenience init(unavailable error: any Error) {
         self.init(database: nil)
         lastError = "\(error)"
     }
 
-    // MARK: Закладки
+    // MARK: Bookmarks
 
     public func isBookmarked(_ target: Bookmark.Target) -> Bool {
         bookmarks.contains { $0.target == target }
@@ -239,13 +239,13 @@ public final class UserData {
         }
     }
 
-    // MARK: Підсвітки
+    // MARK: Highlights
 
     public func highlight(for key: VerseKey) -> HighlightColor? { highlights[key] }
 
-    /// `nil` прибирає підсвітку.
+    /// `nil` removes the highlight.
     public func setHighlight(_ color: HighlightColor?, for keys: some Collection<VerseKey>) {
-        // Усі вірші однією транзакцією; пам'ять міняємо лише після успішного запису.
+        // All verses in one transaction; memory changes only after a successful write.
         let statements: [(String, StatementArguments)] = keys.map { key in
             if let color {
                 ("INSERT OR REPLACE INTO highlight (book, chapter, verse, color) VALUES (?, ?, ?, ?)",
@@ -258,11 +258,11 @@ public final class UserData {
         for key in keys { highlights[key] = color }
     }
 
-    // MARK: Нотатки
+    // MARK: Notes
 
     public func note(for key: VerseKey) -> Note? { notes[key] }
 
-    /// Порожній текст видаляє нотатку.
+    /// Empty text deletes the note.
     public func setNote(_ text: String, for key: VerseKey) {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
@@ -278,7 +278,7 @@ public final class UserData {
         }
     }
 
-    /// Нотатки, що містять запит (без регістру й «ё»), у порядку книг.
+    /// Notes containing the query (ignoring case and «ё»), in book order.
     public func searchNotes(_ query: String) -> [Note] {
         let needle = SearchText.fold(query.trimmingCharacters(in: .whitespacesAndNewlines)).lowercased()
         guard !needle.isEmpty else { return [] }
@@ -289,9 +289,9 @@ public final class UserData {
 
     public var sortedNotes: [Note] { notes.values.sorted { $0.key < $1.key } }
 
-    // MARK: Позначки розділу
+    // MARK: Chapter marks
 
-    /// Позначки вірша, що складається з одного чи кількох віршів KJV (злиті в Синодальному).
+    /// Marks of a verse made of one or more KJV verses (merged in the Synodal).
     public func marks(for keys: [VerseKey]) -> VerseMarks {
         var marks = VerseMarks()
         for key in keys {
@@ -304,7 +304,7 @@ public final class UserData {
 
     public func marks(for key: VerseKey) -> VerseMarks { marks(for: [key]) }
 
-    /// Множина для швидкої перевірки в кожному рядку розділу.
+    /// A set for a quick check in every chapter row.
     private var bookmarkTargets: Set<Bookmark.Target> { Set(bookmarks.map(\.target)) }
 
     public func marks(book: Int, chapter: Int) -> [Int: VerseMarks] {
@@ -321,7 +321,7 @@ public final class UserData {
         return marks
     }
 
-    // MARK: Експорт
+    // MARK: Export
 
     public func exportJSON() throws -> Data {
         let export = UserDataExport(
@@ -331,7 +331,7 @@ public final class UserData {
         return try JSONEncoder.userData.encode(export)
     }
 
-    /// Markdown із посиланнями мовою перекладу на екрані.
+    /// Markdown with references in the on-screen translation's language.
     public func exportMarkdown(in translation: Translation) -> String {
         var lines = ["# Bible Reader: закладки, підсвітки, нотатки", ""]
         lines.append("## Закладки")
@@ -345,7 +345,7 @@ public final class UserData {
         return lines.joined(separator: "\n") + "\n"
     }
 
-    // MARK: База
+    // MARK: Database
 
     private func load() {
         guard let database else { return }
@@ -371,7 +371,7 @@ public final class UserData {
         }
     }
 
-    /// Одна транзакція; `false` — запис не вдався, стан у пам'яті не міняємо. Без бази — лише пам'ять.
+    /// One transaction; `false` means the write failed, the in-memory state is not changed. Without a database, memory only.
     private func write(_ statements: [(String, StatementArguments)]) -> Bool {
         guard let database else { return true }
         do {
@@ -385,9 +385,9 @@ public final class UserData {
         }
     }
 
-    /// Користувач закрив повідомлення про помилку.
+    /// The user dismissed the error message.
     public func dismissError() { lastError = nil }
 
-    /// Зміни живуть лише до виходу: базу не вдалося відкрити.
+    /// Changes live only until exit: the database could not be opened.
     public var isInMemoryOnly: Bool { database == nil }
 }

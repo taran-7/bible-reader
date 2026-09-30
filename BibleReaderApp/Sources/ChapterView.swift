@@ -6,16 +6,16 @@ import SwiftUI
 struct ChapterView: View {
     let model: ReaderViewModel
     let fontSize: Double
-    /// «Порівняти» (FR-36): вибір перекладів і режим порівняння — у `ContentView`.
+    /// "Compare" (FR-36): the translation picker and comparison mode live in `ContentView`.
     var compare: (Set<Int>) -> Void = { _ in }
     @State private var selection = Set<Int>()
-    /// Ширина колонки тексту: у вузькій кнопки на виділенні — лише іконки.
+    /// The text column width: in a narrow one the selection buttons show icons only.
     @State private var listWidth: CGFloat = 1000
-    /// Вірш, нотатку до якого редагують.
+    /// The verse whose note is being edited.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
     @Environment(DraftStore.self) private var drafts
-    /// Після переходу до вірша фокус у списку, щоб ⌘C копіював цитату, а не текст запиту.
+    /// After jumping to a verse, focus is in the list, so ⌘C copies the quote, not the query text.
     @FocusState private var listFocused: Bool
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
@@ -26,7 +26,7 @@ struct ChapterView: View {
     }
 
     var body: some View {
-        // Дані користувача в нумерації KJV: у Синодальному позначки стають на той самий зміст.
+        // User data in KJV numbering: in the Synodal the marks land on the same content.
         let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
         let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
         let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale, count: buttonCount)
@@ -46,16 +46,16 @@ struct ChapterView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
-                        // Один переклад — колонка ~75 знаків по центру (FR-15): довгий рядок важко читати.
+                        // One translation: a centered ~75-character column (FR-15): long lines are hard to read.
                         .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
                         .frame(maxWidth: .infinity)
-                        // Широке праве поле лише в рядку з кнопкою копіювання, інакше вузьке вікно втрачає чверть ширини.
-                        // Однакове праве поле в усіх рядках: кнопки на виділенні не налазять на текст,
-                        // а виділений вірш не зсувається (запит власника 2026-09-28).
+                        // A wide right margin only in the row with the copy button, otherwise a narrow window loses a quarter of its width.
+                        // The same right margin in all rows: selection buttons do not overlap the text,
+                        // and the selected verse does not shift (owner request 2026-09-28).
                         .padding(.trailing, SelectionButton.rowWidth(for: scale, compact: compactButtons, count: buttonCount))
                         .overlay(alignment: .topTrailing) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
-                                // Виділення на момент рендеру: клік по кнопці в рядку не має звузити його до одного вірша.
+                                // The selection at render time: a click on a button in a row must not narrow it to one verse.
                                 HStack(spacing: SelectionButton.spacing) {
                                     IllustrationsButton { [verses = selection] in illustrations(verses) }
                                     CompareButton { [verses = selection] in compare(verses) }
@@ -80,7 +80,7 @@ struct ChapterView: View {
             })
             .background(ThemeBackground())
             .focused($listFocused)
-            // Esc — пункт меню «Правка → Зняти виділення»: працює за будь-якого фокусу (FR-17).
+            // Esc is the Edit → Deselect menu item: works with any focus (FR-17).
             .onChange(of: model.clearSelectionRequest) { _, _ in selection = [] }
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
@@ -92,7 +92,7 @@ struct ChapterView: View {
                     Divider()
                     let canonical = key(first)
                     let target = Bookmark.Target(book: canonical.book, chapter: canonical.chapter, verse: canonical.verse)
-                    // Закладка ставиться на перший виділений вірш — так і написано в пункті.
+                    // The bookmark goes on the first selected verse, as the item says.
                     Button(userData.isBookmarked(target) ? "Прибрати закладку з вірша \(first)" : "Додати закладку на вірш \(first)") {
                         userData.toggleBookmark(target)
                     }
@@ -117,12 +117,12 @@ struct ChapterView: View {
                 return [NSItemProvider(object: quote as NSString)]
             }
             .onChange(of: model.location) { _, _ in selection = [] }
-            // Той самий номер в іншому перекладі може означати інший зміст; вірш перевиділить фокус.
+            // The same number in another translation may mean different content; the verse will re-select the focus.
             .onChange(of: model.translation) { _, _ in selection = [] }
-            // Перший виділений вірш: при перемиканні перекладу відкриється саме він (FR-27).
+            // The first selected verse: switching translation opens exactly this one (FR-27).
             .onChange(of: selection) { _, selection in model.anchorVerse = selection.min() }
             .onAppear {
-                // Після коміту першого кадру з віршами (NFR-3).
+                // After the first frame with verses is committed (NFR-3).
                 CATransaction.setCompletionBlock { model.markFirstChapterShown() }
             }
             .onChange(of: model.focusRequest, initial: true) { _, _ in
@@ -141,21 +141,21 @@ struct ChapterView: View {
         return ParallelColumn.spoken(secondary, translation: other, primaryChapter: model.location.chapter)
     }
 
-    /// Виділення важливіше за підсвітку, щоб було видно, що саме виділено.
+    /// Selection beats highlight, so it is visible what exactly is selected.
     private func rowBackground(_ verse: Int, _ highlight: HighlightColor?) -> Color {
         if selection.contains(verse) { return Color(theme.selection) }
         return highlight.map(Color.highlight) ?? .clear
     }
 
-    /// Ілюстрації — панеллю праворуч у тому самому вікні.
+    /// Illustrations: a panel on the right in the same window.
     private func illustrations(_ verses: Set<Int>) {
         model.showIllustrations(for: verses)
     }
 
-    /// «В чорнетку» відкрита лише з панеллю чорнеток: інакше четверта кнопка забирала б місце в кожному рядку.
+    /// "To draft" is shown only with the drafts panel open: otherwise a fourth button would take space in every row.
     private var buttonCount: Int { drafts.isOpen ? 4 : 3 }
 
-    /// Та сама цитата, що й копіювання, у кінець активної чорнетки (FR-38).
+    /// The same quote as copying, at the end of the active draft (FR-38).
     private func addToDraft(_ verses: Set<Int>) {
         guard let quote = model.quote(for: verses) else { return }
         drafts.append(quote)
@@ -169,7 +169,7 @@ struct ChapterView: View {
 }
 
 struct VerseRow: View {
-    /// Підсвітка, закладка й нотатка для VoiceOver (текст вірша вже в label).
+    /// Highlight, bookmark and note for VoiceOver (the verse text is already in the label).
     var accessibilityMarks: String {
         var parts: [String] = []
         if let highlight = marks.highlight { parts.append("підсвітка: \(highlight.title)") }
@@ -184,10 +184,10 @@ struct VerseRow: View {
     let fontSize: Double
     var marks = VerseMarks()
     var openNote: () -> Void = {}
-    /// Вірш згадано в чорнетці (FR-39): позначка веде до цих чорнеток.
+    /// The verse is mentioned in a draft (FR-39): the marker leads to those drafts.
     var inDrafts = false
     var openDrafts: () -> Void = {}
-    /// Другий переклад для VoiceOver: рядок читається разом із паралельною колонкою.
+    /// The second translation for VoiceOver: the row is read together with the parallel column.
     var parallelText: String?
     @Environment(\.theme) private var theme
 
@@ -230,7 +230,7 @@ struct VerseRow: View {
         }
         .padding(.vertical, 2)
         .accessibilityElement(children: .ignore)
-        // Позначки — у кінці мітки: value рядка списку macOS не віддає ні VoiceOver, ні XCUI.
+        // Marks go at the end of the label: macOS does not give a list row's value to either VoiceOver or XCUI.
         .accessibilityLabel(["\(verse.verse) \(verse.text)", accessibilityMarks, parallelText ?? ""]
             .filter { !$0.isEmpty }.joined(separator: "; "))
         .accessibilityIdentifier("verse-\(verse.verse)")
@@ -239,7 +239,7 @@ struct VerseRow: View {
 }
 
 extension Color {
-    /// Напівпрозорі маркери: текст теми лишається читабельним і на світлих, і на темних темах.
+    /// Semi-transparent markers: the theme text stays readable on both light and dark themes.
     static func highlight(_ color: HighlightColor) -> Color {
         switch color {
         case .yellow: Color(red: 1.0, green: 0.84, blue: 0.0).opacity(0.3)
@@ -254,10 +254,10 @@ extension VerseKey: @retroactive Identifiable {
     public var id: Self { self }
 }
 
-/// Нотатка до вірша: порожній текст при збереженні видаляє її.
+/// A verse note: empty text on save deletes it.
 struct NoteEditor: View {
     let key: VerseKey
-    /// Посилання мовою й нумерацією перекладу на екрані.
+    /// The reference in the on-screen translation's language and numbering.
     let title: String
     @Environment(UserData.self) private var userData
     @Environment(\.dismiss) private var dismiss
@@ -292,8 +292,8 @@ struct NoteEditor: View {
     }
 }
 
-/// Друга колонка паралельного перегляду (FR-26): відповідні вірші іншого перекладу; якщо розділ інший —
-/// номер із розділом. Порожньо — вірш злито з попереднім або відповідника немає.
+/// The second column of the parallel view (FR-26): the corresponding verses of the other translation; if the chapter differs,
+/// the number with the chapter. Empty means the verse is merged with the previous one or has no counterpart.
 struct ParallelColumn: View {
     let verses: [Verse]
     let translation: BibleCore.Translation
@@ -310,7 +310,7 @@ struct ParallelColumn: View {
                     .lineSpacing(fontSize * theme.lineSpacing)
             }
         }
-        // VoiceOver читає колонку в мітці рядка основного вірша (`VerseRow.parallelText`).
+        // VoiceOver reads the column in the label of the main verse's row (`VerseRow.parallelText`).
         .accessibilityHidden(true)
     }
 

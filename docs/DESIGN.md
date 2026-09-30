@@ -1,3 +1,3 @@
 # Design
 
-Технічні рішення: [ARCHITECTURE.md](../ARCHITECTURE.md). Принципи: [design-docs/core-beliefs.md](design-docs/core-beliefs.md). Нові рішення оформлюємо окремим файлом у `design-docs/` і додаємо в `design-docs/index.md`.
+Technical decisions: [ARCHITECTURE.md](../ARCHITECTURE.md). Principles: [design-docs/core-beliefs.md](design-docs/core-beliefs.md). New decisions go into a separate file in `design-docs/` and are listed in `design-docs/index.md`.

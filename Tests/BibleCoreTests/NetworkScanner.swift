@@ -1,20 +1,20 @@
 import Foundation
 
-/// Шукає мережеві API й адреси в `.swift`-файлах (NFR-2). Живе в тестах: це перевірка, а не код додатка.
-/// Правило суворе: адреса в коментарі теж знахідка. `URL(fileURLWithPath:)` дозволено.
+/// Looks for network APIs and addresses in `.swift` files (NFR-2). Lives in tests: it is a check, not app code.
+/// The rule is strict: an address in a comment is a finding too. `URL(fileURLWithPath:)` is allowed.
 enum NetworkScanner {
     static let tokens = [
         "URLSession", "URLRequest", "URLComponents", "URL(string:", "NSURL(", "NSURLConnection",
         "NWConnection", "NWListener", "NWPathMonitor", "CFStream", "CFSocket", "SCNetworkReachability",
         "getaddrinfo", "WKWebView", "http://", "https://", "ws://", "wss://",
     ]
-    /// `import Network`, `@testable import WebKit` тощо.
+    /// `import Network`, `@testable import WebKit` etc.
     static var imports: Regex<Substring> { /^\s*(?:@\w+\s+)*import\s+(?:Network|WebKit|CFNetwork)\b/ }
 
     struct Report {
-        /// «шлях:рядок: шаблон», відсортовані; шлях — відносно кореня.
+        /// "path:line: pattern", sorted; the path is relative to the root.
         var findings: [String] = []
-        /// Скільки `.swift`-файлів переглянуто: 0 означає, що перевірка нічого не довела.
+        /// How many `.swift` files were scanned: 0 means the check proved nothing.
         var scannedFiles = 0
     }
 

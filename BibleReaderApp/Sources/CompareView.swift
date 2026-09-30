@@ -1,8 +1,8 @@
 import BibleCore
 import SwiftUI
 
-/// Режим «Порівняти» в головному вікні (FR-36): увесь розділ колонками по перекладах, рядки вирівняні
-/// за віршами, виділені вірші підсвічені і прокручені у видиму частину. ✕ або Esc — назад до читання.
+/// "Compare" mode in the main window (FR-36): the whole chapter in columns by translation, rows aligned
+/// by verse, selected verses highlighted and scrolled into view. ✕ or Esc return to reading.
 struct CompareView: View {
     let comparison: Comparison
     let fontSize: Double
@@ -26,10 +26,10 @@ struct CompareView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                 }
-                // І при першому показі, і коли «Переклади…» замінили порівняння.
+                // Both on first display and when "Translations…" replaced the comparison.
                 .onChange(of: comparison.translations, initial: true) {
                     guard let first = comparison.highlighted.min() else { return }
-                    // Вірш перед виділеним теж у кадрі: видно, звідки починається думка.
+                    // The verse before the selected one is also in frame: you see where the thought starts.
                     let target = comparison.rows.last { $0.id < first }?.id ?? first
                     DispatchQueue.main.async { proxy.scrollTo(target, anchor: .top) }
                 }
@@ -76,19 +76,19 @@ struct CompareView: View {
         return HStack(alignment: .firstTextBaseline, spacing: 16) {
             column([row.primary])
             ForEach(Array(row.others.enumerated()), id: \.offset) { _, verses in column(verses) }
-            // Під кнопками заголовка — щоб колонки стояли точно під своїми назвами.
+            // Under the header buttons, so the columns stand exactly under their titles.
             Color.clear.frame(width: 44 * scale.factor, height: 1)
         }
         .padding(.vertical, 4)
         .padding(.horizontal, 6)
         .background(highlighted ? Color(theme.selection) : .clear, in: RoundedRectangle(cornerRadius: 6))
         .accessibilityElement(children: .combine)
-        // Позначка виділення — в ідентифікаторі: value об'єднаного елемента macOS не віддає ні VoiceOver, ні XCUI.
+        // The selection mark goes into the identifier: macOS does not give a combined element's value to either VoiceOver or XCUI.
         .accessibilityIdentifier("compare-row-\(row.primary.verse)" + (highlighted ? "-selected" : ""))
         .accessibilityAddTraits(highlighted ? .isSelected : [])
     }
 
-    /// Порожня клітинка — вірш злито з попереднім або відповідника немає.
+    /// An empty cell means the verse is merged with the previous one or has no counterpart.
     private func column(_ verses: [Verse]) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(verses) { verse in
@@ -105,8 +105,8 @@ struct CompareView: View {
     }
 }
 
-/// Вікно вибору перекладів для «Порівняти»: чекбокси, вибір запам'ятовується в налаштуваннях.
-/// Переклад на екрані завжди перша колонка, тож його в списку немає.
+/// The translation picker for "Compare": checkboxes, the choice is remembered in settings.
+/// The on-screen translation is always the first column, so it is not in the list.
 struct CompareSetup: View {
     let current: BibleCore.Translation
     @Bindable var preferences: PreferencesStore
@@ -126,7 +126,7 @@ struct CompareSetup: View {
                     get: { chosen.contains(translation) },
                     set: { _ in preferences.preferences.comparePanels.toggle(translation) }))
                     .toggleStyle(.checkbox)
-                    // Останній вибраний не зняти: порівнювати не буде з чим.
+                    // The last selected one cannot be unchecked: there would be nothing to compare with.
                     .disabled(chosen == [translation])
                     .accessibilityIdentifier("compare-choice-\(translation.rawValue)")
             }

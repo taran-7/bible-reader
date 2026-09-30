@@ -1,7 +1,7 @@
 import Testing
 @testable import BibleCore
 
-/// Ідентичність для списків SwiftUI і підписи перекладів у тулбарі.
+/// Identity for SwiftUI lists and translation labels in the toolbar.
 @Suite struct IdentityTests {
     // @trace FR-4
     @Test func testTranslationTitles() {

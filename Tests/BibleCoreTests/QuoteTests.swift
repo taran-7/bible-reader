@@ -6,7 +6,7 @@ import Testing
         Verse(translation: t, book: 43, chapter: 3, verse: n, text: text)
     }
 
-    // Скорочена мітка результату пошуку (FR-11), а не цитата FR-9.
+    // A shortened search result label (FR-11), not the FR-9 quote.
     // @trace FR-11
     @Test func testReferenceFormat() {
         #expect(Reference(book: 43, chapter: 3, verseStart: 16).format(in: .synodal) == "Ин. 3:16")

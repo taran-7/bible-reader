@@ -4,7 +4,7 @@ import GRDB
 public enum ImportError: Error, Equatable, CustomStringConvertible {
     case missingFile(String)
     case malformed(String)
-    /// Урізаний файл: книг менше, ніж у каноні (tech debt #14).
+    /// A truncated file: fewer books than in the canon (tech debt #14).
     case incomplete(String, books: Int, expected: Int)
 
     public var description: String {
@@ -16,17 +16,17 @@ public enum ImportError: Error, Equatable, CustomStringConvertible {
     }
 }
 
-/// Імпорт `data/raw/*.json` (формат thiagobodruk) у `bible.sqlite`.
+/// Imports `data/raw/*.json` (thiagobodruk format) into `bible.sqlite`.
 public enum BibleImporter {
     private struct SourceBook: Decodable {
         let chapters: [[String]]
     }
 
-    /// `translations` — модулі з маніфесту (FR-30); за замовчуванням вшитий каталог.
-    /// `expectedBooks` — мінімум книг у кожному файлі (CLI вимагає весь канон; фікстури тестів коротші).
+    /// `translations`: modules from the manifest (FR-30); the bundled catalog by default.
+    /// `expectedBooks`: the minimum number of books per file (the CLI requires the whole canon; test fixtures are shorter).
     public static func run(rawDirectory: URL, output: URL, translations: [Translation] = Translation.allCases,
                            expectedBooks: Int? = nil) throws {
-        // Спочатку читаємо всі джерела, щоб не створювати базу при помилці вхідних даних.
+        // Read all sources first, so no database is created on an input data error.
         let sources = try translations.map { ($0, try load($0, from: rawDirectory)) }
         if let expectedBooks {
             for (translation, books) in sources where books.count < expectedBooks {
@@ -59,7 +59,7 @@ public enum BibleImporter {
         }
     }
 
-    /// Прибирає курсивну розмітку `{…}` і зайві пробіли.
+    /// Removes `{…}` italic markup and extra spaces.
     static func clean(_ text: String) -> String {
         text.replacingOccurrences(of: "{", with: "")
             .replacingOccurrences(of: "}", with: "")
@@ -72,7 +72,7 @@ public enum BibleImporter {
         guard let data = FileManager.default.contents(atPath: url.path) else {
             throw ImportError.missingFile(name)
         }
-        // JSONDecoder не приймає BOM.
+        // JSONDecoder does not accept a BOM.
         let bom = Data([0xEF, 0xBB, 0xBF])
         let body = data.starts(with: bom) ? data.dropFirst(3) : data
         do {
@@ -109,7 +109,7 @@ public enum BibleImporter {
             """)
     }
 
-    /// Заповнює `verses_stem_fts` основами слів кожного вірша стемером мови перекладу.
+    /// Fills `verses_stem_fts` with the word stems of every verse using the translation language's stemmer.
     private static func indexStems(_ db: Database, translations: [Translation]) throws {
         let insert = try db.makeStatement(sql: "INSERT INTO verses_stem_fts(rowid, stems) VALUES (?, ?)")
         for translation in translations {
@@ -127,7 +127,7 @@ public enum BibleImporter {
             for (chapterIndex, verses) in book.chapters.enumerated() {
                 for (verseIndex, text) in verses.enumerated() {
                     let text = clean(text)
-                    // Порожній рядок — пропущений у джерелі вірш: не пишемо його, номери наступних зберігаються.
+                    // An empty string is a verse missing in the source: we skip it, following numbers are kept.
                     guard !text.isEmpty else { continue }
                     let folded = SearchText.fold(text)
                     try statement.execute(arguments: [translation.rawValue, bookIndex + 1, chapterIndex + 1, verseIndex + 1, text,
@@ -138,7 +138,7 @@ public enum BibleImporter {
     }
 }
 
-/// CLI `bible-import` як функція: код виходу і stderr покриваються тестами.
+/// The `bible-import` CLI as a function: exit code and stderr are covered by tests.
 public enum ImportCommand {
     public static func run(arguments: [String], stderr: (String) -> Void) -> Int32 {
         guard arguments.count == 3 else {

@@ -37,14 +37,14 @@ import Testing
         prefs.resetFonts()
         #expect(prefs.verseFontSize == 15 && prefs.bookListFontSize == 13)
         #expect(prefs.areFontsDefault)
-        // Змішаний стан: вірші вже на межі, список книг ще ні — ⌘+ доступна і збільшує лише список.
+        // A mixed state: verses are already at the limit, the book list is not; ⌘+ is available and grows only the list.
         prefs.verseFontSize = 32
         prefs.bookListFontSize = 20
         #expect(prefs.canIncreaseFonts)
         prefs.increaseFonts()
         #expect(prefs.verseFontSize == 32 && prefs.bookListFontSize == 21)
         prefs.resetFonts()
-        // Межі однакові: після багатьох ⌘+ обидва на 32.
+        // The limits are the same: after many ⌘+ both are at 32.
         for _ in 0..<100 { prefs.increaseFonts() }
         #expect(prefs.verseFontSize == 32 && prefs.bookListFontSize == 32)
     }

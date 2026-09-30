@@ -1,31 +1,31 @@
-# План: Bible Reader для macOS (capstone)
+# Plan: Bible Reader for macOS (capstone)
 
 ## Context
-Capstone курсу вимагає власний невеликий проєкт з доведеними практиками agentic engineering. Користувач обрав десктопний додаток для читання Біблії в дусі biblequote.org. MVP: один переклад на екрані з перемикачем KJV ↔ Синодальний, навігація книга → розділ → вірш, копіювання цитати з посиланням, повнотекстовий пошук. Стек: SwiftUI + Swift Package `BibleCore` + GRDB (SQLite FTS5) + Swift CLI-конвертер. Паралельний перегляд і таблиця відповідностей нумерації поза межами MVP.
+The course capstone requires an own small project with proven agentic engineering practices. The user chose a desktop Bible reading app in the spirit of biblequote.org. MVP: one translation on screen with a KJV ↔ Synodal switcher, navigation book → chapter → verse, copying a quote with a reference, full-text search. Stack: SwiftUI + Swift Package `BibleCore` + GRDB (SQLite FTS5) + a Swift CLI converter. The parallel view and the numbering mapping table are outside the MVP.
 
-Репозиторій: `bible-reader` (окремий від форку курсу; у форку лише README з посиланням). Структура: `Package.swift`, `BibleReaderApp/`, `data/`, `docs/`, `openspec/`, `.claude/`.
+Repository: `bible-reader` (separate from the course fork; the fork only has a README with a link). Structure: `Package.swift`, `BibleReaderApp/`, `data/`, `docs/`, `openspec/`, `.claude/`.
 
-## Кроки
-1. **Специфікація**: OpenSpec change `bible-reader-mvp` (`/opsx:propose`) + `docs/product-specs/bible-reader-mvp.md` з погодженим дизайном; коміт на гілці `feature/01-bible-reader-mvp` (нумерація гілок: `feature/NN-<change>` за OpenSpec change).
-2. **План реалізації** через скіл writing-plans (задачі TDD: червоний тест → зелений).
-3. **Дані**: `data/raw/en_kjv.json`, `data/raw/ru_synodal.json` з `thiagobodruk/bible` (однаковий формат для обох, суспільне надбання), `data/raw/SOURCE.md` з посиланням і ліцензією.
-4. **Package.swift**: таргети `BibleCore` (lib, залежить від GRDB), `bible-import` (executable), `BibleCoreTests`. macOS 14+.
-5. **BibleCore**: `Translation`, `Book` (1–66, назви/скорочення en/ru), `Verse`, `BibleRepository` (books, chapterCount, verses, search з екрануванням FTS-запиту), `Reference` (format/parse, діапазони).
-6. **bible-import**: JSON → `bible.sqlite` (таблиця `verses` + `verses_fts` FTS5 `unicode61 remove_diacritics 2`).
-7. **BibleReaderApp** (Xcode-проєкт): `NavigationSplitView`, тулбар з перемикачем перекладу, `.searchable` (посилання → перехід, інакше FTS), копіювання ⌘C/контекстне меню, екран помилки БД. `ReaderViewModel` `@Observable`.
-8. **Харнес для доказів практик**: `CLAUDE.md` сабмішену (правила: TDD, `swift test` перед комітом), субагент-рецензент `.claude/agents/reviewer.md`, цикл `make check` (swift test до зеленого).
-9. **README сабмішену** і заповнений PR-шаблон; відео робить користувач.
+## Steps
+1. **Spec**: OpenSpec change `bible-reader-mvp` (`/opsx:propose`) + `docs/product-specs/bible-reader-mvp.md` with the agreed design; a commit on the `feature/01-bible-reader-mvp` branch (branch numbering: `feature/NN-<change>` per OpenSpec change).
+2. **Implementation plan** via the writing-plans skill (TDD tasks: red test → green).
+3. **Data**: `data/raw/en_kjv.json`, `data/raw/ru_synodal.json` from `thiagobodruk/bible` (same format for both, public domain), `data/raw/SOURCE.md` with a link and license.
+4. **Package.swift**: targets `BibleCore` (lib, depends on GRDB), `bible-import` (executable), `BibleCoreTests`. macOS 14+.
+5. **BibleCore**: `Translation`, `Book` (1–66, names/abbreviations en/ru), `Verse`, `BibleRepository` (books, chapterCount, verses, search with FTS query escaping), `Reference` (format/parse, ranges).
+6. **bible-import**: JSON → `bible.sqlite` (table `verses` + `verses_fts` FTS5 `unicode61 remove_diacritics 2`).
+7. **BibleReaderApp** (Xcode project): `NavigationSplitView`, a toolbar with the translation switcher, `.searchable` (reference → jump, otherwise FTS), copying via ⌘C/context menu, a DB error screen. `ReaderViewModel` `@Observable`.
+8. **Harness for practice evidence**: the submission's `CLAUDE.md` (rules: TDD, `swift test` before committing), a reviewer subagent `.claude/agents/reviewer.md`, a `make check` loop (swift test until green).
+9. **Submission README** and a filled PR template; the user records the video.
 
 ## Verification
-- `make test` (`swift test`) у корені проєкту: імпорт (66 книг, кількість віршів KJV за джерелом ≈31 102, контрольні Быт 1:1 / Ин 3:16), Reference (parse/format обох мов, діапазони), пошук (регістр, кирилиця, спецсимволи `"*` не падають).
-- `swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite` генерує базу.
-- `xcodebuild -scheme BibleReader build`, потім ручна перевірка: навігація, перемикач, пошук «love»/«любовь», перехід «Ин 3:16», копіювання 3:16-18.
-- Прохід субагента-рецензента по diff перед PR.
+- `make test` (`swift test`) at the project root: import (66 books, KJV verse count per source ≈31,102, control verses Быт 1:1 / Ин 3:16), Reference (parse/format in both languages, ranges), search (case, Cyrillic, special characters `"*` do not crash).
+- `swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite` generates the database.
+- `xcodebuild -scheme BibleReader build`, then a manual check: navigation, switcher, search "love"/"любовь", jumping to "Ин 3:16", copying 3:16-18.
+- A reviewer subagent pass over the diff before the PR.
 
-## Погоджений дизайн (коротко)
-- **UI:** `NavigationSplitView`; бічна панель 66 книг (СЗ/НЗ) мовою перекладу; основна область з текстом розділу, ◀ ▶ і вибір розділу; перемикач KJV / Синодальний у тулбарі.
-- **Пошук:** `.searchable`; якщо запит розбирається як посилання (`Ин 3:16`, `John 3`), відбувається перехід, інакше FTS з підсвіченими фрагментами; клік відкриває вірш.
-- **Копіювання:** `«текст» (От Иоанна 3:16)`, діапазони `От Иоанна 3:16-18` (повна назва книги).
-- **Дані:** `ReaderViewModel` (`@Observable`) → `BibleRepository`; БД read-only з бандла, один `DatabaseQueue`.
-- **Помилки:** екран помилки, якщо БД не відкрилась; «Нічого не знайдено»; FTS-запит екранується.
-- **Відоме обмеження:** нумерація Синодального місцями відрізняється від KJV (Псалми тощо); UI перевіряється вручну.
+## Agreed design (short)
+- **UI:** `NavigationSplitView`; a sidebar with 66 books (OT/NT) in the translation's language; a main area with the chapter text, ◀ ▶ and a chapter picker; a KJV / Synodal switcher in the toolbar.
+- **Search:** `.searchable`; if the query parses as a reference (`Ин 3:16`, `John 3`), it jumps there, otherwise FTS with highlighted snippets; a click opens the verse.
+- **Copying:** `«текст» (От Иоанна 3:16)`, ranges `От Иоанна 3:16-18` (full book name).
+- **Data:** `ReaderViewModel` (`@Observable`) → `BibleRepository`; the DB is read-only from the bundle, one `DatabaseQueue`.
+- **Errors:** an error screen if the DB did not open; "Nothing found"; the FTS query is escaped.
+- **Known limitation:** Synodal numbering differs from KJV in places (Psalms etc.); the UI is checked manually.

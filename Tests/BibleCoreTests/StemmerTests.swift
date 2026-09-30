@@ -12,7 +12,7 @@ import Testing
         #expect(same(.english, ["love", "loved", "loveth", "lovest", "loving", "Loves"]))
         #expect(same(.english, ["come", "cometh", "comest"]))
         #expect(same(.english, ["walk", "walketh", "walked"]))
-        // Слова на -est, які не є формами дієслова, не зливаються з іншими.
+        // Words ending in -est that are not verb forms do not merge with others.
         #expect(!same(.english, ["priest", "pries"]))
         #expect(!same(.english, ["beast", "be"]))
     }
@@ -44,13 +44,13 @@ import Testing
         #expect(Stemmer.czech("kůň") == "koň")
         #expect(Stemmer.czech("otec") == "otek")
         #expect(Stemmer.czech("kněz") == "kněh")
-        // Запит без діакритики дає ту саму основу, що й текст із нею.
+        // A query without diacritics gives the same stem as the text with them.
         #expect(Stemmer(language: .czech).stem("Bůh") == Stemmer(language: .czech).stem("buh"))
     }
 
     // @trace FR-18
     @Test func testWordsSplitLikeTheIndex() {
-        // Апостроф і розділові знаки ділять слова так само, як unicode61.
+        // An apostrophe and punctuation split words the same way as unicode61.
         #expect(Stemmer.words(in: "п'ять, любов’ю!").map(\.text) == ["п", "ять", "любов", "ю"])
         #expect(Stemmer(language: .ukrainian).stemmed("Любов’ю Бога") == "люб ю бог")
         #expect(Stemmer(language: .russian).stemmed("Её") == Stemmer(language: .russian).stemmed("ее"))

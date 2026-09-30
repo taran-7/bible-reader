@@ -34,11 +34,11 @@ import Testing
 
     // @trace FR-29
     @Test func testNewTranslationsAreClean() throws {
-        // Без знаків наголосу, тегів і фігурних дужок.
+        // No stress marks, tags or curly braces.
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation IN ('ohienko','bkr') AND (text LIKE '%' || char(769) || '%' OR text LIKE '%<%' OR text LIKE '%{%')", in: db) == 0)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'bkr'", in: db) == 31_102)
-        // Огієнко з bolls.life (UBIO, 1962): повний текст; число фіксуємо, щоб перегенерація не змінила його тихо.
-        // Нумерація як у KJV — вірш у вірш: надпис псалма входить у вірш 1.
+        // Ohienko from bolls.life (UBIO, 1962): the full text; the count is pinned so a regeneration cannot change it silently.
+        // Numbering as in KJV, verse for verse: a psalm superscription is part of verse 1.
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'ohienko'", in: db) == 31_102)
         #expect(try TestSupport.count("""
             SELECT COUNT(*) FROM (SELECT book, chapter, COUNT(*) n FROM verses WHERE translation = 'ohienko' GROUP BY 1, 2) o

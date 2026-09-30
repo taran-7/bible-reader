@@ -51,7 +51,7 @@ import Testing
         #expect(Reference.parse("Žalmy 23")?.book == 19)
         #expect(Reference.parse("Gn 1:1")?.book == 1)
         #expect(Reference.parse("Dn 7")?.book == 27)
-        // Короткі чеські форми, що збігаються зі звичними англійськими: `Jon` — Йона, як і в англійській.
+        // Short Czech forms that match common English ones: `Jon` is Jonah, as in English.
         #expect(Reference.parse("Jon 3")?.book == 32)
         #expect(Reference.parse("Na 1")?.book == 34)
     }

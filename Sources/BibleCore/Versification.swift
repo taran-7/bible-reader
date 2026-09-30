@@ -1,24 +1,24 @@
 import GRDB
 
-/// Таблиця відповідностей нумерації KJV ↔ Синодальний (FR-27, PRD 6.13).
-/// KJV, Kralická й Огієнко нумеровані однаково, тож «KJV» тут — будь-який із них.
+/// The KJV ↔ Synodal numbering mapping table (FR-27, PRD 6.13).
+/// KJV, Kralická and Ohienko share numbering, so "KJV" here means any of them.
 ///
-/// Правила звірено з текстами обох перекладів у `bible.sqlite`:
-/// - Псалми: номер за Септуагінтою (9–10 → 9, 11–113 → −1, 114–115 → 113, 116 → 114–115, 117–146 → −1,
-///   147 → 146–147); надписи в Синодальному — окремі вірші 1–2, тож зсув = різниця кількості віршів.
-///   Для злитих і розділених (9–10, 114–115, 116, 147) зсуви задано явно й звірено з текстом (Син. 9:1 — надпис);
-/// - решта — межі розділів і злиті вірші в Левит, Числа, Ісус Навин, 1 Самуїла, Йов, Приповісті,
-///   Екклезіаст, Пісня пісень, Ісая, Даниїл, Осія, Йона, Дії, Римлян, 2 Коринтян, 3 Івана.
-/// Вірші Синодального без відповідника (доповнення Септуагінти, Пс 151, Дан 3:24–90, 13–14) дають `nil`.
+/// The rules were checked against the texts of both translations in `bible.sqlite`:
+/// - Psalms: numbered per the Septuagint (9–10 → 9, 11–113 → −1, 114–115 → 113, 116 → 114–115, 117–146 → −1,
+///   147 → 146–147); superscriptions in the Synodal are separate verses 1–2, so the shift = the verse count difference.
+///   For merged and split ones (9–10, 114–115, 116, 147) the shifts are explicit and checked against the text (Syn. 9:1 is a superscription);
+/// - the rest are chapter boundaries and merged verses in Leviticus, Numbers, Joshua, 1 Samuel, Job, Proverbs,
+///   Ecclesiastes, Song of Songs, Isaiah, Daniel, Hosea, Jonah, Acts, Romans, 2 Corinthians, 3 John.
+/// Synodal verses without a counterpart (Septuagint additions, Ps 151, Dan 3:24–90, 13–14) give `nil`.
 ///
-/// Інші системи нумерації (tech debt #25) приносять `VersificationTable` у маніфесті; KJV — вузол,
-/// тож вірш між двома не-KJV системами йде через KJV.
+/// Other numbering systems (tech debt #25) bring a `VersificationTable` in the manifest; KJV is the hub,
+/// so a verse between two non-KJV systems goes through KJV.
 public struct Versification: Sendable {
-    /// Відповідності однієї системи нумерації до KJV.
+    /// The mapping of one numbering system to KJV.
     struct Table: Sendable {
         var fromKJV: [VerseKey: VerseKey] = [:]
         var toKJV: [VerseKey: VerseKey] = [:]
-        /// Усі вірші KJV, що злиті в один вірш цієї системи (для позначок користувача).
+        /// All KJV verses merged into one verse of this system (for user marks).
         var allKJV: [VerseKey: [VerseKey]] = [:]
 
         mutating func add(_ kjv: VerseKey, _ local: VerseKey) {
@@ -27,7 +27,7 @@ public struct Versification: Sendable {
             allKJV[local, default: []].append(kjv)
         }
 
-        /// Сегменти перекривають відповідність; решта віршів KJV — `identity` (за замовчуванням той самий номер).
+        /// Segments override the mapping; the remaining KJV verses are `identity` (the same number by default).
         init(segments: [Segment], kjvCounts: [Int: [Int: Int]],
              identity: (VerseKey, _ chapterCount: Int, _ chapters: [Int: Int]) -> VerseKey = { key, _, _ in key }) {
             var overridden = Set<VerseKey>()
@@ -53,8 +53,8 @@ public struct Versification: Sendable {
 
     private var tables: [Translation.Numbering: Table] = [:]
 
-    /// Лінійний шматок: вірші `from...to` розділу KJV ідуть підряд від `localVerse` у розділі `localChapter`.
-    /// `merge` — усі ці вірші KJV складають один вірш іншої системи.
+    /// A linear piece: verses `from...to` of a KJV chapter run consecutively from `localVerse` in chapter `localChapter`.
+    /// `merge` means all these KJV verses form one verse of the other system.
     public struct Segment: Decodable, Hashable, Sendable {
         public let book: Int, chapter: Int, from: Int, to: Int
         public let localChapter: Int, localVerse: Int
@@ -82,7 +82,7 @@ public struct Versification: Sendable {
         }
     }
 
-    /// Вірші Синодального, що належать до попереднього вірша KJV (продовження розділеного вірша).
+    /// Synodal verses belonging to the previous KJV verse (the continuation of a split verse).
     struct Continuation { let synodal: VerseKey; let kjv: VerseKey }
 
     static let segments: [Segment] = [
@@ -104,7 +104,7 @@ public struct Versification: Sendable {
         Segment(book: 20, chapter: 18, from: 8, to: 24, localChapter: 18, localVerse: 9),
         Segment(book: 21, chapter: 5, from: 1, to: 1, localChapter: 4, localVerse: 17),
         Segment(book: 21, chapter: 5, from: 2, to: 20, localChapter: 5, localVerse: 1),
-        // Пісня пісень 1:1 (заголовок) у Синодальному входить у 1:1.
+        // Song of Songs 1:1 (the title) is part of 1:1 in the Synodal.
         Segment(book: 22, chapter: 1, from: 1, to: 2, localChapter: 1, localVerse: 1, merge: true),
         Segment(book: 22, chapter: 1, from: 3, to: 17, localChapter: 1, localVerse: 2),
         Segment(book: 22, chapter: 6, from: 13, to: 13, localChapter: 7, localVerse: 1),
@@ -123,7 +123,7 @@ public struct Versification: Sendable {
         Segment(book: 47, chapter: 11, from: 32, to: 33, localChapter: 11, localVerse: 32, merge: true),
         Segment(book: 47, chapter: 13, from: 12, to: 13, localChapter: 13, localVerse: 12, merge: true),
         Segment(book: 47, chapter: 13, from: 14, to: 14, localChapter: 13, localVerse: 13),
-        // Псалом 116:8–9 KJV — один вірш 114:8.
+        // KJV Psalm 116:8–9 is one verse 114:8.
         Segment(book: 19, chapter: 116, from: 8, to: 9, localChapter: 114, localVerse: 8, merge: true),
         Segment(book: 19, chapter: 116, from: 10, to: 19, localChapter: 115, localVerse: 1),
     ]
@@ -133,7 +133,7 @@ public struct Versification: Sendable {
         Continuation(synodal: VerseKey(book: 64, chapter: 1, verse: 15), kjv: VerseKey(book: 64, chapter: 1, verse: 14)),
     ]
 
-    /// Розділ Синодального для псалма KJV (без 116 і 147, які діляться).
+    /// The Synodal chapter for a KJV psalm (except 116 and 147, which are split).
     static func synodalPsalm(_ chapter: Int) -> Int {
         switch chapter {
         case 10: 9
@@ -144,13 +144,13 @@ public struct Versification: Sendable {
         }
     }
 
-    /// `counts[translation][book][chapter]` = кількість віршів; `custom` — таблиці нових систем з маніфесту.
+    /// `counts[translation][book][chapter]` = verse count; `custom` are tables of new systems from the manifest.
     init(kjvCounts: [Int: [Int: Int]], synodalCounts: [Int: [Int: Int]],
          custom: [Translation.Numbering: VersificationTable] = [:]) {
         var synodal = Table(segments: Self.segments, kjvCounts: kjvCounts) { kjv, count, chapters in
             kjv.book == 19 ? Self.psalm(kjv, chapterCount: count, kjvCounts: chapters, synodalCounts: synodalCounts[19] ?? [:]) : kjv
         }
-        // Надписи псалмів (вірші Синодального перед першим відповідником) ведуть до першого вірша KJV.
+        // Psalm superscriptions (Synodal verses before the first counterpart) lead to the first KJV verse.
         for (chapter, count) in synodalCounts[19] ?? [:] where count > 0 {
             for verse in 1...count {
                 let key = VerseKey(book: 19, chapter: chapter, verse: verse)
@@ -168,15 +168,15 @@ public struct Versification: Sendable {
         }
     }
 
-    /// Псалом: розділ за Септуагінтою, зсув = надписи Синодального (різниця кількості віршів).
+    /// A psalm: the chapter per the Septuagint, the shift = Synodal superscriptions (the verse count difference).
     private static func psalm(_ kjv: VerseKey, chapterCount: Int, kjvCounts: [Int: Int], synodalCounts: [Int: Int]) -> VerseKey {
         func key(_ chapter: Int, _ verse: Int) -> VerseKey { VerseKey(book: 19, chapter: chapter, verse: verse) }
         switch kjv.chapter {
-        case 9: return key(9, kjv.verse + 1)                                   // надпис у 9
-        case 10: return key(9, kjv.verse + (kjvCounts[9] ?? 0) + 1)            // 10 продовжує 9
+        case 9: return key(9, kjv.verse + 1)                                   // superscription in 9
+        case 10: return key(9, kjv.verse + (kjvCounts[9] ?? 0) + 1)            // 10 continues 9
         case 114: return key(113, kjv.verse)
         case 115: return key(113, kjv.verse + (kjvCounts[114] ?? 0))
-        case 116: return key(114, kjv.verse)                                   // 1–7; 8–19 у сегментах
+        case 116: return key(114, kjv.verse)                                   // 1–7; 8–19 in segments
         case 147 where kjv.verse <= 11: return key(146, kjv.verse)
         case 147: return key(147, kjv.verse - 11)
         default:
@@ -189,15 +189,15 @@ public struct Versification: Sendable {
     public func synodal(fromKJV key: VerseKey) -> VerseKey? { tables[.synodal]?.fromKJV[key] }
     public func kjv(fromSynodal key: VerseKey) -> VerseKey? { tables[.synodal]?.toKJV[key] }
 
-    /// Усі вірші KJV, з яких складається вірш Синодального, у порядку KJV.
+    /// All KJV verses that make up a Synodal verse, in KJV order.
     public func allKJV(fromSynodal key: VerseKey) -> [VerseKey] { allKJV(from: .synodal, key) }
 
-    /// Усі вірші KJV, з яких складається вірш системи `numbering`, у порядку KJV.
+    /// All KJV verses that make up a verse of the `numbering` system, in KJV order.
     public func allKJV(from numbering: Translation.Numbering, _ key: VerseKey) -> [VerseKey] {
         numbering == .kjv ? [key] : (tables[numbering]?.allKJV[key] ?? []).sorted()
     }
 
-    /// Вірш в іншій системі нумерації; `nil` — відповідника немає (або немає таблиці системи).
+    /// The verse in another numbering system; `nil` means no counterpart (or no table for the system).
     public func map(_ key: VerseKey, fromNumbering source: Translation.Numbering, to target: Translation.Numbering) -> VerseKey? {
         if source == target { return key }
         let kjv = source == .kjv ? key : tables[source]?.toKJV[key]
@@ -205,7 +205,7 @@ public struct Versification: Sendable {
         return target == .kjv ? kjv : tables[target]?.fromKJV[kjv]
     }
 
-    /// Вірш іншого перекладу; `nil` — відповідника немає.
+    /// The verse of another translation; `nil` means no counterpart.
     public func map(_ key: VerseKey, from source: Translation, to target: Translation) -> VerseKey? {
         map(key, fromNumbering: source.numbering, to: target.numbering)
     }
@@ -221,7 +221,7 @@ public struct Versification: Sendable {
                 return result
             }
         }
-        // Таблиця системи — з першого модуля, що її приносить.
+        // The system's table comes from the first module that brings it.
         var custom: [Translation.Numbering: VersificationTable] = [:]
         for translation in Translation.allCases {
             if let table = translation.versificationTable, custom[translation.numbering] == nil {
@@ -232,8 +232,8 @@ public struct Versification: Sendable {
     }
 }
 
-/// Таблиця відповідностей нової системи нумерації до KJV (поле `versification` маніфесту, tech debt #25):
-/// лише відмінності від KJV; вірші поза сегментами мають той самий номер.
+/// The mapping table of a new numbering system to KJV (the manifest's `versification` field, tech debt #25):
+/// only the differences from KJV; verses outside the segments keep the same number.
 public struct VersificationTable: Decodable, Hashable, Sendable {
     public let segments: [Versification.Segment]
 

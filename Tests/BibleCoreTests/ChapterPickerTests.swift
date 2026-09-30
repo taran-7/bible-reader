@@ -8,7 +8,7 @@ import Testing
         model.open(Location(book: 43, chapter: 3))
         model.pickBook(8)
         #expect(model.chapterPicker == ChapterPicker(book: 8, chapterCount: 3, current: nil))
-        // Текст поточного розділу лишається під вікном.
+        // The current chapter's text stays under the window.
         #expect(model.location == Location(book: 43, chapter: 3))
         model.pickChapter(2)
         #expect(model.location == Location(book: 8, chapter: 2))
@@ -24,7 +24,7 @@ import Testing
         model.dismissChapterPicker()
         #expect(model.chapterPicker == nil)
         #expect(model.location == Location(book: 43, chapter: 3))
-        // Без відкритого вікна вибір розділу нічого не робить.
+        // Without an open window, choosing a chapter does nothing.
         model.pickChapter(1)
         #expect(model.location == Location(book: 43, chapter: 3))
     }

@@ -2,99 +2,99 @@
 
 ## Purpose
 
-Дозволяє знайти вірші за словом чи фразою в активному перекладі або перейти за введеним посиланням.
+Lets the user find verses by a word or phrase in the active translation, or jump to a typed reference.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-11, FR-12, FR-13, FR-14, FR-18, FR-19, FR-20, FR-21.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-11, FR-12, FR-13, FR-14, FR-18, FR-19, FR-20, FR-21.
 
 ## Requirements
 
-### Requirement: Пошук за текстом
-Система SHALL шукати вірші, що містять усі слова запиту в будь-якій їхній формі (за основою слова), лише в активному перекладі, без урахування регістру; результати SHALL містити посилання і текст вірша з підсвіченими збігами і SHALL бути впорядковані за порядком книг.
+### Requirement: Text search
+The system SHALL search for verses containing all query words in any of their forms (by word stem), only in the active translation, case-insensitive; results SHALL contain a reference and the verse text with matches highlighted and SHALL be ordered by book order.
 
-#### Scenario: Латиниця
-- **WHEN** у KJV шукають `love`
-- **THEN** результати непорожні і кожен вірш містить слово з основою «lov» у будь-якому регістрі
+#### Scenario: Latin
+- **WHEN** `love` is searched in KJV
+- **THEN** the results are non-empty and every verse contains a word with the stem "lov" in any case
 
-#### Scenario: Кирилиця і регістр
-- **WHEN** у Синодальному шукають `ЛЮБОВЬ`
-- **THEN** результати ті самі, що для `любовь`
+#### Scenario: Cyrillic and case
+- **WHEN** `ЛЮБОВЬ` is searched in the Synodal
+- **THEN** the results are the same as for `любовь`
 
-#### Scenario: Лише активний переклад
-- **WHEN** у KJV шукають `любовь`
-- **THEN** показано «Нічого не знайдено»
+#### Scenario: Active translation only
+- **WHEN** `любовь` is searched in KJV
+- **THEN** «Нічого не знайдено» (Nothing found) is shown
 
-### Requirement: Безпечний запит
-Спеціальні символи пошукового синтаксису (`"`, `*`, `(`, `)`, `:`, `-` тощо) MUST трактуватися як звичайний текст і MUST NOT спричиняти помилку.
+### Requirement: Safe query
+Special characters of the search syntax (`"`, `*`, `(`, `)`, `:`, `-` etc.) MUST be treated as plain text and MUST NOT cause an error.
 
-#### Scenario: Спецсимволи
-- **WHEN** шукають `"love*` або `(`
-- **THEN** пошук повертає результат або порожній список без помилки
+#### Scenario: Special characters
+- **WHEN** `"love*` or `(` is searched
+- **THEN** search returns a result or an empty list without an error
 
-#### Scenario: Порожній запит
-- **WHEN** запит порожній або з пробілів
-- **THEN** результатів немає і помилки немає
+#### Scenario: Empty query
+- **WHEN** the query is empty or only spaces
+- **THEN** there are no results and no error
 
-### Requirement: Перехід за посиланням
-Якщо запит у полі пошуку розбирається як посилання, додаток SHALL відкрити відповідне місце замість текстового пошуку і прокрутити до вірша, якщо його вказано.
+### Requirement: Jump to a reference
+If the query in the search field parses as a reference, the app SHALL open that passage instead of a text search and scroll to the verse if one is given.
 
-#### Scenario: Перехід до вірша
-- **WHEN** у полі пошуку введено `Ин 3:16`
-- **THEN** відкрито розділ Иоанна 3 з віршем 16 у фокусі
+#### Scenario: Jump to a verse
+- **WHEN** `Ин 3:16` is typed in the search field
+- **THEN** the chapter Иоанна 3 opens with verse 16 in focus
 
-### Requirement: Відкриття результату
-Клік по результату пошуку SHALL відкривати розділ із цим віршем у фокусі.
+### Requirement: Opening a result
+Clicking a search result SHALL open the chapter with that verse in focus.
 
-#### Scenario: Клік по результату
-- **WHEN** користувач клікає результат 1 John 4:8
-- **THEN** відкрито 1 John 4 з віршем 8 у фокусі
+#### Scenario: Clicking a result
+- **WHEN** the user clicks the result 1 John 4:8
+- **THEN** 1 John 4 opens with verse 8 in focus
 
-### Requirement: Морфологічний пошук
-Слова запиту без лапок SHALL знаходити інші форми того самого слова: англійською (зокрема KJV-форми на -eth, -est), російською, українською і чеською. Підсвічуються всі знайдені форми.
+### Requirement: Morphological search
+Unquoted query words SHALL find other forms of the same word: in English (including KJV forms in -eth, -est), Russian, Ukrainian and Czech. All found forms are highlighted.
 
-#### Scenario: Російські відмінки
-- **WHEN** у Синодальному шукають `любовь`
-- **THEN** серед результатів є вірші зі словами «любви» і «любовью»
+#### Scenario: Russian cases
+- **WHEN** `любовь` is searched in the Synodal
+- **THEN** the results include verses with the words «любви» and «любовью»
 
-#### Scenario: KJV-форми
-- **WHEN** у KJV шукають `love`
-- **THEN** серед результатів є вірші з «loved», «loveth», «loving», а в Ин 3:16 підсвічено «loved»
+#### Scenario: KJV forms
+- **WHEN** `love` is searched in KJV
+- **THEN** the results include verses with "loved", "loveth", "loving", and in John 3:16 "loved" is highlighted
 
-#### Scenario: Українська і чеська
-- **WHEN** в Огієнка шукають `любов`, а в Кралицькій `láska`
-- **THEN** знайдено вірші з «любові» і з «lásky»
+#### Scenario: Ukrainian and Czech
+- **WHEN** `любов` is searched in Ohienko and `láska` in Kralická
+- **THEN** verses with «любові» and with «lásky» are found
 
-### Requirement: Область пошуку
-Над результатами SHALL бути панель області: уся Біблія, Старий Завіт (книги 1–39), Новий Завіт (40–66), поточна книга. Зміна області SHALL перезапускати пошук за тим самим запитом.
+### Requirement: Search scope
+Above the results there SHALL be a scope bar: the whole Bible, the Old Testament (books 1–39), the New Testament (40–66), the current book. Changing the scope SHALL rerun the search with the same query.
 
-#### Scenario: Завіти
-- **WHEN** у KJV шукають `love` в СЗ і в НЗ
-- **THEN** результати СЗ лише з книг 1–39, НЗ — з 40–66, а сума кількостей дорівнює кількості по всій Біблії
+#### Scenario: Testaments
+- **WHEN** `love` is searched in KJV in the OT and in the NT
+- **THEN** OT results come only from books 1–39, NT from 40–66, and the sum of the counts equals the count over the whole Bible
 
-#### Scenario: Поточна книга
-- **WHEN** відкрито Івана і обрано «Іоан»/«John» в панелі
-- **THEN** усі результати з книги 43
+#### Scenario: Current book
+- **WHEN** John is open and «Іоан»/"John" is chosen in the bar
+- **THEN** all results come from book 43
 
-### Requirement: Усі результати з лічильником
-Результати SHALL показувати напис «Знайдено: N» з повною кількістю в області й SHALL довантажуватися сторінками по 100, коли список прокручено до кінця; обмеження кількості результатів немає.
+### Requirement: All results with a counter
+Results SHALL show the label «Знайдено: N» (Found: N) with the full count in the scope and SHALL load more in pages of 100 when the list is scrolled to the end; there is no result limit.
 
-#### Scenario: Довантаження
-- **WHEN** запит має 250 збігів
-- **THEN** спершу показано 100 і «Знайдено: 250», після прокручування — 200, потім усі 250 без повторів
+#### Scenario: Loading more
+- **WHEN** a query has 250 matches
+- **THEN** first 100 and «Знайдено: 250» are shown, after scrolling 200, then all 250 without repeats
 
-### Requirement: Пошук фрази в лапках
-Текст запиту в лапках (`"…"`, `«…»`, `„…“`, `“…”`) SHALL шукатися як точна фраза: ці слова поспіль і в точних формах. Слова поза лапками шукаються як звичайно; непарна лапка SHALL трактуватися як звичайний символ.
+### Requirement: Quoted phrase search
+Query text in quotes (`"…"`, `«…»`, `„…“`, `“…”`) SHALL be searched as an exact phrase: these words in a row and in exact forms. Words outside the quotes are searched as usual; an unpaired quote SHALL be treated as a plain character.
 
-#### Scenario: Точна фраза
-- **WHEN** у KJV шукають `"only begotten Son"`
-- **THEN** кожен результат містить «only begotten Son» поспіль, серед них Ин 3:16
+#### Scenario: Exact phrase
+- **WHEN** `"only begotten Son"` is searched in KJV
+- **THEN** every result contains "only begotten Son" in a row, John 3:16 among them
 
-#### Scenario: Точна форма
-- **WHEN** у KJV шукають `"loved"`
-- **THEN** кожен результат містить саме «loved»
+#### Scenario: Exact form
+- **WHEN** `"loved"` is searched in KJV
+- **THEN** every result contains exactly "loved"
 
-### Requirement: Швидкість пошуку
-Пошук SHALL повертати кількість і першу сторінку результатів менш ніж за 200 мс на всій Біблії для найчастіших слів кожного перекладу.
+### Requirement: Search speed
+Search SHALL return the count and the first page of results in less than 200 ms over the whole Bible for the most frequent words of each translation.
 
-#### Scenario: Найгірший випадок
-- **WHEN** у KJV шукають `the`, у Синодальному `и`, в Огієнка `і`, у Кралицькій `a`
-- **THEN** кожен пошук триває < 200 мс
+#### Scenario: Worst case
+- **WHEN** `the` is searched in KJV, `и` in the Synodal, `і` in Ohienko, `a` in Kralická
+- **THEN** each search takes < 200 ms

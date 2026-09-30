@@ -3,14 +3,14 @@ public enum Testament: Sendable {
     case new
 }
 
-/// Книга протестантського канону (1–66) з назвами і скороченнями обох мов.
+/// A book of the Protestant canon (1–66) with names and abbreviations in both languages.
 public struct Book: Hashable, Identifiable, Sendable {
     public let number: Int
     public let englishName: String
     public let englishAbbreviation: String
     public let russianName: String
     public let russianAbbreviation: String
-    /// Додаткові написання для розбору посилань.
+    /// Extra spellings for reference parsing.
     let aliases: [String]
 
     public var id: Int { number }
@@ -35,7 +35,7 @@ public struct Book: Hashable, Identifiable, Sendable {
     public var czechName: String { Book.czech[number - 1].name }
     public var czechAbbreviation: String { Book.czech[number - 1].abbreviation }
 
-    /// Назва мовою перекладу; модуль із власними назвами книг має пріоритет.
+    /// The name in the translation's language; a module with its own book names takes priority.
     public func name(in translation: Translation) -> String {
         if let books = translation.books { return books[number - 1].name }
         switch translation.language {
@@ -56,14 +56,14 @@ public struct Book: Hashable, Identifiable, Sendable {
         }
     }
 
-    /// Усі написання: назви, скорочення, синоніми.
+    /// All spellings: names, abbreviations, synonyms.
     var spellings: [String] {
         [englishName, englishAbbreviation, russianName, russianAbbreviation,
          ukrainianName, ukrainianAbbreviation, czechName, czechAbbreviation] + aliases
             + Book.moduleSpellings[number - 1]
     }
 
-    /// Назви книг із модулів нових мов; рахуються один раз.
+    /// Book names from modules of new languages; computed once.
     private static let moduleSpellings = spellings(from: Translation.allCases)
 
     static func spellings(from translations: [Translation]) -> [[String]] {
@@ -139,11 +139,11 @@ public struct Book: Hashable, Identifiable, Sendable {
         Book(66, "Revelation", "Rev", "Откровение", "Откр", ["Revelation of John", "Апокалипсис"]),
     ]
 
-    /// Українські назви (як у виданні Огієнка) і скорочення; індекс + 1 = номер книги.
+    /// Ukrainian names (as in the Ohienko edition) and abbreviations; index + 1 = book number.
     static let ukrainian: [(name: String, abbreviation: String)] = [
         ("Буття", "Бут"), ("Вихід", "Вих"), ("Левит", "Лев"), ("Числа", "Чис"), ("Повторення Закону", "Повт"),
         ("Ісус Навин", "Нав"), ("Суддів", "Суд"), ("Рут", "Рут"), ("1 Самуїлова", "1 Сам"), ("2 Самуїлова", "2 Сам"),
-        // «1 Цар» у російській — 1 Самуїлова, тож скорочення царів інші.
+        // «1 Цар» in Russian is 1 Samuel, so the Kings abbreviations differ.
         ("1 Царів", "1 Цр"), ("2 Царів", "2 Цр"), ("1 Хроніки", "1 Хр"), ("2 Хроніки", "2 Хр"), ("Ездра", "Езд"),
         ("Неемія", "Неем"), ("Естер", "Ест"), ("Йов", "Йов"), ("Псалми", "Пс"), ("Приповісті", "Прип"),
         ("Екклезіяст", "Екл"), ("Пісня над піснями", "Пісн"), ("Ісая", "Іс"), ("Єремія", "Єр"), ("Плач Єремії", "Плач"),
@@ -158,7 +158,7 @@ public struct Book: Hashable, Identifiable, Sendable {
         ("3 Івана", "3 Ів"), ("Юди", "Юд"), ("Об'явлення", "Об"),
     ]
 
-    /// Чеські назви і скорочення за Českým ekumenickým překladem; індекс + 1 = номер книги.
+    /// Czech names and abbreviations per the Český ekumenický překlad; index + 1 = book number.
     static let czech: [(name: String, abbreviation: String)] = [
         ("Genesis", "Gn"), ("Exodus", "Ex"), ("Leviticus", "Lv"), ("Numeri", "Nu"), ("Deuteronomium", "Dt"),
         ("Jozue", "Joz"), ("Soudců", "Sd"), ("Rút", "Rt"), ("1. Samuelova", "1S"), ("2. Samuelova", "2S"),

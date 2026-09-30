@@ -1,8 +1,8 @@
 import Darwin
 import Foundation
 
-/// Час від старту процесу (NFR-3: запуск < 1 с). Старт береться з ядра (`kinfo_proc.p_starttime`),
-/// тож у вимір входить усе: завантаження бінарника, `init` додатка, відкриття бази, перший рендер.
+/// Time since process start (NFR-3: launch < 1 s). The start comes from the kernel (`kinfo_proc.p_starttime`),
+/// so the measurement includes everything: loading the binary, the app's `init`, opening the database, the first render.
 public enum LaunchClock {
     public static func processStart(pid: pid_t = getpid()) -> Date? {
         var info = kinfo_proc()
@@ -13,7 +13,7 @@ public enum LaunchClock {
         return Date(timeIntervalSince1970: Double(start.tv_sec) + Double(start.tv_usec) / 1_000_000)
     }
 
-    /// Мілісекунди від старту процесу до `now`.
+    /// Milliseconds from process start to `now`.
     public static func millisecondsSinceStart(now: Date = Date()) -> Int? {
         processStart().map { Int((now.timeIntervalSince($0) * 1000).rounded()) }
     }

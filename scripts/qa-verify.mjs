@@ -100,7 +100,7 @@ const commands = [
   // listed in DEFERRED below and printed on every run, never counted as PASS.
   {
     // Swift adaptation + PD-12: the Release app build is the production build;
-    // on it check NFR-1 (macOS 14+, arm64 only) and NFR-5 (.app < 100 МБ).
+    // on it check NFR-1 (macOS 14+, arm64 only) and NFR-5 (.app < 100 MB).
     name: "app-build",
     command: "node",
     args: ["scripts/check-platform.mjs"],

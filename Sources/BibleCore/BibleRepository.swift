@@ -11,12 +11,12 @@ public enum RepositoryError: Error, CustomStringConvertible {
     }
 }
 
-/// Єдина точка доступу до тексту Біблії.
+/// The single access point to the Bible text.
 public protocol BibleRepository: Sendable {
     func books(translation: Translation) throws -> [Book]
     func chapterCount(book: Int, translation: Translation) throws -> Int
     func verses(book: Int, chapter: Int, translation: Translation) throws -> [Verse]
-    /// Сторінка результатів у порядку книг і загальна кількість збігів в області.
+    /// A page of results in book order and the total match count in the scope.
     func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage
 }
 
@@ -28,7 +28,7 @@ public final class SQLiteBibleRepository: BibleRepository {
         config.readonly = true
         do {
             queue = try DatabaseQueue(path: path.path, configuration: config)
-            // Відкриття ліниве щодо вмісту: перевіряємо, що це наша база.
+            // Opening is lazy about content: check that this is our database.
             _ = try queue.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM verses LIMIT 1") }
         } catch {
             throw RepositoryError.cannotOpen(path: path.path, reason: "\(error)")
