@@ -1,35 +1,35 @@
 # AGENTS.md
 
-Bible Reader: нативний macOS-додаток (SwiftUI) для читання Біблії, KJV і Синодальний переклад. Capstone курсу fwdays «Agentic Engineering».
+Bible Reader: a native macOS app (SwiftUI) for reading the Bible (KJV, Synodal and other translations). Capstone of the fwdays course "Agentic Engineering".
 
-Цей файл є картою, а не енциклопедією. Деталі лежать у `docs/`.
+This file is a map, not an encyclopedia. Details live in `docs/`.
 
-## Куди дивитися
-- **Почни з [docs/exec-plans/active/HANDOFF.md](docs/exec-plans/active/HANDOFF.md)**: поточний стан і наступний крок.
-- [ARCHITECTURE.md](ARCHITECTURE.md): модулі, межі, потік даних.
-- [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md): принципи, яких тримаємося.
-- [docs/product-specs/](docs/product-specs/index.md): що будуємо (поведінка для користувача).
-- [docs/exec-plans/active/](docs/exec-plans/active/): поточний план виконання. Завершені плани переносимо в `completed/`.
-- [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md): відомі обмеження і борг.
-- [docs/generated/db-schema.md](docs/generated/db-schema.md): схема БД (генерується, руками не правити).
-- `openspec/`: зміни у форматі OpenSpec (`/opsx:propose`, `/opsx:apply`, `/opsx:archive`).
+## Where to look
+- **Start with [docs/exec-plans/active/HANDOFF.md](docs/exec-plans/active/HANDOFF.md)**: current state and next step.
+- [ARCHITECTURE.md](ARCHITECTURE.md): modules, boundaries, data flow.
+- [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md): principles we hold to.
+- [docs/product-specs/](docs/product-specs/index.md): what we build (user-facing behavior).
+- [docs/exec-plans/active/](docs/exec-plans/active/): the current execution plan. Finished plans move to `completed/`.
+- [docs/exec-plans/tech-debt-tracker.md](docs/exec-plans/tech-debt-tracker.md): known limitations and debt.
+- [docs/generated/db-schema.md](docs/generated/db-schema.md): DB schema (generated, do not edit by hand).
+- `openspec/`: changes in OpenSpec format (`/opsx:propose`, `/opsx:apply`, `/opsx:archive`).
 
-## Правила
-- Мова документації: українська.
-- TDD: спочатку червоний тест у `BibleCoreTests`, потім реалізація.
-- Перед комітом `swift test` має бути зеленим.
-- Логіка живе в `BibleCore`; SwiftUI-шар тільки відображає стан і викликає `BibleRepository`.
+## Rules
+- Documentation, specs, code comments, commit messages and PR descriptions are written in English. The app UI and Bible texts keep their own languages.
+- TDD: a red test in `BibleCoreTests` first, then the implementation.
+- `swift test` must be green before committing.
+- Logic lives in `BibleCore`; the SwiftUI layer only renders state and calls `BibleRepository`.
 
-## Команди
-- `make test`: `swift test` (якщо активні лише Command Line Tools, додає шляхи до Swift Testing). Тести пишемо на Swift Testing (`import Testing`).
+## Commands
+- `make test`: `swift test` (adds Swift Testing paths when only Command Line Tools are active). Tests use Swift Testing (`import Testing`).
 - `make db`: `swift run bible-import data/raw BibleReaderApp/Resources/bible.sqlite`.
-- `python3 scripts/convert_synodal.py RusSynodal.json data/raw/ru_synodal.json`: перегенерувати Синодальний (див. `data/raw/SOURCE.md`).
-- `cd BibleReaderApp && xcodegen generate`: перегенерувати `BibleReader.xcodeproj` з `project.yml` (руками `.xcodeproj` не правити).
-- `xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build`: збірка додатка; база генерується pre-build скриптом, якщо її немає.
+- `python3 scripts/convert_synodal.py RusSynodal.json data/raw/ru_synodal.json`: regenerate the Synodal translation (see `data/raw/SOURCE.md`).
+- `cd BibleReaderApp && xcodegen generate`: regenerate `BibleReader.xcodeproj` from `project.yml` (never edit `.xcodeproj` by hand).
+- `xcodebuild -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader build`: build the app; a pre-build script generates the database if it is missing.
 
 ## Project Factory
 
-Цикл фабрики агентів (гейти, агенти `.claude/agents/`, скрипти `scripts/check-*.mjs`) описано в [docs/project-factory.md](docs/project-factory.md). Команда `npm run qa:verify` запускає весь набір перевірок, а `npm run gate:status` показує стан гейтів.
+The agent factory loop (gates, agents in `.claude/agents/`, `scripts/check-*.mjs`) is described in [docs/project-factory.md](docs/project-factory.md). `npm run qa:verify` runs the full check battery, and `npm run gate:status` shows gate status.
 
 <!-- BEGIN-FACTORY-LESSONS -->
 <!-- BEGIN-LESSON-vacuous-pass-not-earned -->

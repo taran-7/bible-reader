@@ -1,5 +1,5 @@
 # Security
 
-- Додаток офлайн: мережевих запитів і збору даних немає.
-- Тексти KJV і Синодального в суспільному надбанні; джерело зафіксовано в `data/raw/SOURCE.md`.
-- БД лише для читання, користувацький ввід потрапляє в SQL тільки через параметри GRDB.
+- The app is offline: no network requests and no data collection.
+- The KJV and Synodal texts are in the public domain; the source is recorded in `data/raw/SOURCE.md`.
+- The database is read-only; user input reaches SQL only through GRDB parameters.

@@ -1,8 +1,8 @@
 # Quality score
 
-| Область | Перевірка | Стан |
+| Area | Check | Status |
 |---|---|---|
-| Імпорт даних | `swift test` (кількість книг/віршів, контрольні вірші) | не почато |
-| Reference | `swift test` (parse/format, діапазони) | не почато |
-| Пошук | `swift test` (регістр, кирилиця, спецсимволи) | не почато |
-| UI | ручна перевірка сценаріїв | не почато |
+| Data import | `swift test` (book/verse counts, control verses) | not started |
+| Reference | `swift test` (parse/format, ranges) | not started |
+| Search | `swift test` (case, Cyrillic, special characters) | not started |
+| UI | manual scenario check | not started |

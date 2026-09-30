@@ -1,5 +1,5 @@
 # Design docs
 
-| Документ | Статус |
+| Document | Status |
 |---|---|
-| [core-beliefs.md](core-beliefs.md) | прийнято |
+| [core-beliefs.md](core-beliefs.md) | accepted |

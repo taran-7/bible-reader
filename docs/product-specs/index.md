@@ -1,9 +1,9 @@
 # Product specs
 
-| Специфікація | Статус |
+| Spec | Status |
 |---|---|
-| [prd.md](prd.md) | PRD всього продукту і роадмап, чернетка |
-| [illustration-sources.md](illustration-sources.md) | allowlist/blocklist джерел для ілюстрацій (6.17), чернетка |
-| [bible-reader-mvp.md](bible-reader-mvp.md) | реалізовано (v1.0), вимоги в `openspec/specs/` |
+| [prd.md](prd.md) | PRD for the whole product and roadmap, draft |
+| [illustration-sources.md](illustration-sources.md) | allowlist/blocklist of illustration sources (6.17), draft |
+| [bible-reader-mvp.md](bible-reader-mvp.md) | implemented (v1.0), requirements in `openspec/specs/` |
 
-Формальні вимоги (SHALL/MUST) ведуться в `openspec/specs/`; тут опис для людини.
+Formal requirements (SHALL/MUST) live in `openspec/specs/`; this folder is the human-readable description.

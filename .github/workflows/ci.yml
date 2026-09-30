@@ -1,5 +1,5 @@
-# CI — адаптація шаблону Project Factory під Swift/macOS.
-# Дзеркалить локальні гейти: якщо тут не зелено, то не готово.
+# CI: the Project Factory template adapted to Swift/macOS.
+# Mirrors the local gates: if it is not green here, it is not done.
 name: ci
 
 on:
@@ -16,34 +16,34 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          fetch-depth: 0 # check-trajectory читає трейлери Slice: з історії
+          fetch-depth: 0 # check-trajectory reads Slice: trailers from history
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
       - run: npm install -g @fission-ai/openspec@1.13.2
 
-      # --- статичні, швидкі, детерміновані ---
-      # PD-18: ключі API (Claude, Brave…) не в git — перевірка всіх файлів, навіть якщо коміт ішов повз хук.
+      # --- static, fast, deterministic ---
+      # PD-18: API keys (Claude, Brave…) never in git; checks all files, even if a commit bypassed the hook.
       - name: Secrets scan
         run: |
           node --test scripts/check-secrets.test.mjs scripts/claude-hooks.test.mjs
           node scripts/check-secrets.mjs
-          # Кожен коміт PR: ключ, доданий і потім видалений, лишився б в історії.
+          # Every PR commit: a key added and later removed would stay in history.
           if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
             node scripts/check-secrets.mjs --history "${{ github.event.pull_request.base.sha }}..HEAD"
           fi
-      # PD-20: PR змінює код → ручна частина HANDOFF.md теж має змінитись (або `Handoff: skip`).
+      # PD-20: a PR changes code → the manual part of HANDOFF.md must change too (or `Handoff: skip`).
       - name: HANDOFF freshness
         run: |
           node --test scripts/handoff.test.mjs
           if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
             node scripts/handoff.mjs --check "${{ github.event.pull_request.base.sha }}"
           fi
-      - name: Traceability chain (і свіжість звіту)
+      - name: Traceability chain (and report freshness)
         run: |
           node scripts/check-traceability.mjs --check-fresh
           node scripts/check-traceability.mjs ${{ github.ref_name == 'master' && '--release' || '' }}
-      - name: Trajectory process audit (і свіжість звіту)
+      - name: Trajectory process audit (and report freshness)
         run: |
           node scripts/check-trajectory.mjs --check-fresh
           node scripts/check-trajectory.mjs ${{ github.ref_name == 'master' && '--release' || '' }}
@@ -52,20 +52,20 @@ jobs:
       - name: OpenSpec strict validation
         run: openspec validate --all --strict
 
-      # --- тести ---
+      # --- tests ---
       - name: Swift tests + coverage
         run: make coverage
       - name: Coverage ratchet
         run: node scripts/check-coverage-ratchet.mjs
 
-      # --- збірка додатка ---
+      # --- app build ---
       - name: Build app + UI tests (XCUITest)
         run: |
           brew install xcodegen
           (cd BibleReaderApp && xcodegen generate)
-          # PD-14: спільна VM CI в 1,5–2× повільніша за Mac користувача; межа NFR-3 тут 2000 мс, на Mac — 1000.
+          # PD-14: the shared CI VM is 1.5–2× slower than the user's Mac; the NFR-3 limit is 2000 ms here, 1000 on a Mac.
           TEST_RUNNER_BIBLE_LAUNCH_BUDGET_MS=2000 make ui-test
-      # PD-17: знімки екрана й журнал UI-тестів, коли вони падають лише на CI.
+      # PD-17: UI test screenshots and log when they fail only in CI.
       - name: Upload UI test results
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -75,7 +75,7 @@ jobs:
       - name: Platform and size (NFR-1, NFR-5)
         run: node scripts/check-platform.mjs
 
-      # --- докази ---
+      # --- evidence ---
       - name: Upload QA evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -1,34 +1,34 @@
-# ADR-0001: Лишаємо наявний стек Swift і адаптуємо під нього Project Factory
+# ADR-0001: Keep the existing Swift stack and adapt Project Factory to it
 
-- **Статус:** accepted
-- **Дата:** 2026-09-25
+- **Status:** accepted
+- **Date:** 2026-09-25
 
-## Контекст
+## Context
 
-Project Factory ставиться на наявний проєкт (`/project-factory:onboard`). Фабрика
-розрахована на Node/Next.js (Vitest, Playwright, ESLint, tsc), а Bible Reader
-це Swift-пакет `BibleCore` + SwiftUI-додаток (XcodeGen), тести на Swift Testing,
-SQLite FTS5, без мережі.
+Project Factory is installed onto an existing project (`/project-factory:onboard`). The factory
+targets Node/Next.js (Vitest, Playwright, ESLint, tsc), while Bible Reader
+is a Swift package `BibleCore` + a SwiftUI app (XcodeGen), tests in Swift Testing,
+SQLite FTS5, no network.
 
-## Рішення
+## Decision
 
-Стек не мігруємо. Node потрібен лише для детермінованих скриптів `scripts/*.mjs`;
-runtime-залежностей у `package.json` немає. Адаптації (усі записано в `factory-lock.json`):
+We do not migrate the stack. Node is needed only for the deterministic `scripts/*.mjs`;
+`package.json` has no runtime dependencies. Adaptations (all recorded in `factory-lock.json`):
 
-- Продуктовий код: `Sources/`, `BibleReaderApp/`, розширення `.swift`; тести: `Tests/**/*Tests.swift`.
-  Без цього перевірки не бачили б Swift-код і давали б порожні «PASS».
-- Модулі для `check-trajectory`: `Sources/<Module>/`.
-- pre-commit: `swift build` замість ESLint/tsc; commit-msg вимагає трейлер для змін у `Sources/`, `BibleReaderApp/`.
-- Набір `qa-verify`: `make test`, покриття через llvm-cov (`scripts/swift-coverage-summary.mjs`),
-  збірка через `xcodebuild`; без Playwright, відеозаписів, a11y-сканера й pixel-parity.
-- CI на `macos-15`.
-- Не встановлено: `check-recordings`, `record-demos`, `check-a11y`, `check-visual-fidelity`
-  (веб-специфічні), Claude Code PostToolUse-хук ESLint, адаптери Cursor/Codex/Copilot.
-  Уроки `block-conquest-doctrine`, `capture-determinism`, `sampling-blindness` не
-  вставлено в AGENTS.md: вони про pixel-parity вебсторінок.
+- Product code: `Sources/`, `BibleReaderApp/`, `.swift` extension; tests: `Tests/**/*Tests.swift`.
+  Without this, the checks would not see Swift code and would report empty "PASS" results.
+- Modules for `check-trajectory`: `Sources/<Module>/`.
+- pre-commit: `swift build` instead of ESLint/tsc; commit-msg requires a trailer for changes in `Sources/`, `BibleReaderApp/`.
+- The `qa-verify` set: `make test`, coverage via llvm-cov (`scripts/swift-coverage-summary.mjs`),
+  build via `xcodebuild`; no Playwright, video recordings, a11y scanner or pixel parity.
+- CI on `macos-15`.
+- Not installed: `check-recordings`, `record-demos`, `check-a11y`, `check-visual-fidelity`
+  (web-specific), the Claude Code ESLint PostToolUse hook, Cursor/Codex/Copilot adapters.
+  The lessons `block-conquest-doctrine`, `capture-determinism`, `sampling-blindness` are not
+  inserted into AGENTS.md: they are about web page pixel parity.
 
-## Наслідки
+## Consequences
 
-- Докази UI (FR-10, FR-14, NFR-4) поки ручні; для автоматизації потрібен XCUITest,
-  і це окремий слайс.
-- Оновлення скриптів з upstream потребує повторної адаптації і коміту з `Refs: PD-x`.
+- UI evidence (FR-10, FR-14, NFR-4) was manual at first; automating it needs XCUITest,
+  which is a separate slice.
+- Updating scripts from upstream requires re-adaptation and a commit with `Refs: PD-x`.
