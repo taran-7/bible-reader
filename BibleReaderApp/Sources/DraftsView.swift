@@ -3,7 +3,7 @@ import BibleCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Панель «Чорнетки» праворуч від тексту (FR-38…FR-40): список або редактор активної чорнетки.
+/// The "Drafts" panel to the right of the text (FR-38…FR-40): the list or the active draft's editor.
 struct DraftsPanel: View {
     @Bindable var store: DraftStore
     let model: ReaderViewModel
@@ -25,7 +25,7 @@ struct DraftsPanel: View {
     }
 }
 
-/// Список чорнеток: пошук, «Нова чорнетка», «Нова проповідь», фільтр за віршем.
+/// The draft list: search, "New draft", "New sermon", a filter by verse.
 struct DraftList: View {
     @Bindable var store: DraftStore
     let model: ReaderViewModel
@@ -41,7 +41,7 @@ struct DraftList: View {
                 Button("Закрити чорнетки", systemImage: "xmark") { store.isOpen = false }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
-                    // У режимі «Проповідь» Esc належить йому: панель під ним лишається відкритою.
+                    // In "Sermon" mode Esc belongs to it: the panel under it stays open.
                     .keyboardShortcut(store.isPresenting ? nil : .cancelAction)
                     .accessibilityIdentifier("drafts-close")
             }
@@ -97,7 +97,7 @@ struct DraftList: View {
     }
 }
 
-/// Редактор чорнетки: назва, Markdown-текст із кнопками форматування, живі посилання, перегляд, меню дій.
+/// The draft editor: title, Markdown text with formatting buttons, live references, preview, action menu.
 struct DraftEditor: View {
     @Bindable var store: DraftStore
     let model: ReaderViewModel
@@ -132,7 +132,7 @@ struct DraftEditor: View {
                 Button("Закрити чорнетки", systemImage: "xmark") { store.isOpen = false }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
-                    // У режимі «Проповідь» Esc належить йому: панель під ним лишається відкритою.
+                    // In "Sermon" mode Esc belongs to it: the panel under it stays open.
                     .keyboardShortcut(store.isPresenting ? nil : .cancelAction)
                     .accessibilityIdentifier("drafts-close")
             }
@@ -147,7 +147,7 @@ struct DraftEditor: View {
                 }
             } else {
                 formatting
-                // Ідентифікатор `draft-text` — на самому NSTextView: на обгортці-прокрутці XCUI не бачив тексту (CI).
+                // The `draft-text` identifier is on the NSTextView itself: on the scroll wrapper XCUI did not see the text (CI).
                 MarkdownEditor(text: $text, controller: editor, fontSize: scale.systemFontSize * 1.1, theme: theme)
                 references
             }
@@ -158,10 +158,10 @@ struct DraftEditor: View {
             title = draft.title
             text = draft.text
         }
-        // Автозбереження: кожна зміна одразу в базі користувача.
+        // Autosave: every change goes straight to the user database.
         .onChange(of: title) { _, title in store.update(draft.id, title: title) }
         .onChange(of: text) { _, text in store.update(draft.id, text: text) }
-        // «В чорнетку» дописує в сховище, поки редактор відкритий: підтягуємо текст.
+        // "To draft" appends to the store while the editor is open: pull the text in.
         .onChange(of: store.active?.text) { _, stored in
             if let stored, stored != text { text = stored }
         }
@@ -207,7 +207,7 @@ struct DraftEditor: View {
         .buttonStyle(.borderless)
     }
 
-    /// Живі посилання під текстом: клік відкриває місце ліворуч, підказка — текст вірша.
+    /// Live references under the text: a click opens the passage on the left, the tooltip is the verse text.
     @ViewBuilder private var references: some View {
         let found = DraftReferences.find(in: text)
         if !found.isEmpty {
@@ -237,7 +237,7 @@ struct DraftEditor: View {
     }
 }
 
-/// Текст чорнетки з форматуванням: заголовки, списки, жирний, курсив, посилання (перегляд і «Проповідь»).
+/// Formatted draft text: headings, lists, bold, italic, links (preview and "Sermon").
 struct DraftDocument: View {
     let text: String
     let fontSize: Double
@@ -273,7 +273,7 @@ struct DraftDocument: View {
     }
 }
 
-/// Режим «Проповідь» (FR-40): лише текст активної чорнетки великим шрифтом; ⌘+ / ⌘− — розмір, Esc — назад.
+/// "Sermon" mode (FR-40): only the active draft's text in a large font; ⌘+ / ⌘− for size, Esc to go back.
 struct SermonView: View {
     @Bindable var store: DraftStore
     let model: ReaderViewModel
@@ -293,7 +293,7 @@ struct SermonView: View {
         .background(ThemeBackground())
         .overlay(alignment: .topTrailing) {
             HStack {
-                // ⌘+ / ⌘− — у меню «Вигляд» (FontCommands): у цьому режимі вони змінюють цей шрифт.
+                // ⌘+ / ⌘− are in the View menu (FontCommands): in this mode they change this font.
                 Button("Менший шрифт", systemImage: "textformat.size.smaller") { store.changeSermonFont(by: -2) }
                 Button("Більший шрифт", systemImage: "textformat.size.larger") { store.changeSermonFont(by: 2) }
                 Button("Вийти з режиму «Проповідь»", systemImage: "xmark") { store.isPresenting = false }
@@ -315,7 +315,7 @@ struct SermonView: View {
     }
 }
 
-/// Друк чорнетки; «Зберегти як PDF» — у системному діалозі друку (FR-40).
+/// Printing a draft; "Save as PDF" is in the system print dialog (FR-40).
 enum DraftPrinter {
     @MainActor static func print(_ draft: Draft) {
         let body = NSMutableAttributedString()
@@ -346,12 +346,12 @@ enum DraftPrinter {
     }
 }
 
-/// Команди редактору: форматування діє на виділений текст (TextEditor на macOS 14 не дає доступу до виділення).
+/// Editor commands: formatting applies to the selected text (TextEditor on macOS 14 gives no access to the selection).
 @MainActor
 final class MarkdownEditorController {
     weak var textView: NSTextView?
 
-    /// `**виділене**`; без виділення — `****` з курсором посередині.
+    /// `**selected**`; without a selection, `****` with the cursor in the middle.
     func wrap(_ marker: String) {
         guard let textView else { return }
         let range = textView.selectedRange()
@@ -360,7 +360,7 @@ final class MarkdownEditorController {
         textView.setSelectedRange(NSRange(location: range.location + marker.utf16.count, length: selected.utf16.count))
     }
 
-    /// Префікс на початку кожного рядка виділення (заголовок, список).
+    /// A prefix at the start of every selected line (heading, list).
     func prefixLines(_ prefix: String) {
         guard let textView else { return }
         let string = textView.string as NSString
@@ -379,7 +379,7 @@ final class MarkdownEditorController {
     }
 }
 
-/// Редактор Markdown на `NSTextView`: undo, перевірка правопису, форматування виділеного.
+/// A Markdown editor on `NSTextView`: undo, spell checking, formatting of the selection.
 struct MarkdownEditor: NSViewRepresentable {
     @Binding var text: String
     let controller: MarkdownEditorController
@@ -423,7 +423,7 @@ struct MarkdownEditor: NSViewRepresentable {
     }
 }
 
-/// Збереження у файл, обраний користувачем (FR-24, FR-40).
+/// Saving to a file chosen by the user (FR-24, FR-40).
 enum FileExport {
     @MainActor static func save(name: String, type: UTType, contents: () throws -> Data) {
         let panel = NSSavePanel()
@@ -438,7 +438,7 @@ enum FileExport {
     }
 }
 
-/// «В чорнетку» на виділенні (FR-38).
+/// "To draft" on the selection (FR-38).
 struct DraftButton: View {
     let action: () -> Void
     @State private var added = false

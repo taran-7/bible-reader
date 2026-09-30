@@ -1,14 +1,14 @@
 import Foundation
 
-/// Єдиний файл з мережею в додатку (NFR-2): GET до сайтів ілюстрацій після кліку користувача.
-/// Хости приходять з `IllustrationSources` (allowlist) і API Вікіпедії та Brave; інших запитів немає.
+/// The only file with network code in the app (NFR-2): GET to illustration sites after the user's click.
+/// Hosts come from `IllustrationSources` (allowlist) and the Wikipedia and Brave APIs; there are no other requests.
 public struct IllustrationNetwork: IllustrationHTTP {
     public static let userAgent = "BibleReader/0.1 (macOS; github.com/taran-7/bible-reader)"
     private let session: URLSession
 
-    /// `configuration` — для тестів (підставний `URLProtocol`), у додатку — ефемерна сесія без кешу й cookies.
+    /// `configuration`: for tests (a stub `URLProtocol`); in the app, an ephemeral session without cache and cookies.
     public init(timeout: TimeInterval = 15, configuration: URLSessionConfiguration = .ephemeral) {
-        // Копія: переданий об'єкт (спільний у тестах) не змінюється.
+        // A copy: the passed object (shared in tests) is not changed.
         let configuration = configuration.copy() as! URLSessionConfiguration
         configuration.timeoutIntervalForRequest = timeout
         var headers = configuration.httpAdditionalHeaders ?? [:]
@@ -21,7 +21,7 @@ public struct IllustrationNetwork: IllustrationHTTP {
         try await send(host: host, path: path, query: query, headers: headers, body: nil)
     }
 
-    /// POST JSON — лише до API моделі, що відбирає історії (FR-41).
+    /// POST JSON: only to the API of the model that curates stories (FR-41).
     public func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data) {
         try await send(host: host, path: path, query: [], headers: headers, body: body)
     }
@@ -42,7 +42,7 @@ public struct IllustrationNetwork: IllustrationHTTP {
         }
         do {
             let (data, response) = try await session.data(for: request)
-            // Запит https — відповідь HTTP; інакше код 0, і адаптер вважає відповідь невдалою.
+            // An https request gets an HTTP response; otherwise code 0, and the adapter treats the response as failed.
             guard let http = response as? HTTPURLResponse else { return (0, data) }
             return (http.statusCode, data)
         } catch let error as URLError where Self.offlineCodes.contains(error.code) {
@@ -52,15 +52,15 @@ public struct IllustrationNetwork: IllustrationHTTP {
         }
     }
 
-    /// Посилання картки для відкриття в браузері: ще раз через allowlist, а не лише на слово адаптера.
+    /// A card link to open in the browser: checked against the allowlist again, not just on the adapter's word.
     public static func link(for story: Illustration, sources: IllustrationSources) -> URL? {
         sources.isAllowed(story.source) ? URL(string: story.source) : nil
     }
 
-    /// Сторінка, де користувач бере безкоштовний ключ Brave Search API (посилання в Settings).
+    /// The page where the user gets a free Brave Search API key (a link in Settings).
     public static let braveKeyPage = URL(string: "https://brave.com/search/api/")!
 
-    /// Сторінка ключів Claude API (посилання в Settings, FR-41).
+    /// The Claude API keys page (a link in Settings, FR-41).
     public static let claudeKeyPage = URL(string: "https://console.anthropic.com/settings/keys")!
 
     static let offlineCodes: Set<URLError.Code> = [
@@ -70,9 +70,9 @@ public struct IllustrationNetwork: IllustrationHTTP {
 }
 
 extension IllustrationSources {
-    /// Схема і хост адреси (нижній регістр, без `www.`); `nil` — не абсолютна адреса.
-    /// Адреса з userinfo (`https://trusted.org:x@evil.example/`) відкидається: браузер відкрив би інший хост,
-    /// ніж той, що пройшов allowlist (security review 2026-09-28). Тут, бо `URLComponents` — лише в мережевому файлі (NFR-2).
+    /// The scheme and host of an address (lowercase, without `www.`); `nil` means not an absolute address.
+    /// An address with userinfo (`https://trusted.org:x@evil.example/`) is rejected: the browser would open a different host
+    /// than the one that passed the allowlist (security review 2026-09-28). It lives here because `URLComponents` is only in the network file (NFR-2).
     static func parse(_ address: String) -> (scheme: String, host: String)? {
         guard !address.contains("\\"), let components = URLComponents(string: address),
               components.user == nil, components.password == nil,

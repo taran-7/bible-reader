@@ -1,20 +1,20 @@
 import BibleCore
 import SwiftUI
 
-/// Кнопка на виділенні: іконка з написом, однакова ширина для «Ілюстрації», «Порівняти», «Копіювати»,
-/// напівпрозора підкладка, текст вірша під неї не заходить (FR-17, FR-33, FR-36).
+/// A button on the selection: an icon with a label, the same width for "Illustrations", "Compare", "Copy",
+/// a semi-transparent backing, the verse text does not run under it (FR-17, FR-33, FR-36).
 struct SelectionButton: View {
-    /// Ширина кожної кнопки за масштабом інтерфейсу; `compact` — лише іконка (вузька колонка тексту).
+    /// Each button's width by the interface scale; `compact` means icon only (a narrow text column).
     static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 32 : 124) * scale.factor }
     static let spacing: CGFloat = 4
 
-    /// Праве поле рядка під `count` кнопок (три; четверта — «В чорнетку», коли відкриті чорнетки).
+    /// The row's right margin for `count` buttons (three; the fourth is "To draft" when drafts are open).
     static func rowWidth(for scale: InterfaceScale, compact: Bool = false, count: Int = 3) -> CGFloat {
         CGFloat(count) * width(for: scale, compact: compact) + CGFloat(count - 1) * spacing + 12
     }
 
-    /// Написи лише коли текстові вірша лишається хоча б 360 pt; інакше вірш стискається у вузьку високу
-    /// колонку, і кнопки над першим віршем виділення виходять за край при прокручуванні.
+    /// Labels only when the verse text keeps at least 360 pt; otherwise the verse shrinks into a narrow tall
+    /// column, and the buttons above the first selected verse go past the edge when scrolling.
     static func isCompact(listWidth: CGFloat, scale: InterfaceScale, count: Int = 3) -> Bool {
         listWidth - rowWidth(for: scale, count: count) < 360 * scale.factor
     }
@@ -44,7 +44,7 @@ struct SelectionButton: View {
                 .foregroundStyle(Color(theme.accent))
                 .padding(.horizontal, 6)
                 .padding(.vertical, 3)
-                // Напівпрозора лише підкладка: іконка й текст лишаються контрастними (FR-32).
+                // Only the backing is semi-transparent: the icon and text stay high-contrast (FR-32).
                 .background(Color(theme.copyButton).opacity(isHovered ? 1 : 0.6), in: RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.borderless)
@@ -55,7 +55,7 @@ struct SelectionButton: View {
     }
 }
 
-/// «Копіювати» → на ~1,5 с «Скопійовано» на тому самому місці (FR-17).
+/// "Copy" → "Copied" for ~1.5 s in the same place (FR-17).
 struct CopyButton: View {
     let action: () -> Void
     @State private var copies = 0
@@ -68,7 +68,7 @@ struct CopyButton: View {
             showCopied = true
             copies += 1
         }
-        // Повторний клік перезапускає відлік; зникнення view скасовує його.
+        // A repeated click restarts the countdown; the view disappearing cancels it.
         .task(id: copies) {
             guard copies > 0 else { return }
             try? await Task.sleep(for: CopyButtonModel.feedbackDuration)
@@ -77,7 +77,7 @@ struct CopyButton: View {
     }
 }
 
-/// «Порівняти» (FR-36).
+/// "Compare" (FR-36).
 struct CompareButton: View {
     let action: () -> Void
 
@@ -88,6 +88,6 @@ struct CompareButton: View {
 }
 
 extension EnvironmentValues {
-    /// Кнопки на виділенні лише іконками (вузька колонка тексту); підказка лишається.
+    /// Selection buttons with icons only (a narrow text column); the tooltip stays.
     @Entry var compactSelectionButtons = false
 }

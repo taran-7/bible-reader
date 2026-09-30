@@ -1,6 +1,6 @@
 import Foundation
 
-/// Де шукати `bible.sqlite`: `BIBLE_READER_DB` (для UI-тестів) має пріоритет над бандлом.
+/// Where to look for `bible.sqlite`: `BIBLE_READER_DB` (for UI tests) takes priority over the bundle.
 public enum DatabaseLocation {
     public static let environmentKey = "BIBLE_READER_DB"
 

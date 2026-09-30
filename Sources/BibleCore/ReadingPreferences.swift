@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// Масштаб інтерфейсу відносно системного розміру шрифту macOS (FR-16).
+/// Interface scale relative to the macOS system font size (FR-16).
 public enum InterfaceScale: String, CaseIterable, Codable, Sendable {
     case small, standard, large, extraLarge
 
@@ -23,18 +23,18 @@ public enum InterfaceScale: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    /// `base` — системний розмір шрифту (`NSFont.systemFontSize`).
+    /// `base` is the system font size (`NSFont.systemFontSize`).
     public func fontSize(base: Double) -> Double { (base * factor * 100).rounded() / 100 }
 }
 
-/// Розміри шрифтів і масштаб інтерфейсу (FR-15, FR-16). Сеттери обрізають значення до меж.
+/// Font sizes and interface scale (FR-15, FR-16). Setters clamp values to the limits.
 public struct ReadingPreferences: Equatable, Codable, Sendable {
     public static let defaultVerseFontSize = 15.0
     public static let defaultBookListFontSize = 13.0
     public static let verseFontRange = 11.0...32.0
     public static let bookListFontRange = 11.0...32.0
 
-    /// Колонка тексту без паралельного перекладу: ~75 знаків у рядку (середній знак ≈ 0,5 кегля) плюс номер вірша.
+    /// The text column without a parallel translation: ~75 characters per line (an average character ≈ 0.5 em) plus the verse number.
     public static let readingColumnEms = 40.0
 
     public static func readingColumnWidth(fontSize: Double) -> Double { fontSize * readingColumnEms }
@@ -47,9 +47,9 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
     }
     public var interfaceScale: InterfaceScale
     public var theme: ThemeChoice
-    /// Переклади, вибрані для «Порівняти» (FR-36), у порядку колонок.
+    /// Translations chosen for "Compare" (FR-36), in column order.
     public var comparePanels: ComparePanels
-    /// Другий переклад поруч (FR-26); `nil` — вимкнено.
+    /// The second translation alongside (FR-26); `nil` means off.
     public var parallelTranslation: Translation?
 
     public init(
@@ -68,7 +68,7 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
         self.parallelTranslation = parallelTranslation
     }
 
-    /// Відсутнє чи невідоме поле бере стандартне значення, решта збережених лишається.
+    /// A missing or unknown field takes the default value, the rest of the saved ones stay.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         self.init(
@@ -80,7 +80,7 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
             parallelTranslation: try? c.decodeIfPresent(Translation.self, forKey: .parallelTranslation))
     }
 
-    // ⌘+ / ⌘− / ⌘0 змінюють текст віршів і список книг разом; кожен обрізається своїми межами.
+    // ⌘+ / ⌘− / ⌘0 change verse text and the book list together; each is clamped to its own limits.
     public var canIncreaseFonts: Bool {
         verseFontSize < Self.verseFontRange.upperBound || bookListFontSize < Self.bookListFontRange.upperBound
     }
@@ -108,11 +108,11 @@ public struct ReadingPreferences: Equatable, Codable, Sendable {
 }
 
 private extension Double {
-    /// Цілі pt у межах: крок завжди 1, тож порівняння зі стандартом точне.
+    /// Whole pt within the limits: the step is always 1, so comparing with the default is exact.
     func clamped(to range: ClosedRange<Double>) -> Double { Swift.min(Swift.max(rounded(), range.lowerBound), range.upperBound) }
 }
 
-/// Сховище ключ–значення; у додатку це `UserDefaults`, у тестах — словник.
+/// A key–value store; `UserDefaults` in the app, a dictionary in tests.
 public protocol KeyValueStore: AnyObject {
     func data(forKey key: String) -> Data?
     func set(_ data: Data, forKey key: String)
@@ -123,7 +123,7 @@ extension UserDefaults: KeyValueStore {
     public func set(_ data: Data, forKey key: String) { set(data as Any, forKey: key) }
 }
 
-/// Тримає `ReadingPreferences` і зберігає їх при кожній зміні. Немає даних або вони пошкоджені → стандартні значення.
+/// Holds `ReadingPreferences` and saves them on every change. No data or corrupted data → default values.
 @MainActor @Observable
 public final class PreferencesStore {
     public static let key = "readingPreferences"
@@ -147,7 +147,7 @@ public final class PreferencesStore {
     }
 
     private func save() {
-        // Кодування трьох простих полів не може впасти.
+        // Encoding three simple fields cannot fail.
         storage.set(try! JSONEncoder().encode(preferences), forKey: Self.key)
     }
 }

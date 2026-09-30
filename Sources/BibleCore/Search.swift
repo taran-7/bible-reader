@@ -1,10 +1,10 @@
 import Foundation
 import GRDB
 
-/// Згортання для пошуку: `unicode61 remove_diacritics` згортає лише латиницю,
-/// тож «ё → е» робимо самі; типографські апострофи (’ ʼ ‘) → ' — інакше `пʼять`
-/// стає одним токеном. Заміна символ-на-символ, тому позиції у згорнутому
-/// і оригінальному тексті збігаються.
+/// Folding for search: `unicode61 remove_diacritics` folds only Latin,
+/// so we do «ё → е» ourselves; typographic apostrophes (’ ʼ ‘) → ', otherwise `пʼять`
+/// becomes one token. The replacement is character for character, so positions in the folded
+/// and the original text match.
 public enum SearchText {
     public static func fold(_ text: String) -> String {
         String(text.map { character in
@@ -17,13 +17,13 @@ public enum SearchText {
         })
     }
 
-    /// Слово, як його порівнює індекс: згорнуте, у нижньому регістрі, без діакритики латиниці.
+    /// A word as the index compares it: folded, lowercase, without Latin diacritics.
     static func key(_ word: String) -> String {
         fold(word).lowercased().folding(options: .diacriticInsensitive, locale: nil)
     }
 }
 
-/// Область пошуку (FR-19).
+/// Search scope (FR-19).
 public enum SearchScope: Hashable, Sendable {
     case bible, oldTestament, newTestament
     case book(Int)
@@ -38,8 +38,8 @@ public enum SearchScope: Hashable, Sendable {
     }
 }
 
-/// Розібраний запит: слова без лапок шукаються за основами (FR-18),
-/// текст у лапках — точною фразою (FR-21). Непарна лапка — звичайний символ.
+/// A parsed query: unquoted words are searched by stems (FR-18),
+/// quoted text as an exact phrase (FR-21). An unpaired quote is a plain character.
 public struct SearchQuery: Equatable, Sendable {
     public var words: [String]
     public var phrases: [[String]]
@@ -70,12 +70,12 @@ public struct SearchQuery: Equatable, Sendable {
         return SearchQuery(words: words, phrases: phrases)
     }
 
-    /// Кожне слово в лапках FTS5 (синтаксис FTS5 стає текстом); через пробіл — AND.
+    /// Each word in FTS5 quotes (FTS5 syntax becomes text); separated by a space, AND.
     static func fts(words: [String]) -> String {
         words.map(quoted).joined(separator: " ")
     }
 
-    /// Кожна фраза — один рядок у лапках FTS5, тобто слова поспіль.
+    /// Each phrase is one string in FTS5 quotes, i.e. the words in a row.
     static func fts(phrases: [[String]]) -> String {
         phrases.map { quoted($0.joined(separator: " ")) }.joined(separator: " ")
     }
@@ -92,12 +92,12 @@ public struct SearchResult: Identifiable, Hashable, Sendable {
     }
 
     public let verse: Verse
-    /// Повний текст вірша, поділений на звичайні частини і збіги.
+    /// The full verse text, split into plain parts and matches.
     public let segments: [Segment]
 
     public var id: VerseID { verse.id }
 
-    /// Підсвічує слова, чия основа є в запиті, і фрази з лапок — лише там, де слова стоять поспіль.
+    /// Highlights words whose stem is in the query, and quoted phrases only where the words stand in a row.
     static func segments(for text: String, query: SearchQuery, stemmer: Stemmer) -> [Segment] {
         let stems = Set(query.words.map(stemmer.stem))
         let words = Stemmer.words(in: text)
@@ -124,7 +124,7 @@ public struct SearchResult: Identifiable, Hashable, Sendable {
     }
 }
 
-/// Сторінка результатів і загальна кількість збігів в області (FR-20).
+/// A page of results and the total match count in the scope (FR-20).
 public struct SearchPage: Sendable {
     public let results: [SearchResult]
     public let total: Int
@@ -138,7 +138,7 @@ public struct SearchPage: Sendable {
 }
 
 extension BibleRepository {
-    /// Перша сторінка результатів по всій Біблії.
+    /// The first page of results over the whole Bible.
     public func search(_ query: String, translation: Translation, limit: Int = 200) throws -> [SearchResult] {
         try searchPage(query, translation: translation, scope: .bible, offset: 0, limit: limit).results
     }
@@ -160,9 +160,9 @@ extension SQLiteBibleRepository {
         }
         let whereClause = filters.joined(separator: " AND ")
         return try read { db in
-            // COUNT(*) завжди повертає один рядок.
+            // COUNT(*) always returns one row.
             let total = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM verses v WHERE \(whereClause)", arguments: arguments)!
-            // rowid іде в порядку імпорту, тобто в порядку книг, розділів і віршів.
+            // rowid follows import order, i.e. the order of books, chapters and verses.
             let rows = try Row.fetchAll(db, sql: """
                 SELECT v.book, v.chapter, v.verse, v.text FROM verses v
                 WHERE \(whereClause)

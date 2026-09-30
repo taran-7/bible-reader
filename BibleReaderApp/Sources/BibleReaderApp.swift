@@ -5,10 +5,10 @@ import UniformTypeIdentifiers
 
 @main
 struct BibleReaderApp: App {
-    /// Закладки, підсвітки, нотатки й останнє місце — в окремій базі користувача.
+    /// Bookmarks, highlights, notes and the last position live in a separate user database.
     private static let userDatabase: Result<UserDatabase, any Error> = Result {
         #if DEBUG
-        // UI-тести передають свій профіль, щоб стартувати з чистого стану.
+        // UI tests pass their own profile to start from a clean state.
         let profile = ProcessInfo.processInfo.environment["BIBLE_READER_PROFILE"]
         #else
         let profile: String? = nil
@@ -16,11 +16,11 @@ struct BibleReaderApp: App {
         return try UserDatabase(path: UserDatabase.defaultURL(profile: profile))
     }
     @State private var userData = BibleReaderApp.makeUserData()
-    /// Чорнетки проповідей у тій самій базі користувача (FR-38).
+    /// Sermon drafts in the same user database (FR-38).
     @State private var drafts = DraftStore(database: try? BibleReaderApp.userDatabase.get())
     @State private var model = ReaderViewModel(positionStore: try? BibleReaderApp.userDatabase.get()) {
         #if DEBUG
-        let environment = ProcessInfo.processInfo.environment // BIBLE_READER_DB для UI-тестів
+        let environment = ProcessInfo.processInfo.environment // BIBLE_READER_DB for UI tests
         #else
         let environment: [String: String] = [:]
         #endif
@@ -74,7 +74,7 @@ struct BibleReaderApp: App {
     private static func makePreferences() -> PreferencesStore {
         let store = PreferencesStore(storage: UserDefaults.standard)
         #if DEBUG
-        // UI-тести стартують зі стандартних налаштувань.
+        // UI tests start from default settings.
         if UserDefaults.standard.bool(forKey: "ResetReadingPreferences") { store.reset() }
         #endif
         return store
@@ -83,7 +83,7 @@ struct BibleReaderApp: App {
 
 struct FontCommands: Commands {
     let preferences: PreferencesStore
-    /// У режимі «Проповідь» ⌘+ / ⌘− змінюють його шрифт, а не шрифт читання (FR-40).
+    /// In "Sermon" mode ⌘+ / ⌘− change its font, not the reading font (FR-40).
     let drafts: DraftStore
 
     var body: some Commands {
@@ -110,9 +110,9 @@ struct FontCommands: Commands {
     }
 }
 
-/// ⌘⌥1…9 за фізичною клавішею цифрового ряду: `keyboardShortcut` меню порівнює символ,
-/// а на чеській розкладці цифровий ряд без Shift дає `+ ě š č` (tech debt #23).
-/// Локальний монітор бачить подію раніше за меню, тож переклад не перемикається двічі.
+/// ⌘⌥1…9 by the physical digit-row key: the menu's `keyboardShortcut` compares the character,
+/// and on the Czech layout the digit row without Shift gives `+ ě š č` (tech debt #23).
+/// A local monitor sees the event before the menu, so the translation does not switch twice.
 @MainActor enum TranslationKeyMonitor {
     private static var token: Any?
 
@@ -129,7 +129,7 @@ struct FontCommands: Commands {
     }
 }
 
-/// Меню «Переклад»: перші дев'ять перекладів з маніфесту мають ⌘⌥1…9, решта — без скорочення.
+/// The Translation menu: the first nine translations from the manifest get ⌘⌥1…9, the rest no shortcut.
 struct TranslationCommands: Commands {
     let model: ReaderViewModel
     let preferences: PreferencesStore
@@ -147,7 +147,7 @@ struct TranslationCommands: Commands {
                 }
             }
             Divider()
-            // Другий переклад поруч (FR-26): і тут, бо кнопка тулбара у вузькому вікні ховається.
+            // The second translation alongside (FR-26): here too, because the toolbar button hides in a narrow window.
             Menu("Поруч") {
                 Toggle("Вимкнено", isOn: Binding(
                     get: { model.parallelTranslation == nil },
@@ -162,7 +162,7 @@ struct TranslationCommands: Commands {
     }
 }
 
-/// Файл → експорт закладок, підсвіток і нотаток (FR-24).
+/// File → export of bookmarks, highlights and notes (FR-24).
 struct ExportCommands: Commands {
     let userData: UserData
     let model: ReaderViewModel
@@ -185,7 +185,7 @@ struct ExportCommands: Commands {
     }
 }
 
-/// ⌘D у меню, а не на кнопці тулбара: працює й тоді, коли тулбар сховано.
+/// ⌘D in the menu, not on the toolbar button: works even when the toolbar is hidden.
 struct BookmarkCommands: Commands {
     let userData: UserData
     let model: ReaderViewModel
@@ -201,17 +201,17 @@ struct BookmarkCommands: Commands {
     }
 }
 
-/// ⌘F переводить фокус у поле пошуку (NFR-4: робота з клавіатури).
+/// ⌘F moves focus to the search field (NFR-4: keyboard operation).
 struct FindCommands: Commands {
     var body: some Commands {
-        // Замість системного «Знайти…» (панель пошуку в тексті), щоб не було двох ⌘F.
+        // Replaces the system "Find…" (the in-text find bar), so there are not two ⌘F.
         CommandGroup(replacing: .textEditing) {
             Button("Знайти") {
                 guard let window = NSApp.keyWindow, let items = window.toolbar?.items else { return }
                 if let item = items.lazy.compactMap({ $0 as? NSSearchToolbarItem }).first {
                     item.beginSearchInteraction()
                 } else if let field = items.lazy.compactMap({ $0.view.flatMap(Self.searchField(in:)) }).first {
-                    // Поле по центру тулбара (.toolbarPrincipal) — звичайне NSSearchField усередині item.
+                    // The field in the toolbar center (.toolbarPrincipal) is a plain NSSearchField inside an item.
                     window.makeFirstResponder(field)
                 }
             }

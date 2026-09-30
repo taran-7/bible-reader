@@ -1,7 +1,7 @@
 import Foundation
 
-/// Мова перекладу: визначає назви книг, посилання, цитати й стемер.
-/// Для мов без вбудованих назв книг модуль перекладу приносить їх сам (`Translation.books`).
+/// The translation language: sets book names, references, quotes and the stemmer.
+/// For languages without built-in book names the translation module brings them itself (`Translation.books`).
 public enum Language: Hashable, Sendable {
     case english, russian, ukrainian, czech
     case other(String)
@@ -26,27 +26,27 @@ public enum Language: Hashable, Sendable {
         }
     }
 
-    /// Мови з вбудованими назвами й скороченнями 66 книг.
+    /// Languages with built-in names and abbreviations of the 66 books.
     public var hasBuiltInBookNames: Bool {
         if case .other = self { return false }
         return true
     }
 }
 
-/// Переклад — модуль із маніфесту `Resources/translations.json` (FR-30): новий переклад додається
-/// файлом у `data/raw` і рядком маніфесту, без змін коду. Порядок у маніфесті — порядок у меню і в ⌘⌥1…9.
-/// Коди `kjv`, `bkr`, `ohienko`, `synodal` обов'язкові: на них спираються код і таблиця відповідностей.
+/// A translation is a module from the `Resources/translations.json` manifest (FR-30): a new translation is added
+/// with a file in `data/raw` and a manifest line, without code changes. Manifest order is the order in the menu and in ⌘⌥1…9.
+/// The codes `kjv`, `bkr`, `ohienko`, `synodal` are required: the code and the mapping table rely on them.
 public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, CustomStringConvertible {
-    /// Система нумерації віршів. `kjv` — вузол: кожна інша система має таблицю відповідностей до KJV,
-    /// а між двома не-KJV системами вірш іде через KJV. `synodal` має вбудовану таблицю; нова система
-    /// (Вульгата, LXX) приносить свою в маніфесті полем `versification` (tech debt #25).
+    /// A verse numbering system. `kjv` is the hub: every other system has a mapping table to KJV,
+    /// and between two non-KJV systems a verse goes through KJV. `synodal` has a built-in table; a new system
+    /// (Vulgate, LXX) brings its own in the manifest via the `versification` field (tech debt #25).
     public struct Numbering: RawRepresentable, Hashable, Codable, Sendable, ExpressibleByStringLiteral {
         public let rawValue: String
         public init(rawValue: String) { self.rawValue = rawValue }
         public init(stringLiteral value: String) { self.rawValue = value }
         public static let kjv: Numbering = "kjv"
         public static let synodal: Numbering = "synodal"
-        /// Системи з таблицею в коді: для них маніфест не мусить приносити таблицю.
+        /// Systems with a table in code: the manifest does not have to bring a table for them.
         public var isBuiltIn: Bool { self == .kjv || self == .synodal }
     }
 
@@ -55,23 +55,23 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
         public let abbreviation: String
     }
 
-    /// Код перекладу: ключ у базі й у налаштуваннях.
+    /// The translation code: the key in the database and in settings.
     public let rawValue: String
     public let title: String
     public let language: Language
     public let languageTitle: String
     public let numbering: Numbering
-    /// Ім'я вихідного файлу в `data/raw`.
+    /// The source file name in `data/raw`.
     public let sourceFileName: String
-    /// Назви книг для мови без вбудованих назв (66, у порядку канону).
+    /// Book names for a language without built-in names (66, in canonical order).
     public let books: [BookName]?
-    /// Таблиця відповідностей до KJV для нової системи нумерації (з маніфесту).
+    /// The mapping table to KJV for a new numbering system (from the manifest).
     public let versificationTable: VersificationTable?
 
     public var id: String { rawValue }
     public var description: String { rawValue }
 
-    /// Пункт меню перекладів: назва і мова.
+    /// A translation menu item: title and language.
     public var menuTitle: String { "\(title) — \(languageTitle)" }
 
     public init(rawValue: String, title: String, language: Language, languageTitle: String, numbering: Numbering,
@@ -86,7 +86,7 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
         self.versificationTable = versificationTable
     }
 
-    /// Переклад із каталогу за кодом.
+    /// A translation from the catalog by code.
     public init?(rawValue: String) {
         guard let found = Self.allCases.first(where: { $0.rawValue == rawValue }) else { return nil }
         self = found
@@ -95,8 +95,8 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public static func == (a: Translation, b: Translation) -> Bool { a.rawValue == b.rawValue }
     public func hash(into hasher: inout Hasher) { hasher.combine(rawValue) }
 
-    /// Каталог з вшитого маніфесту; вбудовані переклади перевіряються тестами.
-    // Пошкоджений маніфест або відсутній вбудований код — помилка збірки даних, додаток без них не працює.
+    /// The catalog from the bundled manifest; built-in translations are checked by tests.
+    // A corrupted manifest or a missing built-in code is a data build error; the app does not work without them.
     public static let allCases: [Translation] = try! TranslationCatalog.load(from: TranslationCatalog.bundledManifest)
 
     private static func builtIn(_ code: String) -> Translation { Translation(rawValue: code)! }
@@ -107,7 +107,7 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public static let synodal = builtIn("synodal")
 }
 
-/// Зберігається кодом (у налаштуваннях і базі); невідомий код — помилка декодування.
+/// Stored by code (in settings and the database); an unknown code is a decoding error.
 extension Translation: Codable {
     public init(from decoder: Decoder) throws {
         let code = try decoder.singleValueContainer().decode(String.self)
@@ -154,8 +154,8 @@ public enum TranslationCatalog {
         }
     }
 
-    /// Розбирає маніфест і перевіряє: коди унікальні, мова без вбудованих назв приносить 66 назв книг,
-    /// нова система нумерації має таблицю відповідностей хоча б в одному модулі.
+    /// Parses the manifest and checks: codes are unique, a language without built-in names brings 66 book names,
+    /// a new numbering system has a mapping table in at least one module.
     public static func load(from data: Data) throws -> [Translation] {
         let entries = try JSONDecoder().decode([Entry].self, from: data)
         let tabled = Set(entries.filter { $0.versification != nil }.map(\.numbering))
@@ -173,17 +173,17 @@ public enum TranslationCatalog {
     }
 }
 
-/// Скорочення ⌘⌥ для пункту меню перекладу: цифра 1…9 для перших дев'яти, далі — без скорочення.
+/// The ⌘⌥ shortcut for a translation menu item: digit 1…9 for the first nine, none after that.
 public enum TranslationShortcut {
     public static func digit(forIndex index: Int) -> Character? {
         (0..<9).contains(index) ? Character("\(index + 1)") : nil
     }
 
-    /// Фізичні клавіші цифрового ряду 1…9 (коди ANSI). На чеській розкладці ряд без Shift дає
-    /// `+ ě š č`, тож ⌘⌥1…9 ловимо за кодом клавіші, а не за символом (tech debt #23).
+    /// Physical digit-row keys 1…9 (ANSI codes). On the Czech layout the row without Shift gives
+    /// `+ ě š č`, so ⌘⌥1…9 is caught by key code, not by character (tech debt #23).
     static let digitKeyCodes: [UInt16] = [18, 19, 20, 21, 23, 22, 26, 28, 25]
 
-    /// Індекс перекладу для клавіші цифрового ряду; `nil` — інша клавіша.
+    /// The translation index for a digit-row key; `nil` means another key.
     public static func index(forKeyCode keyCode: UInt16) -> Int? {
         digitKeyCodes.firstIndex(of: keyCode)
     }

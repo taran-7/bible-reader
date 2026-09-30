@@ -1,8 +1,8 @@
-# Без Xcode (лише Command Line Tools) Swift Testing треба підключати явно.
+# Without Xcode (Command Line Tools only) Swift Testing must be linked explicitly.
 CLT := /Library/Developer/CommandLineTools
 ifeq ($(shell xcode-select -p),$(CLT))
 FW := $(CLT)/Library/Developer/Frameworks
-# _Testing_Foundation у CLT без swiftmodule, тому вимикаємо cross-import overlays.
+# _Testing_Foundation in CLT has no swiftmodule, so cross-import overlays are disabled.
 TEST_FLAGS := -Xswiftc -F$(FW) -Xswiftc -Xfrontend -Xswiftc -disable-cross-import-overlays -Xlinker -F$(FW) -Xlinker -rpath -Xlinker $(FW) \
 	-Xlinker -rpath -Xlinker $(CLT)/Library/Developer/usr/lib
 endif
@@ -15,7 +15,7 @@ test:
 
 DB := BibleReaderApp/Resources/bible.sqlite
 
-# База перебудовується, коли змінилися тексти або код імпорту чи пошуку (схема).
+# The database is rebuilt when the texts or the import or search code (schema) change.
 db: $(DB)
 
 $(DB): $(wildcard data/raw/*.json) $(wildcard Sources/BibleCore/*.swift) $(wildcard Sources/bible-import/*.swift) $(wildcard Sources/CSnowball/*/*.c) Sources/BibleCore/Resources/translations.json
@@ -23,13 +23,13 @@ $(DB): $(wildcard data/raw/*.json) $(wildcard Sources/BibleCore/*.swift) $(wildc
 
 check: test
 
-# Покриття Sources/ для check-coverage-ratchet (див. scripts/swift-coverage-summary.mjs).
+# Coverage of Sources/ for check-coverage-ratchet (see scripts/swift-coverage-summary.mjs).
 coverage:
 	swift test --enable-code-coverage $(TEST_FLAGS)
 	node scripts/swift-coverage-summary.mjs
 
-# Збірка додатка і XCUITest (Tests/BibleReaderUITests). Локально потрібен Automation Mode
-# (перший запуск просить підтвердження; або `sudo automationmodetool enable-automationmode-without-authentication`).
+# App build and XCUITest (Tests/BibleReaderUITests). Locally Automation Mode is required
+# (the first run asks for confirmation; or `sudo automationmodetool enable-automationmode-without-authentication`).
 ui-test:
 	rm -rf build/ui-tests.xcresult
 	xcodebuild test -project BibleReaderApp/BibleReader.xcodeproj -scheme BibleReader -destination 'platform=macOS' -resultBundlePath build/ui-tests.xcresult

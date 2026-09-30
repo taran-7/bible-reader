@@ -1,6 +1,6 @@
 import Foundation
 
-/// Колір sRGB з компонентами 0…1 і контрастом за WCAG 2.x (FR-32).
+/// An sRGB color with 0…1 components and WCAG 2.x contrast (FR-32).
 public struct ThemeColor: Equatable, Hashable, Sendable {
     public let red: Double
     public let green: Double
@@ -24,7 +24,7 @@ public struct ThemeColor: Equatable, Hashable, Sendable {
         return byte(red) << 16 | byte(green) << 8 | byte(blue)
     }
 
-    /// Відносна яскравість WCAG.
+    /// WCAG relative luminance.
     public var luminance: Double {
         func linear(_ c: Double) -> Double { c <= 0.03928 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4) }
         return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue)
@@ -35,14 +35,14 @@ public struct ThemeColor: Equatable, Hashable, Sendable {
         return (max(a, b) + 0.05) / (min(a, b) + 0.05)
     }
 
-    /// Цей колір з непрозорістю `opacity`, накладений на `background`.
+    /// This color with `opacity`, composited over `background`.
     public func composited(over background: ThemeColor, opacity: Double) -> ThemeColor {
         func mix(_ top: Double, _ bottom: Double) -> Double { top * opacity + bottom * (1 - opacity) }
         return ThemeColor(red: mix(red, background.red), green: mix(green, background.green), blue: mix(blue, background.blue))
     }
 
-    /// Найменше зміщення до чорного чи білого (що далі від фонів), яке дає потрібний контраст на кожному з фонів.
-    /// На крайньому кроці колір стає чистим полюсом; якщо й це не досягає цілі, тест контрасту це покаже.
+    /// The smallest shift toward black or white (whichever is farther from the backgrounds) that gives the required contrast on each background.
+    /// At the last step the color becomes the pure pole; if even that misses the target, the contrast test shows it.
     func strengthened(toContrast target: Double, against backgrounds: [ThemeColor]) -> ThemeColor {
         let light = backgrounds.map(\.luminance).reduce(0, +) / Double(backgrounds.count) > 0.18
         let pole = ThemeColor(hex: light ? 0x000000 : 0xFFFFFF)
@@ -68,7 +68,7 @@ public enum ThemeID: String, CaseIterable, Codable, Sendable {
     }
 }
 
-/// Вибір користувача: «Як у системі» або конкретна тема (FR-31).
+/// The user's choice: "System" or a specific theme (FR-31).
 public enum ThemeChoice: Hashable, Sendable, CaseIterable, Codable {
     case system
     case theme(ThemeID)
@@ -104,16 +104,16 @@ public enum ThemeChoice: Hashable, Sendable, CaseIterable, Codable {
 }
 
 public enum ThemeFont: Sendable, Equatable {
-    /// Системний serif macOS.
+    /// The macOS system serif.
     case newYork
     case sfPro
-    /// Вшитий у додаток, OFL.
+    /// Bundled with the app, OFL.
     case ebGaramond
 }
 
 public enum ThemeColorScheme: Sendable, Equatable { case light, dark }
 
-/// Набір токенів теми; SwiftUI лише застосовує їх (PRD 6.18).
+/// A theme's token set; SwiftUI only applies them (PRD 6.18).
 public struct ThemeTokens: Sendable, Equatable {
     public var background: ThemeColor
     public var sidebar: ThemeColor
@@ -124,24 +124,24 @@ public struct ThemeTokens: Sendable, Equatable {
     public var verseNumber: ThemeColor
     public var searchHighlight: ThemeColor
     public var selection: ThemeColor
-    /// Фон вибраної книги в бічній панелі.
+    /// The background of the selected book in the sidebar.
     public var sidebarSelection: ThemeColor
     public var copyButton: ThemeColor
     public var font: ThemeFont
     public var colorScheme: ThemeColorScheme
-    /// Непрозорість підкладки під віршами (Скло: 0,92 поверх розмитого тла).
+    /// The opacity of the backing under verses (Glass: 0.92 over the blurred background).
     public var plateOpacity: Double = 1
-    /// Непрозорість кольору панелі поверх матеріалу/скла в бічній панелі й тулбарі (Скло: 0,92).
+    /// The opacity of the panel color over the material/glass in the sidebar and toolbar (Glass: 0.92).
     public var chromeOpacity: Double = 1
     public var usesGlass = false
     public var textureOpacity: Double = 0
-    /// Додатковий інтервал між рядками в частках кегля: 0,5 → висота рядка 1,5.
+    /// Extra line spacing as a fraction of the font size: 0.5 → line height 1.5.
     public var lineSpacing: Double = 0.5
 
-    /// Фони, на яких реально опиняється текст віршів: для напівпрозорої підкладки — на чорному і на білому тлі.
+    /// Backgrounds verse text actually lands on: for a semi-transparent backing, over black and over white.
     public var effectiveBackgrounds: [ThemeColor] { Self.onAnyBackdrop(background, opacity: plateOpacity) }
 
-    /// Те саме для бічної панелі й тулбара.
+    /// The same for the sidebar and toolbar.
     public var effectiveSidebars: [ThemeColor] { Self.onAnyBackdrop(sidebar, opacity: chromeOpacity) }
 
     private static func onAnyBackdrop(_ color: ThemeColor, opacity: Double) -> [ThemeColor] {
@@ -192,7 +192,7 @@ public enum Theme {
                 searchHighlight: c(0xFFE58F), selection: c(0xD6E2F7), sidebarSelection: c(0xDDE3EE), copyButton: c(0xFFFFFF),
                 font: .sfPro, colorScheme: .light, plateOpacity: 0.92, chromeOpacity: 0.92, usesGlass: true)
         case .pastel:
-            // Палітра coolors.co/512d38-b27092-f4bfdb-ffe9f3; акценти — темніші відтінки B27092 заради контрасту.
+            // Palette coolors.co/512d38-b27092-f4bfdb-ffe9f3; accents are darker shades of B27092 for contrast.
             ThemeTokens(
                 background: c(0xFFE9F3), sidebar: c(0xF4BFDB), results: c(0xFFF5F9),
                 text: c(0x512D38), secondaryText: c(0x7A3E5E), accent: c(0x8C4A6E), verseNumber: c(0x7A3E5E),
@@ -208,19 +208,19 @@ public enum Theme {
     }
 }
 
-/// Вигляд поля пошуку в тулбарі: його малює AppKit, тож SwiftUI-шар застосовує ці значення
-/// до `NSSearchField` напряму (tech debt #15, #18).
+/// The toolbar search field look: AppKit draws it, so the SwiftUI layer applies these values
+/// to `NSSearchField` directly (tech debt #15, #18).
 public struct SearchFieldStyle: Equatable, Sendable {
     public let fontSize: Double
     public let text: ThemeColor
     public let background: ThemeColor
     public let colorScheme: ThemeColorScheme
 
-    /// `fontSize` — системний кегль, уже помножений на масштаб інтерфейсу.
+    /// `fontSize` is the system font size already multiplied by the interface scale.
     public init(theme: ThemeTokens, fontSize: Double) {
         self.fontSize = fontSize
         text = theme.text
-        // Поле лежить на тулбарі кольору бічної панелі; фон — як у результатів пошуку, щоб контрастувати з ним.
+        // The field sits on a toolbar in the sidebar color; its background matches the search results, to contrast with it.
         background = theme.results
         colorScheme = theme.colorScheme
     }

@@ -18,7 +18,7 @@ extension ThemeTokens {
         case .newYork: .system(size: size, design: .serif)
         case .sfPro: .system(size: size)
         case .ebGaramond:
-            // Garamond дрібніший на тому ж кеглі; якщо шрифт не зареєструвався — системний serif.
+            // Garamond is smaller at the same size; if the font did not register, the system serif.
             ThemeFonts.garamondAvailable
                 ? .custom(ThemeFonts.garamond, size: size * 1.12)
                 : .system(size: size, design: .serif)
@@ -27,18 +27,18 @@ extension ThemeTokens {
 }
 
 enum ThemeFonts {
-    /// PostScript-ім'я вшитого EB Garamond (OFL).
+    /// The PostScript name of the bundled EB Garamond (OFL).
     static let garamond = "EBGaramond-Regular"
     private static let log = Logger(subsystem: "dev.taraniuk.BibleReader", category: "fonts")
 
-    /// Реєструє шрифти при першому зверненні: вони потрібні лише темі «Манускрипт», а реєстрація
-    /// на старті додавала часу запуску (NFR-3).
+    /// Registers fonts on first access: only the "Manuscript" theme needs them, and registering
+    /// at startup added to launch time (NFR-3).
     static let garamondAvailable: Bool = {
         register()
         return NSFont(name: garamond, size: 12) != nil
     }()
 
-    /// Реєструє вшиті шрифти (`Resources/Fonts`) для процесу додатка; помилки йдуть у журнал.
+    /// Registers the bundled fonts (`Resources/Fonts`) for the app process; errors go to the log.
     private static func register() {
         guard let folder = Bundle.main.url(forResource: "Fonts", withExtension: nil),
               let files = try? FileManager.default.contentsOfDirectory(at: folder, includingPropertiesForKeys: nil)
@@ -55,8 +55,8 @@ enum ThemeFonts {
     }
 }
 
-/// Застосовує тему до вікна: токени в середовище, колір тексту й акценту, світла/темна схема AppKit.
-/// Схему задаємо через `NSApp.appearance`: `preferredColorScheme(nil)` не повертає вікно до системної.
+/// Applies the theme to the window: tokens into the environment, text and accent color, the AppKit light/dark scheme.
+/// The scheme is set via `NSApp.appearance`: `preferredColorScheme(nil)` does not return the window to the system one.
 struct ThemedScene: ViewModifier {
     let preferences: PreferencesStore
     @Environment(\.colorScheme) private var scheme
@@ -66,7 +66,7 @@ struct ThemedScene: ViewModifier {
     private var choice: ThemeChoice { preferences.preferences.theme }
     private var theme: ThemeTokens {
         Theme.tokens(
-            // Для «Як у системі» appearance скинуто, тож `scheme` — схема macOS.
+            // For "System" the appearance is reset, so `scheme` is the macOS scheme.
             for: choice.resolve(systemIsDark: scheme == .dark),
             reduceTransparency: reduceTransparency,
             increaseContrast: contrast == .increased)
@@ -99,7 +99,7 @@ struct ThemePicker: View {
     }
 }
 
-/// Фон під віршами: підкладка теми, для Скла напівпрозора, для Манускрипту з текстурою.
+/// The background under verses: the theme's backing, semi-transparent for Glass, textured for Manuscript.
 struct ThemeBackground: View {
     @Environment(\.theme) private var theme
 
@@ -114,16 +114,16 @@ struct ThemeBackground: View {
     }
 }
 
-/// Бічна панель і інший «хром»: Скло — розмите скло, інші теми — колір панелі.
+/// The sidebar and other "chrome": Glass is blurred glass, other themes the panel color.
 struct ChromeBackground: ViewModifier {
     let color: ThemeColor
     @Environment(\.theme) private var theme
 
     func body(content: Content) -> some View {
         if theme.usesGlass {
-            // Колір панелі з непрозорістю хрому поверх розмиття: контраст перевірено на чорному і білому тлі.
+            // The panel color with chrome opacity over the blur: contrast checked on black and white backgrounds.
             let tint = Color(color).opacity(theme.chromeOpacity)
-            // `glassEffect` є лише в SDK macOS 26 (Swift 6.2+); CI на macos-15 збирає старішим Xcode.
+            // `glassEffect` exists only in the macOS 26 SDK (Swift 6.2+); CI on macos-15 builds with an older Xcode.
             #if compiler(>=6.2)
             if #available(macOS 26, *) {
                 content.scrollContentBackground(.hidden)
@@ -146,8 +146,8 @@ struct ChromeBackground: ViewModifier {
     }
 }
 
-/// Пергамент, намальований кодом: волокна, плями, потемніння по краях. Плитка 512×512 рахується один раз
-/// з фіксованим seed і повторюється, тож візерунок не «стрибає» при зміні розміру. Непрозорість задає тема (~7 %).
+/// Parchment drawn in code: fibers, stains, darkening at the edges. A 512×512 tile is computed once
+/// with a fixed seed and repeated, so the pattern does not "jump" on resize. The theme sets the opacity (~7 %).
 struct ParchmentTexture: View {
     private static let tile: CGFloat = 512
     private static let ink = Color(red: 0.35, green: 0.24, blue: 0.12)
@@ -205,7 +205,7 @@ struct ParchmentTexture: View {
     }
 }
 
-/// Простий детермінований генератор (SplitMix64) для текстури.
+/// A simple deterministic generator (SplitMix64) for the texture.
 struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
     init(seed: UInt64) { state = seed }
@@ -218,7 +218,7 @@ struct SeededGenerator: RandomNumberGenerator {
     }
 }
 
-/// Тулбар у кольорі панелі теми (для Скла — напівпрозорому).
+/// The toolbar in the theme's panel color (semi-transparent for Glass).
 struct ToolbarTheme: ViewModifier {
     @Environment(\.theme) private var theme
 

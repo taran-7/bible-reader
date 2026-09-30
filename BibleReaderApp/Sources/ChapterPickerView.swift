@@ -2,23 +2,23 @@ import AppKit
 import BibleCore
 import SwiftUI
 
-/// Номери розділів книги у спливаючому вікні (FR-37): збоку від книги в бічній панелі
-/// або донизу від назви розділу в тулбарі. Клік або стрілки + Return відкривають розділ;
-/// Esc, ✕ чи клік поза вікном закривають його без переходу.
+/// A book's chapter numbers in a popover (FR-37): beside the book in the sidebar
+/// or below the chapter title in the toolbar. A click or arrows + Return open a chapter;
+/// Esc, ✕ or a click outside close it without navigating.
 struct ChapterPickerView: View {
     let model: ReaderViewModel
     let picker: ChapterPicker
-    /// Розмір шрифту віршів: ⌘+ / ⌘− збільшують і номери розділів (FR-15).
+    /// The verse font size: ⌘+ / ⌘− also enlarge chapter numbers (FR-15).
     let fontSize: Double
     @State private var cursor = 1
     @FocusState private var focused: Bool
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
 
-    private var cellSize: CGFloat { fontSize * 44 / 15 }  // 44 pt при стандартних 15 pt
+    private var cellSize: CGFloat { fontSize * 44 / 15 }  // 44 pt at the default 15 pt
 
-    /// Усі розділи без прокрутки, якщо дозволяє екран (Псалми — 15 рядків);
-    /// на низькому екрані сітка прокручується. Запас — заголовок вікна, Dock і рамка popover.
+    /// All chapters without scrolling if the screen allows (Psalms is 15 rows);
+    /// on a short screen the grid scrolls. The margin covers the window title, the Dock and the popover frame.
     private var maxGridHeight: CGFloat {
         let screen = NSScreen.main?.visibleFrame.height ?? 800
         return max(screen - 160 * scale.factor, 200)
@@ -26,7 +26,7 @@ struct ChapterPickerView: View {
 
     var body: some View {
         card
-        // Клік по книзі лишає фокус у списку до кінця події; забираємо його на наступному циклі.
+        // A click on a book keeps focus in the list until the event ends; take it on the next cycle.
         .task(id: picker) {
             cursor = picker.initialCursor
             await Task.yield()
@@ -45,7 +45,7 @@ struct ChapterPickerView: View {
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
                     .foregroundStyle(Color(theme.secondaryText))
-                    // Esc і тоді, коли сітка ще не отримала фокус.
+                    // Esc also when the grid has not received focus yet.
                     .keyboardShortcut(.cancelAction)
             }
             ScrollViewReader { proxy in
@@ -65,7 +65,7 @@ struct ChapterPickerView: View {
         .accessibilityIdentifier("chapter-picker")
     }
 
-    /// Фокус на сітці, а не на кнопках: стрілки рухають курсор без Full Keyboard Access (NFR-4).
+    /// Focus on the grid, not on the buttons: arrows move the cursor without Full Keyboard Access (NFR-4).
     private var grid: some View {
         Grid(horizontalSpacing: 6, verticalSpacing: 6) {
             ForEach(Array(stride(from: 1, through: picker.chapterCount, by: ChapterPicker.columns)), id: \.self) { first in
@@ -113,7 +113,7 @@ struct ChapterPickerView: View {
                 .background(
                     isCurrent ? Color(theme.sidebarSelection) : Color(theme.secondaryText).opacity(0.08),
                     in: RoundedRectangle(cornerRadius: 6))
-                // Поточний — ще й рамкою, не лише фоном; курсор клавіатури — рамкою акценту.
+                // The current one also gets a border, not just a background; the keyboard cursor gets an accent border.
                 .overlay {
                     if focused && chapter == cursor {
                         RoundedRectangle(cornerRadius: 6).strokeBorder(Color(theme.accent), lineWidth: 2)
@@ -130,7 +130,7 @@ struct ChapterPickerView: View {
 }
 
 extension ReaderViewModel {
-    /// Показ popover для конкретного місця: книги в бічній панелі або назви в тулбарі.
+    /// Showing the popover for a specific place: a book in the sidebar or the title in the toolbar.
     func chapterPickerBinding(book: Int, origin: ChapterPicker.Origin) -> Binding<Bool> {
         Binding(
             get: { self.chapterPicker.map { $0.book == book && $0.origin == origin } ?? false },

@@ -4,13 +4,13 @@ import SwiftUI
 struct SettingsView: View {
     @Bindable var preferences: PreferencesStore
     @State private var braveKey = KeychainKey.brave.load() ?? ""
-    /// Що справді лежить у Keychain, а не що набрано в полі.
+    /// What is actually in the Keychain, not what is typed in the field.
     @State private var keySaved = KeychainKey.brave.load() != nil
     @State private var keyError = false
     @State private var claudeKey = KeychainKey.claude.load() ?? ""
     @State private var claudeSaved = KeychainKey.claude.load() != nil
     @State private var claudeError = false
-    /// Хто відбиратиме: перечитується після збереження ключа, а не на кожному рендері (Keychain).
+    /// Who will curate: re-read after saving a key, not on every render (Keychain).
     @State private var curatorName = Curators.activeName
 
     var body: some View {
@@ -34,7 +34,7 @@ struct SettingsView: View {
                     .onSubmit(saveKey)
                     .onDisappear(perform: saveKey)
                 HStack {
-                    // Правильність ключа видно лише під час пошуку: тут — лише що він збережений.
+                    // Whether the key is valid shows only during search: here only that it is saved.
                     if keyError {
                         Label("Не вдалося зберегти ключ", systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
                     } else if !keySaved {
@@ -78,7 +78,7 @@ struct SettingsView: View {
 
         }
         .formStyle(.grouped)
-        // Фон форми — тема, а не системний сірий (tech debt #18).
+        // The form background is the theme, not the system gray (tech debt #18).
         .scrollContentBackground(.hidden)
         .background(ThemeBackground())
         .frame(width: 420)

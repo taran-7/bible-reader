@@ -6,7 +6,7 @@ struct ContentView: View {
     let preferences: PreferencesStore
     @Environment(UserData.self) private var userData
     @Environment(DraftStore.self) private var drafts
-    /// Виділені вірші, для яких відкрито вибір перекладів «Порівняти».
+    /// The selected verses for which the "Compare" translation picker is open.
     @State private var compareSelection: CompareSelection?
 
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
@@ -15,7 +15,7 @@ struct ContentView: View {
         content.modifier(ThemedScene(preferences: preferences))
         #if DEBUG
             .overlay(alignment: .bottomLeading) {
-                // Лише Debug; VoiceOver у Debug прочитає це число — свідомо, Release його не має.
+                // Debug only; VoiceOver in Debug will read this number, deliberately; Release does not have it.
                 if let launchMilliseconds = model.launchMilliseconds {
                     Text(verbatim: String(launchMilliseconds))
                         .font(.system(size: 1))
@@ -26,7 +26,7 @@ struct ContentView: View {
         #endif
     }
 
-    /// «Спробувати ще раз» лише коли база відкрилась, а не прочитався розділ (tech debt #11).
+    /// "Try again" only when the database opened but a chapter was not read (tech debt #11).
     private var retryAction: (() -> Void)? {
         guard model.canRetryLoad else { return nil }
         return { [model] in model.retryLoad() }
@@ -50,14 +50,14 @@ struct ContentView: View {
                                     close: model.closeComparison,
                                     chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
                     } else if drafts.isOpen {
-                        // Текст ліворуч, чорнетка праворуч — та сама межа, що й для ілюстрацій.
+                        // Text on the left, the draft on the right: the same divider as for illustrations.
                         IllustrationsSplit {
                             chapter
                         } illustrations: {
                             DraftsPanel(store: drafts, model: model)
                         }
                     } else if let request = model.illustrations {
-                        // Текст ліворуч вузько (35 %), ілюстрації праворуч ширше (65 %); межу можна тягнути.
+                        // Text on the left narrow (35 %), illustrations on the right wider (65 %); the divider is draggable.
                         IllustrationsSplit {
                             chapter
                         } illustrations: {
@@ -74,10 +74,10 @@ struct ContentView: View {
                 .modifier(HiddenToolbarTitle())
             }
             .safeAreaInset(edge: .top) { UserDataWarning() }
-            // Праворуч одна панель: чорнетки закривають ілюстрації і навпаки.
+            // One panel on the right: drafts close illustrations and vice versa.
             .onChange(of: drafts.isOpen) { _, open in if open { model.closeIllustrations() } }
             .onChange(of: model.illustrations) { _, request in if request != nil { drafts.isOpen = false } }
-            // Під режимом «Проповідь» — ні фокусу, ні VoiceOver.
+            // Under "Sermon" mode: no focus and no VoiceOver.
             .accessibilityHidden(drafts.isPresenting)
             .overlay {
                 if drafts.isPresenting, drafts.isOpen, drafts.active != nil {
@@ -89,7 +89,7 @@ struct ContentView: View {
                     model.showComparison(of: selection.verses, with: chosen)
                 }
             }
-            // Паралельний переклад з налаштувань; той самий, що основний, — вимкнено.
+            // The parallel translation from settings; the same as the main one means off.
             .onChange(of: [preferences.preferences.parallelTranslation, model.translation], initial: true) {
                 let other = preferences.preferences.parallelTranslation
                 model.parallelTranslation = other == model.translation ? nil : other
@@ -120,7 +120,7 @@ struct CompareSelection: Identifiable {
 
 struct DatabaseErrorView: View {
     let message: String
-    /// Є, коли база відкрилась, а не прочиталась одна сторінка (tech debt #11).
+    /// Present when the database opened but one page was not read (tech debt #11).
     var retry: (() -> Void)?
 
     var body: some View {
@@ -140,13 +140,13 @@ struct DatabaseErrorView: View {
     }
 }
 
-/// Помилка бази користувача: без неї нотатки тихо губилися б після перезапуску.
+/// A user database error: without it, notes would be silently lost after a restart.
 struct UserDataWarning: View {
     @Environment(UserData.self) private var userData
     @Environment(DraftStore.self) private var drafts
 
     var body: some View {
-        // Чорнетка, що не записалася, інакше зникла б мовчки після перезапуску (рев'ю add-sermon-drafts).
+        // A draft that failed to save would otherwise vanish silently after a restart (add-sermon-drafts review).
         if let error = drafts.lastError, !userData.isInMemoryOnly {
             HStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
@@ -179,8 +179,8 @@ struct UserDataWarning: View {
     }
 }
 
-/// Назву розділу в тулбарі показує кнопка вибору розділу; системний заголовок у тулбарі ховаємо,
-/// а заголовок вікна лишається (меню «Window», VoiceOver). На macOS 14 без API — обидва видно.
+/// The chapter title in the toolbar is shown by the chapter picker button; the system title in the toolbar is hidden,
+/// while the window title stays (the Window menu, VoiceOver). On macOS 14 without the API both are visible.
 struct HiddenToolbarTitle: ViewModifier {
     func body(content: Content) -> some View {
         if #available(macOS 15, *) {
@@ -191,8 +191,8 @@ struct HiddenToolbarTitle: ViewModifier {
     }
 }
 
-/// Поле пошуку по центру тулбара, а не праворуч (запит власника 2026-09-28).
-/// `.toolbarPrincipal` є лише в SDK нових Xcode (Swift 6.2+); зі старішим (CI на macos-15) поле праворуч.
+/// The search field in the toolbar center, not on the right (owner request 2026-09-28).
+/// `.toolbarPrincipal` exists only in the SDK of new Xcode (Swift 6.2+); with an older one (CI on macos-15) the field is on the right.
 struct SearchField: ViewModifier {
     @Binding var query: String
 
@@ -205,8 +205,8 @@ struct SearchField: ViewModifier {
     }
 }
 
-/// Поле пошуку в тулбарі малює AppKit, і `.searchable` не дає задати йому шрифт чи кольори:
-/// знаходимо `NSSearchField` у тулбарі вікна і застосовуємо масштаб інтерфейсу й тему (tech debt #15, #18).
+/// AppKit draws the toolbar search field, and `.searchable` cannot set its font or colors:
+/// we find the `NSSearchField` in the window toolbar and apply the interface scale and theme (tech debt #15, #18).
 struct SearchFieldStyler: NSViewRepresentable {
     @Environment(\.theme) private var theme
     @Environment(\.interfaceScale) private var scale
@@ -215,7 +215,7 @@ struct SearchFieldStyler: NSViewRepresentable {
 
     func updateNSView(_ view: NSView, context: Context) {
         let style = SearchFieldStyle(theme: theme, fontSize: scale.systemFontSize)
-        // Тулбар з'являється після першого проходу розкладки.
+        // The toolbar appears after the first layout pass.
         DispatchQueue.main.async { Self.apply(style, in: view.window) }
     }
 
@@ -247,8 +247,8 @@ extension NSColor {
     }
 }
 
-/// Текст розділу і панель ілюстрацій поруч: частка тексту за замовчуванням 35 %, роздільник тягнеться
-/// і запам'ятовується (`HSplitView` не задає початкову частку).
+/// Chapter text and the illustrations panel side by side: the default text share is 35 %, the divider is draggable
+/// and remembered (`HSplitView` does not set the initial share).
 struct IllustrationsSplit<Text: View, Illustrations: View>: View {
     @ViewBuilder let text: Text
     @ViewBuilder let illustrations: Illustrations
@@ -267,7 +267,7 @@ struct IllustrationsSplit<Text: View, Illustrations: View>: View {
         GeometryReader { geometry in
             let width = geometry.size.width
             HStack(spacing: 0) {
-                // Значення з defaults могло бути зіпсоване — ті самі межі, що й при перетягуванні.
+                // The value from defaults may be corrupted: the same limits as when dragging.
                 text.frame(width: width * min(max(fraction, 0.2), 0.7))
                 Rectangle()
                     .fill(Color(nsColor: .separatorColor))
@@ -275,7 +275,7 @@ struct IllustrationsSplit<Text: View, Illustrations: View>: View {
                     .padding(.horizontal, 3)
                     .contentShape(Rectangle())
                     .onHover { inside in setResizeCursor(inside) }
-                    // Панель закрили Esc, поки курсор над межею: без цього «↔» лишився б.
+                    // The panel was closed with Esc while the cursor was over the divider: without this "↔" would stay.
                     .onDisappear { setResizeCursor(false) }
                     .gesture(DragGesture(minimumDistance: 1)
                         .onChanged { drag in

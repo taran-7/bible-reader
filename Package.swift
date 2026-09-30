@@ -12,12 +12,12 @@ let package = Package(
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.0.0"),
     ],
     targets: [
-        // Snowball (BSD-3): стемери en/ru для морфологічного пошуку (FR-18).
+        // Snowball (BSD-3): en/ru stemmers for morphological search (FR-18).
         .target(name: "CSnowball", exclude: ["COPYING"]),
         .target(name: "BibleCore", dependencies: ["CSnowball", .product(name: "GRDB", package: "GRDB.swift")],
-                // Каталог перекладів (FR-30): модуль додається рядком маніфесту.
+                // The translation catalog (FR-30): a module is added with a manifest line.
                 resources: [.copy("Resources/translations.json"),
-                            // Allowlist/blocklist і адаптери ілюстрацій (FR-34): один файл, без змін коду.
+                            // Allowlist/blocklist and illustration adapters (FR-34): one file, no code changes.
                             .copy("Resources/illustration-sources.json")]),
         .executableTarget(name: "bible-import", dependencies: ["BibleCore"]),
         .testTarget(name: "BibleCoreTests", dependencies: ["BibleCore"]),

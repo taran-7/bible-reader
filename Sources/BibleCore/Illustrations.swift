@@ -1,15 +1,15 @@
 import Foundation
 
-// Ілюстрації (FR-33…FR-35, PRD 6.17): реальні історії до виділених віршів — протестантські сайти, Вікіпедія, Brave.
-// Живий пошук під час кліку, без локального індексу й без збереження: мережа — лише в `IllustrationNetwork`,
-// тут — побудова запитів, розбір відповідей, allowlist, дедуплікація і партії по 7.
+// Illustrations (FR-33…FR-35, PRD 6.17): true stories for the selected verses from Protestant sites, Wikipedia, Brave.
+// Live search on click, no local index and no storage: network only in `IllustrationNetwork`,
+// here: query building, response parsing, allowlist, deduplication and batches of 7.
 
-/// Виділені вірші для вікна ілюстрацій: посилання мовою екрана, текст у KJV (пошук англійською)
-/// і мова перекладу на екрані — у неї кнопка «Перекласти» на картці.
+/// Selected verses for the illustrations window: the reference in the screen language, the text in KJV (English search)
+/// and the on-screen translation's language, the target of the card's "Translate" button.
 public struct IllustrationRequest: Codable, Hashable, Sendable {
     public let reference: String
     public let kjvText: [String]
-    /// Код мови (`uk`, `ru`, `cs`, `en`…) перекладу Біблії на екрані.
+    /// The language code (`uk`, `ru`, `cs`, `en`…) of the on-screen Bible translation.
     public let language: String
 
     public init(reference: String, kjvText: [String], language: String = "en") {
@@ -20,7 +20,7 @@ public struct IllustrationRequest: Codable, Hashable, Sendable {
 
     private enum CodingKeys: String, CodingKey { case reference, kjvText, language }
 
-    /// Вікно, відновлене macOS зі старої версії, не має мови — англійська.
+    /// A window restored by macOS from an old version has no language: English.
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.init(reference: try container.decode(String.self, forKey: .reference),
@@ -28,20 +28,20 @@ public struct IllustrationRequest: Codable, Hashable, Sendable {
                   language: try container.decodeIfPresent(String.self, forKey: .language) ?? "en")
     }
 
-    /// Мова, на яку перекладати історії; `nil` — англійська, перекладати нема що.
+    /// The language to translate stories into; `nil` means English, nothing to translate.
     public var translationTarget: String? { language == "en" ? nil : language }
 }
 
-/// Історія: заголовок, текст сторінки, джерело. Нічого не зберігається — лише «Скопіювати».
+/// A story: title, page text, source. Nothing is stored, only "Copy".
 public struct Illustration: Identifiable, Hashable, Sendable {
     public let title: String
     public let text: String
     public let source: String
     public let siteName: String
     public let date: String?
-    /// Показано лише початок або уривок: у картці посилання «Читати на сайті».
+    /// Only the beginning or an excerpt is shown: the card has a "Read on site" link.
     public let isExcerpt: Bool
-    /// «Чому ця історія» від моделі мовою перекладу на екрані (FR-41); `nil` — без відбору моделлю.
+    /// The model's "Why this story" in the on-screen translation's language (FR-41); `nil` means no model curation.
     public var reason: String?
     public var id: String { source }
 
@@ -56,16 +56,16 @@ public struct Illustration: Identifiable, Hashable, Sendable {
         self.isExcerpt = isExcerpt
     }
 
-    /// Текст для буфера: історія разом із джерелом, щоб її можна було вставити в нотатку.
+    /// Clipboard text: the story together with its source, so it can be pasted into a note.
     public var copyText: String { copyText(title: title, text: text) }
 
-    /// Те, що зараз на картці (оригінал або переклад), і джерело — завжди англомовне посилання.
+    /// What is currently on the card (original or translation) and the source, always an English link.
     public func copyText(title: String, text: String) -> String {
         "\(title)\n\n\(text)\n\nДжерело: \(siteName), \(source)"
     }
 }
 
-/// Список джерел (`Resources/illustration-sources.json`, [illustration-sources.md](docs/product-specs/illustration-sources.md)).
+/// The source list (`Resources/illustration-sources.json`, [illustration-sources.md](docs/product-specs/illustration-sources.md)).
 public struct IllustrationSources: Decodable, Sendable {
     public struct Site: Decodable, Hashable, Sendable {
         public let name: String
@@ -74,7 +74,7 @@ public struct IllustrationSources: Decodable, Sendable {
 
     public let allow: [String]
     public let block: [String]
-    /// Сайти з пошуком WordPress REST (повний текст). Решту allowlist, закриту від ботів, шукає Brave за `site:`.
+    /// Sites with WordPress REST search (full text). The rest of the allowlist, closed to bots, is searched by Brave with `site:`.
     public let wordpress: [Site]
 
     public static func load(from data: Data) throws -> IllustrationSources {
@@ -87,7 +87,7 @@ public struct IllustrationSources: Decodable, Sendable {
         }
     }
 
-    /// Хост без `www.` у нижньому регістрі.
+    /// The host without `www.`, lowercase.
     static func bare(_ host: String) -> String {
         let lower = host.lowercased()
         return lower.hasPrefix("www.") ? String(lower.dropFirst(4)) : lower
@@ -97,16 +97,16 @@ public struct IllustrationSources: Decodable, Sendable {
         host == domain || host.hasSuffix("." + domain)
     }
 
-    /// FR-34: історія береться лише з домену allowlist; blocklist перевіряється першим і перемагає.
+    /// FR-34: a story is taken only from an allowlisted domain; the blocklist is checked first and wins.
     public func isAllowed(_ address: String) -> Bool {
-        // Лише захищені адреси (схема https).
+        // Secure addresses only (https scheme).
         guard let (scheme, host) = Self.parse(address), scheme == "https" else { return false }
         if block.contains(where: { Self.matches(host, $0) }) { return false }
         return allow.contains { Self.matches(host, $0) }
     }
 }
 
-/// Англійські ключові слова з тексту KJV: без службових слів, найчастіші першими.
+/// English keywords from the KJV text: no stop words, most frequent first.
 public enum IllustrationQuery {
     static let stopWords: Set<String> = [
         "the", "and", "that", "for", "unto", "with", "his", "her", "him", "they", "them", "their", "thee", "thou", "thy",
@@ -127,7 +127,7 @@ public enum IllustrationQuery {
                 counts[word, default: 0] += 1
             }
         }
-        // Стабільно: частіші першими, серед рівних — у порядку тексту.
+        // Stable: more frequent first, ties in text order.
         let ranked = order.enumerated().sorted { a, b in
             let (ca, cb) = (counts[a.element]!, counts[b.element]!)
             return ca != cb ? ca > cb : a.offset < b.offset
@@ -135,7 +135,7 @@ public enum IllustrationQuery {
         return ranked.prefix(limit).map(\.element)
     }
 
-    /// Запити від вужчого до ширшого: WordPress шукає всі слова разом, тож далі — пари і окремі слова.
+    /// Queries from narrower to broader: WordPress searches for all words together, so then pairs and single words.
     public static func queries(from texts: [String]) -> [String] {
         let words = keywords(from: texts)
         var result: [String] = []
@@ -147,21 +147,21 @@ public enum IllustrationQuery {
     }
 }
 
-/// Мережа ілюстрацій за протоколом: тести підставляють фікстури, додаток — `IllustrationNetwork`.
+/// The illustration network behind a protocol: tests plug in fixtures, the app `IllustrationNetwork`.
 public protocol IllustrationHTTP: Sendable {
-    /// GET за захищеною адресою `<host><path>?<query>` з заголовками; повертає код відповіді і тіло.
+    /// GET at a secure address `<host><path>?<query>` with headers; returns the response code and body.
     func get(host: String, path: String, query: [(String, String)], headers: [String: String]) async throws -> (status: Int, body: Data)
-    /// POST JSON за захищеною адресою — для API моделі, що відбирає історії (FR-41).
+    /// POST JSON at a secure address: for the API of the model that curates stories (FR-41).
     func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data)
 }
 
 public enum IllustrationError: Error, Equatable, Sendable {
-    /// Немає мережі: повідомлення «Немає підключення до мережі».
+    /// No network: the message «Немає підключення до мережі» (No network connection).
     case offline
     case failed(String)
 }
 
-/// Сторінка одного джерела: історії після фільтрів і чи є в джерела наступна сторінка.
+/// A page from one source: stories after filters, and whether the source has a next page.
 public struct IllustrationPage: Sendable {
     public let stories: [Illustration]
     public let hasMore: Bool
@@ -172,16 +172,16 @@ public struct IllustrationPage: Sendable {
     }
 }
 
-/// Джерело історій: сторінка результатів за запитом.
+/// A story source: a page of results for a query.
 public protocol IllustrationProvider: Sendable {
     func page(_ query: String, page: Int, http: IllustrationHTTP) async throws -> IllustrationPage
 }
 
-/// Текст картки для статей під авторським правом: початок і посилання «Читати на сайті».
+/// Card text for copyrighted articles: the beginning and a "Read on site" link.
 public enum IllustrationExcerpt {
     public static let limit = 1500
 
-    /// Обрізає по межі абзацу або речення в другій половині ліміту; `truncated` — текст скорочено.
+    /// Cuts at a paragraph or sentence boundary in the second half of the limit; `truncated` means the text was shortened.
     public static func cut(_ text: String, limit: Int = limit) -> (text: String, truncated: Bool) {
         guard text.count > limit else { return (text, false) }
         let head = String(text.prefix(limit))
@@ -196,7 +196,7 @@ public enum IllustrationExcerpt {
     }
 }
 
-/// Пошук WordPress REST (`/wp-json/wp/v2/search`) і текст допису (`/wp-json/wp/v2/posts/<id>`).
+/// WordPress REST search (`/wp-json/wp/v2/search`) and post text (`/wp-json/wp/v2/posts/<id>`).
 public struct WordPressAdapter: IllustrationProvider {
     public let site: IllustrationSources.Site
     static let pageSize = 10
@@ -205,11 +205,11 @@ public struct WordPressAdapter: IllustrationProvider {
         self.site = site
     }
 
-    /// Знайдений допис до завантаження тексту.
+    /// A found post before its text is loaded.
     struct Hit: Hashable, Sendable {
         let title: String
         let url: String
-        /// Номер допису з адреси API `/wp-json/wp/v2/posts/<id>` того самого сайту.
+        /// The post id from the API address `/wp-json/wp/v2/posts/<id>` of the same site.
         let id: Int
     }
 
@@ -239,7 +239,7 @@ public struct WordPressAdapter: IllustrationProvider {
         return IllustrationPage(stories: try await illustrations(hits, http: http), hasMore: hits.count == Self.pageSize)
     }
 
-    /// Сторінка результатів; порожній масив — сторінок більше немає (WordPress на зайву сторінку дає 400).
+    /// A page of results; an empty array means no more pages (WordPress gives 400 for an extra page).
     func search(_ text: String, page: Int, http: IllustrationHTTP) async throws -> [Hit] {
         let (status, body) = try await http.get(host: site.host, path: "/wp-json/wp/v2/search", query: [
             ("search", text), ("type", "post"), ("subtype", "post"),
@@ -256,8 +256,8 @@ public struct WordPressAdapter: IllustrationProvider {
         return hits
     }
 
-    /// Тексти всіх дописів сторінки одним запитом (`include=`), у порядку пошуку: сайти обмежують частоту запитів
-    /// (Christianity Today відповідав 403 на десяток окремих). Початок ≤ 1500 символів — авторське право.
+    /// Texts of all posts on the page in one request (`include=`), in search order: sites rate-limit requests
+    /// (Christianity Today answered 403 to a dozen separate ones). The first ≤ 1500 characters: copyright.
     func illustrations(_ hits: [Hit], http: IllustrationHTTP) async throws -> [Illustration] {
         guard !hits.isEmpty else { return [] }
         let (status, body) = try await http.get(host: site.host, path: "/wp-json/wp/v2/posts", query: [
@@ -278,7 +278,7 @@ public struct WordPressAdapter: IllustrationProvider {
         return stories
     }
 
-    /// Номер допису з адреси `…/wp-json/wp/v2/posts/<id>` того самого сайту; чужий хост чи інший тип — `nil`.
+    /// The post id from the address `…/wp-json/wp/v2/posts/<id>` of the same site; a foreign host or another type gives `nil`.
     static func postID(of href: String, host: String) -> Int? {
         guard let hrefHost = IllustrationSources.host(of: href), hrefHost == IllustrationSources.bare(host),
               let range = href.range(of: "/wp-json/wp/v2/posts/") else { return nil }
@@ -286,12 +286,12 @@ public struct WordPressAdapter: IllustrationProvider {
     }
 }
 
-/// Вікіпедія (CC BY-SA): лише біографії реальних людей (категорії «… births/deaths») і без католицьких
-/// та православних тем (святі, папи, ченці тощо — рішення власника 2026-09-28); текст — вступ статті.
+/// Wikipedia (CC BY-SA): only biographies of real people (categories "… births/deaths") and no Catholic
+/// or Orthodox topics (saints, popes, monks etc., owner decision 2026-09-28); the text is the article intro.
 public struct WikipediaAdapter: IllustrationProvider {
     public static let host = "en.wikipedia.org"
     static let pageSize = 10
-    /// Підказка до запиту: життєві історії християн, а не тлумачення віршів.
+    /// A query hint: life stories of Christians, not verse commentary.
     static let hint = "Christian (missionary OR evangelist OR pastor OR preacher OR conversion OR revival)"
     static let excludedWords = [
         "catholic", "orthodox", "pope", "popes", "papal", "saint", "saints", "cardinal", "cardinals", "monk", "monks",
@@ -314,12 +314,12 @@ public struct WikipediaAdapter: IllustrationProvider {
         let query: Query?
     }
 
-    /// Людина: є категорія «… births» або «… deaths».
+    /// A person: has a "… births" or "… deaths" category.
     static func isPerson(_ categories: [String]) -> Bool {
         categories.contains { $0.hasSuffix(" births") || $0.hasSuffix(" deaths") }
     }
 
-    /// Католицька чи православна тема: у назві категорії є одне зі слів `excludedWords`.
+    /// A Catholic or Orthodox topic: a category name contains one of the `excludedWords`.
     static func isExcluded(_ categories: [String]) -> Bool {
         let excluded = Set(excludedWords)
         return categories.contains { category in
@@ -344,21 +344,21 @@ public struct WikipediaAdapter: IllustrationProvider {
                   Self.isPerson(categories), !Self.isExcluded(categories) else { continue }
             stories.append(Illustration(title: page.title, text: extract, source: url, siteName: "Wikipedia"))
         }
-        // Відфільтровані статті не означають кінця: наступна сторінка є, якщо ця була повна.
+        // Filtered-out articles do not mean the end: there is a next page if this one was full.
         return IllustrationPage(stories: stories, hasMore: pages.count == Self.pageSize)
     }
 }
 
-/// Brave Search API (ключ користувача): пошук `site:` по всьому allowlist, зокрема по сайтах,
-/// закритих від ботів. Сторінки не відкриваємо — лише заголовок, уривок пошуковика і посилання.
+/// The Brave Search API (the user's key): a `site:` search over the whole allowlist, including sites
+/// closed to bots. Pages are not opened: only the title, the search engine snippet and the link.
 public struct BraveAdapter: IllustrationProvider {
     public static let host = "api.search.brave.com"
     public let key: String
     public let sites: [String]
     static let pageSize = 20
-    /// Скільки `site:` в одному запиті: ліміт Brave — 400 знаків і 50 слів разом із ключовими словами.
+    /// How many `site:` per query: Brave's limit is 400 characters and 50 words including the keywords.
     public static let sitesPerQuery = 5
-    /// Brave віддає до 10 сторінок (offset 0…9).
+    /// Brave returns up to 10 pages (offset 0…9).
     static let maxPages = 10
 
     public init(key: String, sites: [String]) {
@@ -401,7 +401,7 @@ public struct BraveAdapter: IllustrationProvider {
     }
 }
 
-/// HTML допису → простий текст: абзаци з нового рядка, сутності розкодовано, скрипти й стилі прибрано.
+/// Post HTML → plain text: paragraphs on new lines, entities decoded, scripts and styles removed.
 public enum HTMLText {
     public static func plain(_ html: String) -> String {
         var text = html
@@ -424,7 +424,7 @@ public enum HTMLText {
         "rsquo": "’", "lsquo": "‘", "rdquo": "”", "ldquo": "“", "mdash": "—", "ndash": "–", "hellip": "…",
     ]
 
-    /// `&amp;`, `&#8217;`, `&#x2019;`; невідома сутність лишається як є.
+    /// `&amp;`, `&#8217;`, `&#x2019;`; an unknown entity stays as is.
     static func decodeEntities(_ text: String) -> String {
         guard text.contains("&") else { return text }
         var result = ""
@@ -457,43 +457,43 @@ public enum HTMLText {
     }
 }
 
-/// Пошук історій партіями по 7 (FR-33): «Отримати ще» продовжує з того місця, де зупинились.
-/// Порядок: запити від вужчого до ширшого, у кожному — джерела по черзі, сторінка за сторінкою.
+/// Story search in batches of 7 (FR-33): "Get more" continues from where it stopped.
+/// Order: queries from narrower to broader, in each the sources in turn, page after page.
 public actor IllustrationSearch {
     public static let batchSize = 7
 
     private var queries: [String]
     private let keywords: [String]
     private let request: IllustrationRequest
-    /// Модель, що формує запити й відбирає історії (FR-41); `nil` — сортування за ключовими словами.
+    /// The model that writes queries and curates stories (FR-41); `nil` means sorting by keywords.
     private var curator: IllustrationCurator?
     private var planned = false
-    /// Відібрані моделлю, найкращі першими: «Отримати ще» бере наступні з них.
+    /// Curated by the model, best first: "Get more" takes the next ones from here.
     private var curated: [(score: Int, story: Illustration)] = []
-    /// Чому відбір моделлю не спрацював (підпис під історіями); пошук тоді йде без моделі.
+    /// Why model curation did not work (the caption under the stories); search then runs without the model.
     public private(set) var curatorProblem: String?
-    /// Скільки разів модель оцінює кандидатів за одне «Отримати ще»: ціна пошуку передбачувана;
-    /// не набралося 7 — показуємо менше, а «Отримати ще» лишається.
+    /// How many times the model scores candidates per "Get more": the search cost is predictable;
+    /// if fewer than 7 qualify, show fewer, and "Get more" stays.
     public static let judgementsPerBatch = 2
     private let providers: [IllustrationProvider]
     private let sources: IllustrationSources
     private let http: IllustrationHTTP
     private struct Cursor: Sendable { var query: Int, provider: Int, page: Int }
-    /// `nil` — усе перебрано.
+    /// `nil` means everything has been tried.
     private var cursor: Cursor?
     private var pending: [Illustration] = []
     private var seen = Set<String>()
-    /// Джерела, що відповіли помилкою: пошук іде далі без них (сайт може обмежувати частоту запитів).
+    /// Sources that answered with an error: search continues without them (a site may rate-limit requests).
     private var failed = Set<Int>()
     private var lastError: IllustrationError?
 
-    /// Джерела: сайти WordPress з конфігурації, Вікіпедія і, з ключем, Brave по всьому allowlist.
+    /// Sources: WordPress sites from the configuration, Wikipedia and, with a key, Brave over the whole allowlist.
     public static func providers(sources: IllustrationSources, braveKey: String?) -> [IllustrationProvider] {
         var providers: [IllustrationProvider] = sources.wordpress.map(WordPressAdapter.init(site:))
         providers.append(WikipediaAdapter())
-        // Вікіпедію Brave не шукає: її статті мають пройти фільтр категорій `WikipediaAdapter`.
+        // Brave does not search Wikipedia: its articles must pass the `WikipediaAdapter` category filter.
         let braveSites = sources.allow.filter { $0 != WikipediaAdapter.host }
-        // Brave обмежує запит 400 знаками й 50 словами: allowlist ділимо на групи по `sitesPerQuery` `site:`.
+        // Brave limits a query to 400 characters and 50 words: the allowlist is split into groups of `sitesPerQuery` `site:`.
         if let braveKey, !braveKey.isEmpty {
             for start in stride(from: 0, to: braveSites.count, by: BraveAdapter.sitesPerQuery) {
                 let group = Array(braveSites[start..<min(start + BraveAdapter.sitesPerQuery, braveSites.count)])
@@ -516,20 +516,20 @@ public actor IllustrationSearch {
         self.cursor = queries.isEmpty || providers.isEmpty ? nil : Cursor(query: 0, provider: 0, page: 1)
     }
 
-    /// Є ще що шукати: не всі запити, джерела й сторінки перебрано.
+    /// There is more to search: not all queries, sources and pages have been tried.
     public var hasMore: Bool { cursor != nil || !pending.isEmpty || !curated.isEmpty }
 
-    /// Назва моделі, що відбирає історії; `nil` — без моделі (або вона не впоралася).
+    /// The name of the model curating stories; `nil` means no model (or it failed).
     public var curatorName: String? { curator?.name }
 
-    /// Наступні до 7 історій, найрелевантніші першими; менше — більше не знайшлося.
-    /// Помилка одного джерела не зупиняє інші; кидається, лише якщо нічого не знайшлося. Без мережі — одразу.
+    /// The next up to 7 stories, most relevant first; fewer means nothing more was found.
+    /// One source's error does not stop the others; it throws only if nothing was found. Without network, immediately.
     public func next() async throws -> [Illustration] {
         lastError = nil
-        // Явний повтор («Повторити» чи «Отримати ще») знову питає джерела, що впали минулого разу.
+        // An explicit retry ("Retry" or "Get more") asks the sources that failed last time again.
         failed.removeAll()
         if curator != nil { return try await nextCurated() }
-        // Модель відмовила посеред пошуку: спершу вже відібране нею.
+        // The model failed mid-search: first what it has already curated.
         if !curated.isEmpty {
             let batch = curated.prefix(Self.batchSize).map(\.story)
             curated.removeFirst(batch.count)
@@ -543,8 +543,8 @@ public actor IllustrationSearch {
         return ranked.sorted { $0.score != $1.score ? $0.score > $1.score : $0.offset < $1.offset }.map(\.story)
     }
 
-    /// Партія, відібрана моделлю: кандидати пулом (21 для Claude), не більше двох оцінок за раз, поріг 6, найкращі першими.
-    /// Модель не відповіла чи відповіла не JSON — далі без неї, з уже знайденими кандидатами.
+    /// A batch curated by the model: candidates in a pool (21 for Claude), at most two scorings at a time, threshold 6, best first.
+    /// The model did not answer or answered with non-JSON: continue without it, with the candidates already found.
     private func nextCurated() async throws -> [Illustration] {
         await plan()
         var judgements = 0
@@ -561,7 +561,7 @@ public actor IllustrationSearch {
                 chosen.reason = verdict.reason.isEmpty ? nil : verdict.reason
                 curated.append((verdict.score, chosen))
             }
-            // Стабільно: за оцінкою, за рівної — у порядку пошуку.
+            // Stable: by score, ties in search order.
             curated = curated.enumerated().sorted { $0.element.score != $1.element.score
                 ? $0.element.score > $1.element.score : $0.offset < $1.offset }.map(\.element)
         }
@@ -572,7 +572,7 @@ public actor IllustrationSearch {
         return batch
     }
 
-    /// Запити моделі за змістом вірша — першими, потім за ключовими словами (один раз на пошук).
+    /// Model queries from the verse meaning first, then by keywords (once per search).
     private func plan() async {
         guard !planned, let curator else { return }
         planned = true
@@ -586,7 +586,7 @@ public actor IllustrationSearch {
         }
     }
 
-    /// Оцінки кандидатів; `nil` — модель недоступна, далі без неї.
+    /// Candidate scores; `nil` means the model is unavailable, continue without it.
     private func judge(_ candidates: [Illustration]) async -> [Int: CuratorVerdict]? {
         guard let curator else { return nil }
         do {
@@ -616,7 +616,7 @@ public actor IllustrationSearch {
         self.curator = nil
     }
 
-    /// Ключові слова в заголовку важать удвічі.
+    /// Keywords in the title count double.
     private func score(_ story: Illustration) -> Int {
         let title = story.title.lowercased(), text = story.text.lowercased()
         var score = 0
@@ -631,7 +631,7 @@ public actor IllustrationSearch {
         "title:" + title.lowercased().filter { $0.isLetter || $0.isNumber }
     }
 
-    /// Ще одна сторінка одного джерела в `pending`; `false` — курсор вичерпано.
+    /// One more page of one source into `pending`; `false` means the cursor is exhausted.
     private func fetchPage() async throws -> Bool {
         guard let position = cursor else { return false }
         let page: IllustrationPage
@@ -647,7 +647,7 @@ public actor IllustrationSearch {
             page = IllustrationPage(stories: [], hasMore: false)
         }
         for story in page.stories where sources.isAllowed(story.source) {
-            // Дублікат — та сама адреса або той самий заголовок з іншого джерела.
+            // A duplicate is the same address or the same title from another source.
             guard !seen.contains(story.source), !seen.contains(Self.titleKey(story.title)) else { continue }
             seen.insert(story.source)
             seen.insert(Self.titleKey(story.title))
