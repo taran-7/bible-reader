@@ -10,6 +10,7 @@
 		0FCC6D221AB98311609BC70F /* AccessibilityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ACCA1F6C195A3CDA05AFCDA /* AccessibilityUITests.swift */; };
 		10368275E0EC6A019126EBCE /* bible.sqlite in Resources */ = {isa = PBXBuildFile; fileRef = C438F53C73BE6A2DB8D0650F /* bible.sqlite */; };
 		272222889C59E9539D14C83C /* ThemeEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADE5D263F9EABE3551D97A6D /* ThemeEnvironment.swift */; };
+		29F33283C8D24F43F568D9A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6189D0C43445BDEEC9D7FF2E /* Assets.xcassets */; };
 		2A65813327426C8F15346ED7 /* BookList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3CC1095AD1CF6E94F9D879 /* BookList.swift */; };
 		4102A8A08E6B81E8A2B271FC /* ChapterPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5044431110BF65FFEDACEF /* ChapterPickerView.swift */; };
 		55A1E2D1859F2E2A7F8E2D66 /* InterfaceScaleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63CE2F605BA848371F0FC274 /* InterfaceScaleEnvironment.swift */; };
@@ -55,11 +56,12 @@
 		4645A2B42D629FAA402517A1 /* ThemeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeUITests.swift; sourceTree = "<group>"; };
 		4D25BDB7E2E07378FFCF3E98 /* XCUIHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XCUIHelpers.swift; sourceTree = "<group>"; };
 		5948E78DD2CCBC372A3F6D4D /* ReaderToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderToolbar.swift; sourceTree = "<group>"; };
+		6189D0C43445BDEEC9D7FF2E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		63CE2F605BA848371F0FC274 /* InterfaceScaleEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaceScaleEnvironment.swift; sourceTree = "<group>"; };
 		6E3CC1095AD1CF6E94F9D879 /* BookList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookList.swift; sourceTree = "<group>"; };
 		73C2A9C1432C175820B894A4 /* ParallelUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallelUITests.swift; sourceTree = "<group>"; };
-		7557EC908DC6181676EE028E /* agent-factory-open-questions-c0c4c0 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "agent-factory-open-questions-c0c4c0"; path = ..; sourceTree = SOURCE_ROOT; };
 		836C3DFBC5B65B484366895F /* ReadingComfortUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingComfortUITests.swift; sourceTree = "<group>"; };
+		8995A9A58A07B7987DE95345 /* bible-reader */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "bible-reader"; path = ..; sourceTree = SOURCE_ROOT; };
 		8ACCA1F6C195A3CDA05AFCDA /* AccessibilityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityUITests.swift; sourceTree = "<group>"; };
 		8CCD2208EB70ABD5FF2F7BE5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		96AEB523B6CA71AA5CB422C3 /* DraftsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftsView.swift; sourceTree = "<group>"; };
@@ -138,7 +140,7 @@
 		A4FE416725193964BF9D2433 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				7557EC908DC6181676EE028E /* agent-factory-open-questions-c0c4c0 */,
+				8995A9A58A07B7987DE95345 /* bible-reader */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -146,6 +148,7 @@
 		C8CC1A4708CE470F42893416 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				6189D0C43445BDEEC9D7FF2E /* Assets.xcassets */,
 				C438F53C73BE6A2DB8D0650F /* bible.sqlite */,
 			);
 			path = Resources;
@@ -244,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29F33283C8D24F43F568D9A7 /* Assets.xcassets in Resources */,
 				B220B7A2BA8AF52C5BB88F23 /* Fonts in Resources */,
 				10368275E0EC6A019126EBCE /* bible.sqlite in Resources */,
 			);
@@ -269,7 +273,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# База не комітиться: make перебудовує її, якщо її немає або змінилися\n# data/raw чи код імпорту (інакше стара схема тихо лишається в додатку).\ncd \"$SRCROOT/..\" && make db\n";
+			shellScript = "# The database is not committed: make rebuilds it if it is missing or if\n# data/raw or the import code changed (otherwise an old schema silently stays in the app).\ncd \"$SRCROOT/..\" && make db\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
