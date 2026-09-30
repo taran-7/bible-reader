@@ -32,6 +32,13 @@ jobs:
           if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
             node scripts/check-secrets.mjs --history "${{ github.event.pull_request.base.sha }}..HEAD"
           fi
+      # PD-20: PR змінює код → ручна частина HANDOFF.md теж має змінитись (або `Handoff: skip`).
+      - name: HANDOFF freshness
+        run: |
+          node --test scripts/handoff.test.mjs
+          if [ -n "${{ github.event.pull_request.base.sha }}" ]; then
+            node scripts/handoff.mjs --check "${{ github.event.pull_request.base.sha }}"
+          fi
       - name: Traceability chain (і свіжість звіту)
         run: |
           node scripts/check-traceability.mjs --check-fresh
