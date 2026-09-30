@@ -58,4 +58,10 @@ run('git add docs/qa/traceability-report.md trace/trace.json');
 run("node scripts/check-trajectory.mjs");
 run('git add docs/qa/trajectory-report.md trace/trajectory.json');
 
+// 6 — HANDOFF (PD-20): якщо ручну частину оновлено, освіжити згенерований блок з git.
+if (staged.includes("docs/exec-plans/active/HANDOFF.md")) {
+  run("node scripts/handoff.mjs");
+  run("git add docs/exec-plans/active/HANDOFF.md");
+}
+
 console.log("pre-commit: all deterministic checks passed");

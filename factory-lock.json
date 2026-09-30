@@ -1,6 +1,6 @@
 {
-  "createdAt": "2026-09-29T18:45:06.032Z",
-  "gitHead": "0cffa56fcb053db4adb4851462b40945d61b16ff",
+  "createdAt": "2026-09-30T09:38:22.767Z",
+  "gitHead": "99d68c988a9ea52459833505317bceb3d509aa32",
   "files": {
     ".claude/workflows/eval-suite.js": "f93c99d868b812cfa7412927f52b62d1042525396a9d0265f16cfe435b9c6098",
     ".claude/workflows/review-gate.js": "7295d8e94ba347213120b9d190b9ebbb88dee373173cfc7daba2114b726ca76b",
@@ -11,7 +11,7 @@
     ".githooks/commit-msg": "c6427b364dbc15da31235e4c0f9a8ac74639b7f0512cadce95f301637387fb5c",
     ".githooks/pre-commit": "c64e18049003ddd126e8ac2c61c1ce759923977748f5f044ee34fc1c3212eaea",
     ".githooks/pre-push": "c747fa2f8384f7f6b7a04a0a3281235f0896a34091a9f3eb137c1951c17c3bee",
-    ".github/workflows/ci.yml": "1b7857ec3680f759ce0a903347415edd6f2414caa659fc5ab67d6560ee367270",
+    ".github/workflows/ci.yml": "763aad8e27f54a0de5a52b9cee98a0623610da06ab65f4c1b70ee61314b1dbba",
     "quality/coverage-baseline.json": "300d30180716188eb31e13271e7d67916ca434711bf53427971e37c4ccce9541",
     "quality/process-baseline.json": "4363df6ac375e25c06c8ee85a3aaf49c8cd69f6fab2fbd3e76409ca715c4e20b",
     "quality/telemetry.config.json": "98276dbbd18f9d694f3378aed7ecc042439d99c8e292bb3caeed7a833005835b",
@@ -30,6 +30,7 @@
   },
   "adaptations": [
     "secrets scanner in pre-commit and CI (PD-18)",
-    "pre-push secrets hook and Claude Code edit hooks (PD-19)"
+    "pre-push secrets hook and Claude Code edit hooks (PD-19)",
+    "HANDOFF freshness check in CI and generated block (PD-20)"
   ]
 }

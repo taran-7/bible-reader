@@ -20,6 +20,7 @@
     "check:acceptance": "node scripts/check-acceptance-methods.mjs --mode=existence",
     "check:acceptance:artifact": "node scripts/check-acceptance-methods.mjs --mode=artifact",
     "check:process": "node scripts/check-process-ratchet.mjs",
-    "check:integrity": "node scripts/check-factory-integrity.mjs"
+    "check:integrity": "node scripts/check-factory-integrity.mjs",
+    "handoff": "node scripts/handoff.mjs"
   }
 }
