@@ -156,3 +156,8 @@ Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the t
 
 ## 10. How we work
 Every roadmap item becomes a separate OpenSpec change (`/opsx:propose`), a `feature/NN-<change>` branch, TDD, a manual UI check against a checklist, a diff review before the PR.
+
+## 11. Future process improvements
+Not product features: tooling around the repository, to be installed by the owner as GitHub Apps (free for public repositories).
+- **CodeRabbit (automated AI review of every PR).** A second, independent reviewer on every PR, including hand-made changes; strengthens maker ≠ checker beyond the in-repo reviewer agents (`.claude/agents/`), which use the same model and run only when a slice is closed. Setup: install the app for `taran-7/bible-reader`, add `.coderabbit.yaml` (ignore generated files: `.xcodeproj`, `trace/`, `docs/qa/*-report.md`; point it at `AGENTS.md` rules), let Auto-fix handle its comments, record as a PD entry.
+- **GitGuardian (secret scanning).** A second layer over `scripts/check-secrets.mjs` (PD-18, PD-19): 400+ detectors, validity checks, alerts when a secret reaches GitHub. Our scanner knows only the patterns we wrote (Anthropic, Brave, GitHub, AWS…). Setup: install the app for the repository; no config needed.
