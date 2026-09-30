@@ -1,7 +1,7 @@
 import AppKit
 import XCTest
 
-/// FR-26, FR-27: другий переклад поруч і перемикання перекладу зі збереженням вірша.
+/// FR-26, FR-27: a second translation alongside and switching translation while keeping the verse.
 @MainActor
 final class ParallelUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -28,7 +28,7 @@ final class ParallelUITests: XCTestCase {
         field.typeKey(.return, modifierFlags: [])
     }
 
-    /// Однакові пункти є і в головному меню, і в меню тулбара — клікаємо той, що відкритий.
+    /// The same items exist in the main menu and in the toolbar menu; click the one that is open.
     private func clickMenuItem(_ title: String, file: StaticString = #filePath, line: UInt = #line) {
         let items = app.menuItems.matching(NSPredicate(format: "title == %@", title))
         let deadline = Date().addingTimeInterval(5)
@@ -55,12 +55,12 @@ final class ParallelUITests: XCTestCase {
         search("Ps 22:1")
         expectTitle("Psalms 22")
 
-        // Поруч — Синодальний: біля Пс 22:1 KJV стоїть Пс 21:1–2.
-        // Через головне меню: кнопка тулбара у вузькому вікні CI ховається в переповнення.
+        // The Synodal alongside: next to KJV Ps 22:1 stands Ps 21:1–2.
+        // Via the main menu: the toolbar button hides in the overflow in the narrow CI window.
         app.menuBars.menuBarItems["Переклад"].click()
         app.menuBars.menuItems["Поруч"].hover()
         app.menuBars.menuItems["Синодальний"].click()
-        // Рядок Пс 22:1 читається разом із паралельною колонкою: надпис і Пс 21:2.
+        // The Ps 22:1 row is read together with the parallel column: the superscription and Ps 21:2.
         let verse = app.descendants(matching: .any)["verse-1"].firstMatch
         XCTAssertTrue(verse.waitForExistence(timeout: 5))
         let found = XCTWaiter.wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'Синодальний: 21:1 '"), evaluatedWith: verse)],
@@ -76,7 +76,7 @@ final class ParallelUITests: XCTestCase {
         XCTAssertEqual(found, .completed, "мітка вірша 1: «\(verse.label)»")
         XCTAssertTrue(verse.label.contains("21:2 Боже мой! Боже мой!"), verse.label)
 
-        // Перемикання на Синодальний: відкривається Пс 21, виділено вірш 2 (той самий зміст).
+        // Switching to the Synodal: Ps 21 opens with verse 2 selected (the same content).
         app.menuBars.menuBarItems["Переклад"].click()
         app.menuBars.menuItems["Синодальний — русский"].click()
         expectTitle("Псалтирь 21")

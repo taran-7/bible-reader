@@ -1,14 +1,14 @@
 import Testing
 @testable import BibleCore
 
-/// Кожна книга має 3 розділи по 5 віршів; пошук повертає Ин 3:16 для будь-якого запиту.
+/// Every book has 3 chapters of 5 verses; search returns Ин 3:16 for any query.
 final class FakeRepository: BibleRepository, @unchecked Sendable {
     var searches: [String] = []
     var limits: [Int] = []
     var offsets: [Int] = []
     var scopes: [SearchScope] = []
     var chapterCountCalls = 0
-    /// Разова помилка читання віршів (tech debt #11).
+    /// A one-off verse read error (tech debt #11).
     var failNextVerses = false
     struct Boom: Error {}
 
@@ -24,7 +24,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         }
         return (1...5).map { Verse(translation: translation, book: book, chapter: chapter, verse: $0, text: "\(translation.rawValue) \(book):\(chapter):\($0)") }
     }
-    /// «many» дає 250 збігів (вірші 1…250 Буття 1), інше — один Ин 3:16.
+    /// «many» gives 250 matches (verses 1…250 of Genesis 1), anything else one Ин 3:16.
     func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage {
         searches.append(query)
         limits.append(limit)
@@ -33,7 +33,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         if query == "boom" || (query == "boom later" && offset > 0) { throw Boom() }
         guard query != "nothing" else { return .empty }
         if query == "shrinking" {
-            // База «змінилась»: обіцяно 150, а друга сторінка порожня.
+            // The database "changed": 150 were promised, but the second page is empty.
             return offset == 0 ? SearchPage(results: Array(repeating: SearchResult(
                 verse: Verse(translation: translation, book: 1, chapter: 1, verse: 1, text: "x"), segments: []), count: 100), total: 150) : .empty
         }
@@ -286,7 +286,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         #expect(model.currentBookScope == .book(1))
         model.open(Location(book: 43, chapter: 1))
         #expect(model.currentBookScope == .book(43))
-        // Обрана книга лишається в панелі, навіть коли відкрили іншу.
+        // The chosen book stays in the panel even when another one is opened.
         model.searchScope = .book(43)
         model.open(Location(book: 1, chapter: 1))
         #expect(model.currentBookScope == .book(43))
@@ -303,7 +303,7 @@ final class FakeRepository: BibleRepository, @unchecked Sendable {
         model.query = "boom later"
         model.submitSearch()
         model.loadMore()
-        // Помилка сторінки не ховає вже знайдене.
+        // A page error does not hide what was already found.
         #expect(model.pageError != nil)
         #expect(model.searchError == nil)
         #expect(model.results?.count == 1)
@@ -341,7 +341,7 @@ extension ReaderViewModelTests {
         model.query = "Ин 3:16"
         model.submitSearch()
         #expect(model.takeFocus() == 16)
-        // Повторне відображення розділу (напр. після очищення пошуку) не забирає фокус знову.
+        // Redisplaying the chapter (e.g. after clearing search) does not take the focus again.
         #expect(model.takeFocus() == nil)
         model.submitSearch()
         #expect(model.takeFocus() == 16)

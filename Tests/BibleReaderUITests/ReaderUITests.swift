@@ -2,8 +2,8 @@ import AppKit
 import Carbon.HIToolbox
 import XCTest
 
-/// UI-докази для прив'язки SwiftUI: реальний додаток і реальна база з бандла.
-/// Текст вводимо вставкою, а ⌘C — фізичною клавішею C, щоб тести не залежали від розкладки.
+/// UI evidence for the SwiftUI wiring: the real app and the real database from the bundle.
+/// Text is entered by pasting, and ⌘C with the physical C key, so tests do not depend on the layout.
 @MainActor
 final class ReaderUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -11,7 +11,7 @@ final class ReaderUITests: XCTestCase {
     override func setUp() async throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        // Без відновлення вікон попереднього запуску: інакше вікно інколи не відкривається.
+        // No restoring windows from the previous launch: otherwise the window sometimes does not open.
         app.launchArguments = ["-ApplePersistenceIgnoreState", "YES"]
     }
 
@@ -19,7 +19,7 @@ final class ReaderUITests: XCTestCase {
         app.terminate()
     }
 
-    /// Свій профіль користувача на кожен тест: закладки й останнє місце не перетікають між тестами.
+    /// A separate user profile per test: bookmarks and the last position do not leak between tests.
     private lazy var profile = UUID().uuidString
 
     private func launch(environment: [String: String] = [:]) {
@@ -63,7 +63,7 @@ final class ReaderUITests: XCTestCase {
         return nil
     }
 
-    /// Символ, який фізична клавіша C дає в поточній розкладці («c» в англійській, «с» у російській).
+    /// The character the physical C key gives in the current layout ("c" in English, "с" in Russian).
     private func physicalCKey() -> String {
         guard let source = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue(),
               let data = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
@@ -85,7 +85,7 @@ final class ReaderUITests: XCTestCase {
         search("John 3:16")
         expectTitle("John 3")
         expectSelected(16)
-        // Той самий номер вірша в іншій книзі теж отримує фокус (retrofit R1).
+        // The same verse number in another book also gets focus (retrofit R1).
         search("Rom 3:16")
         expectTitle("Romans 3")
         expectSelected(16)
@@ -96,7 +96,7 @@ final class ReaderUITests: XCTestCase {
         launch()
         search("John 3:16")
         expectSelected(16)
-        // Фокус переходить у список асинхронно; ⌘C має йти вже туди, а не в поле пошуку.
+        // Focus moves to the list asynchronously; ⌘C must already go there, not to the search field.
         let focusLeftField = NSPredicate(format: "hasKeyboardFocus == false")
         wait(for: [expectation(for: focusLeftField, evaluatedWith: app.searchFields.firstMatch)], timeout: 5)
         NSPasteboard.general.clearContents()
@@ -160,8 +160,8 @@ final class ReaderUITests: XCTestCase {
         let restored = NSPredicate(format: "label == 'Копіювати цитату'")
         wait(for: [expectation(for: restored, evaluatedWith: button)], timeout: 4)
 
-        // Кілька віршів: кнопка над першим, копіює весь діапазон.
-        // Діапазон з клавіатури: рядок 18 буває під нижнім краєм вікна, і клік по ньому губиться.
+        // Several verses: the button above the first, copies the whole range.
+        // A range from the keyboard: row 18 is sometimes below the window's bottom edge, and a click on it gets lost.
         verseRow(16).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
         expectSelected(16)
         app.typeKey(.downArrow, modifierFlags: .shift)
@@ -173,7 +173,7 @@ final class ReaderUITests: XCTestCase {
         visible.click()
         let range = pasteboardText()
         XCTAssertTrue(range?.hasSuffix("»\n(John 3:16-18)") == true, range ?? "буфер порожній")
-        // Номер перед кожним віршем, кожен з нового рядка.
+        // A number before each verse, each on a new line.
         XCTAssertTrue(range?.hasPrefix("«16 For God so loved") == true, range ?? "буфер порожній")
         XCTAssertTrue(range?.contains("\n17 For God sent not") == true, range ?? "буфер порожній")
         XCTAssertTrue(range?.contains("\n18 He that believeth") == true, range ?? "буфер порожній")
@@ -187,7 +187,7 @@ final class ReaderUITests: XCTestCase {
     // @trace FR-29
     func testUkrainianAndCzechTranslations() {
         launch()
-        // Тип елемента меню в тулбарі різниться між версіями macOS, тож шукаємо за ідентифікатором.
+        // The toolbar menu element type differs between macOS versions, so we search by identifier.
         XCTAssertTrue(app.descendants(matching: .any)["translation"].firstMatch.waitForExistence(timeout: 5))
         app.menuBars.menuBarItems["Переклад"].click()
         app.menuBars.menuItems["Огієнко — українська"].click()
@@ -196,7 +196,7 @@ final class ReaderUITests: XCTestCase {
         XCTAssertTrue(firstVerse.waitForExistence(timeout: 5))
         wait(for: [expectation(for: NSPredicate(format: "label CONTAINS 'На початку Бог створив'"), evaluatedWith: firstVerse)], timeout: 5)
 
-        // ⌘⌥2 — Kralická (порядок: KJV, Kralická, Огієнко, Синодальний); посилання чеською.
+        // ⌘⌥2 is Kralická (order: KJV, Kralická, Ohienko, Synodal); the reference is in Czech.
         app.typeKey("2", modifierFlags: [.command, .option])
         search("J 3:16")
         expectTitle("Jan 3")
@@ -228,7 +228,7 @@ final class ReaderUITests: XCTestCase {
     func testSearchScopeCountAndPhrase() {
         launch()
         search("loveth")
-        // Морфологія: «loveth» знаходить і «love», і «loved» — набагато більше 100 віршів.
+        // Morphology: "loveth" finds both "love" and "loved": far more than 100 verses.
         guard let all = waitForCount({ $0 > 300 }) else { return }
         XCTAssertTrue(app.buttons.matching(identifier: "search-result").firstMatch.waitForExistence(timeout: 5))
         let scope = app.descendants(matching: .any)["search-scope"].firstMatch
@@ -253,7 +253,7 @@ final class ReaderUITests: XCTestCase {
         app.menuItems["paste:"].click()
     }
 
-    /// Позначки вірша (підсвітка, закладка, нотатка) VoiceOver читає в кінці мітки рядка.
+    /// VoiceOver reads the verse marks (highlight, bookmark, note) at the end of the row label.
     private func expectMarks(_ verse: Int, contain text: String, file: StaticString = #filePath, line: UInt = #line) {
         let element = app.descendants(matching: .any)["verse-\(verse)"].firstMatch
         XCTAssertTrue(element.waitForExistence(timeout: 5), file: file, line: line)
@@ -273,7 +273,7 @@ final class ReaderUITests: XCTestCase {
         let row = verseRow(16)
         XCTAssertTrue(row.waitForExistence(timeout: 5))
 
-        // Координата, а не елемент: рядок під кнопкою копіювання XCUI вважає «not hittable».
+        // A coordinate, not the element: XCUI considers the row under the copy button "not hittable".
         row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).rightClick()
         XCTAssertTrue(app.menuItems["Підсвітити"].waitForExistence(timeout: 5))
         app.menuItems["Підсвітити"].hover()
@@ -291,7 +291,7 @@ final class ReaderUITests: XCTestCase {
         app.buttons["note-save"].click()
         expectMarks(16, contain: "є нотатка")
 
-        // ⌘D — закладка на розділ; обидві закладки в бічній панелі.
+        // ⌘D is a chapter bookmark; both bookmarks are in the sidebar.
         app.buttons.matching(identifier: "bookmark-chapter").firstMatch.click()
         let rows = app.buttons.matching(identifier: "bookmark-row")
         XCTAssertTrue(rows.element(boundBy: 1).waitForExistence(timeout: 5), "дві закладки в бічній панелі")
@@ -301,14 +301,14 @@ final class ReaderUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
 
-        // Перезапуск з тим самим профілем: те саме місце, позначки й нотатка на місці.
+        // A restart with the same profile: the same position, marks and note in place.
         app.terminate()
         launch()
         expectTitle("John 3")
         expectMarks(16, contain: "є нотатка")
         expectMarks(16, contain: "жовтий")
 
-        // Пошук знаходить нотатку; клік відкриває вірш.
+        // Search finds the note; a click opens the verse.
         search("Genesis 1")
         expectTitle("Genesis 1")
         search("центральний")
@@ -325,7 +325,7 @@ final class ReaderUITests: XCTestCase {
         expectTitle("Genesis 1")
         XCTAssertFalse(app.popUpButtons["Розділ"].exists, "вибору розділу в тулбарі більше немає")
         #if compiler(>=6.2)
-        // Поле пошуку по центру тулбара, а не праворуч (лише з SDK, де є .toolbarPrincipal).
+        // The search field in the toolbar center, not on the right (only with an SDK that has .toolbarPrincipal).
         let field = app.searchFields.firstMatch
         let window = app.windows.firstMatch.frame
         XCTAssertEqual(field.frame.midX, window.midX, accuracy: window.width * 0.15, "пошук по центру")
@@ -333,23 +333,23 @@ final class ReaderUITests: XCTestCase {
         let picker = app.descendants(matching: .any)["chapter-picker"].firstMatch
         app.descendants(matching: .any)["book-8"].firstMatch.click()
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
-        // Текст поточного розділу лишається під вікном.
+        // The current chapter's text stays under the window.
         expectTitle("Genesis 1")
         XCTAssertTrue(verseRow(1).exists)
         app.buttons["chapter-4"].click()
         expectTitle("Ruth 4")
         XCTAssertFalse(picker.exists)
-        // Esc закриває вікно без переходу; поточний розділ позначено.
+        // Esc closes the window without navigating; the current chapter is marked.
         app.descendants(matching: .any)["book-8"].firstMatch.click()
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
         XCTAssertEqual(app.buttons["chapter-4"].label, "Розділ 4, поточний")
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
         expectTitle("Ruth 4")
-        // Клавіатура (NFR-4): курсор стоїть на поточному розділі, ← і Return відкривають попередній.
+        // Keyboard (NFR-4): the cursor is on the current chapter, ← and Return open the previous one.
         app.descendants(matching: .any)["book-8"].firstMatch.click()
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
-        // Курсор з'являється, коли сітка отримала фокус.
+        // The cursor appears when the grid gets focus.
         let grid = app.descendants(matching: .any).matching(NSPredicate(format: "hasKeyboardFocus == true")).firstMatch
         XCTAssertTrue(grid.waitForExistence(timeout: 5))
         app.typeKey(.leftArrow, modifierFlags: [])
@@ -358,9 +358,9 @@ final class ReaderUITests: XCTestCase {
         XCTAssertTrue(picker.waitForNonExistence(timeout: 5))
     }
 
-    /// Знімок вікна для огляду (QA_SHOTS_DIR); без змінної — лише вкладення до результату тесту.
+    /// A window screenshot for review (QA_SHOTS_DIR); without the variable, only an attachment to the test result.
     private func shot(_ name: String) {
-        let screenshot = XCUIScreen.main.screenshot()  // увесь екран: popover виходить за межі вікна
+        let screenshot = XCUIScreen.main.screenshot()  // the whole screen: the popover goes beyond the window
         let attachment = XCTAttachment(screenshot: screenshot)
         attachment.name = name
         attachment.lifetime = .keepAlways
@@ -374,7 +374,7 @@ final class ReaderUITests: XCTestCase {
     func testPsalmsPickerAndTitleDropdown() {
         launch()
         expectTitle("Genesis 1")
-        // Найбільша книга: 150 розділів у вікні збоку від «Psalms», прокрутка всередині.
+        // The largest book: 150 chapters in the window beside "Psalms", scrolling inside.
         let picker = app.descendants(matching: .any)["chapter-picker"].firstMatch
         app.descendants(matching: .any)["book-19"].firstMatch.click()
         XCTAssertTrue(picker.waitForExistence(timeout: 5))
@@ -382,7 +382,7 @@ final class ReaderUITests: XCTestCase {
         XCTAssertGreaterThan(picker.frame.minX, book.frame.minX, "вікно праворуч від книги")
         XCTAssertTrue(app.buttons["chapter-1"].exists)
         shot("psalms-sidebar")
-        // Граничне значення: вікно не виходить за екран; якщо екран дозволяє, 150-й видно без прокрутки.
+        // The boundary value: the window does not go off screen; if the screen allows, the 150th is visible without scrolling.
         let screen = NSScreen.main?.frame.height ?? 0
         XCTAssertLessThanOrEqual(picker.frame.maxY, screen, "вікно в межах екрана")
         let last = app.buttons["chapter-150"]
@@ -391,7 +391,7 @@ final class ReaderUITests: XCTestCase {
         shot("psalms-sidebar-scrolled")
         last.click()
         expectTitle("Psalms 150")
-        // Назва розділу в тулбарі — випадайка донизу з розділами відкритої книги.
+        // The chapter title in the toolbar is a dropdown with the open book's chapters.
         let title = app.descendants(matching: .any)["chapter-title"].firstMatch
         XCTAssertTrue(title.waitForExistence(timeout: 5))
         title.click()
@@ -402,7 +402,7 @@ final class ReaderUITests: XCTestCase {
         let standard = app.buttons["chapter-23"].frame.width
         app.buttons["chapter-23"].click()
         expectTitle("Psalms 23")
-        // Шрифт віршів (⌘+) збільшує й номери розділів у вікні.
+        // The verse font (⌘+) also enlarges chapter numbers in the window.
         for _ in 0..<4 {
             app.menuBars.menuBarItems["View"].click()
             app.menuBars.menuItems["Збільшити шрифт"].click()
@@ -415,7 +415,7 @@ final class ReaderUITests: XCTestCase {
 }
 
 private extension XCUIElement {
-    /// Прокрутка вниз, поки кнопка не стане видимою в сітці розділів.
+    /// Scroll down until the button becomes visible in the chapter grid.
     func scrollToVisible() {
         var tries = 0
         while !isHittable, tries < 20 {

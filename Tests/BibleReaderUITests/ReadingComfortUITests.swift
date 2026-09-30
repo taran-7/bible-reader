@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import XCTest
 
-/// UI-докази для масштабу шрифтів (FR-15): реальне меню, реальні `UserDefaults`.
+/// UI evidence for font scale (FR-15): the real menu, the real `UserDefaults`.
 @MainActor
 final class ReadingComfortUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -10,7 +10,7 @@ final class ReadingComfortUITests: XCTestCase {
     override func setUp() async throws {
         continueAfterFailure = false
         app = XCUIApplication()
-        // Свій профіль користувача: останнє місце попереднього тесту не впливає на цей.
+        // A separate user profile: the previous test's last position does not affect this one.
         app.launchEnvironment = ["BIBLE_READER_PROFILE": UUID().uuidString]
     }
 
@@ -40,7 +40,7 @@ final class ReadingComfortUITests: XCTestCase {
         XCTAssertTrue(predicate(firstVerse.frame.height), "\(message): \(firstVerse.frame.height)")
     }
 
-    /// Символ фізичної клавіші в поточній розкладці, щоб тест не залежав від неї.
+    /// The physical key's character in the current layout, so the test does not depend on it.
     private func physicalKey(_ keyCode: Int, fallback: String) -> String {
         guard let source = TISCopyCurrentKeyboardLayoutInputSource()?.takeRetainedValue(),
               let data = TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)
@@ -67,7 +67,7 @@ final class ReadingComfortUITests: XCTestCase {
         let plus = physicalKey(kVK_ANSI_Equal, fallback: "=")
         for _ in 0..<5 { app.typeKey(plus, modifierFlags: .command) }
         waitForHeight({ $0 > standard + 3 }, "⌘+ збільшує рядок")
-        // Назви книг ростуть разом із текстом віршів.
+        // Book names grow together with verse text.
         XCTAssertGreaterThan(book.frame.height, bookStandard + 3, "⌘+ збільшує назву книги")
         let enlarged = firstVerse.frame.height
 
@@ -109,7 +109,7 @@ final class ReadingComfortUITests: XCTestCase {
         while Date() < deadline, result.frame.height < standard * 1.1 {
             RunLoop.current.run(until: Date().addingTimeInterval(0.1))
         }
-        // Рядок має фіксовані відступи, тож росте повільніше за шрифт (×1,4 дає ~×1,16).
+        // The row has fixed paddings, so it grows slower than the font (×1.4 gives ~×1.16).
         XCTAssertGreaterThanOrEqual(result.frame.height, standard * 1.1, "стандарт \(standard)")
     }
 }

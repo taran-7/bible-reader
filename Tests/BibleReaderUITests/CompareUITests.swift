@@ -1,7 +1,7 @@
 import AppKit
 import XCTest
 
-/// FR-36: «Порівняти» — режим у головному вікні; вибір перекладів переживає перезапуск.
+/// FR-36: "Compare" is a mode in the main window; the translation choice survives a restart.
 @MainActor
 final class CompareUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -34,7 +34,7 @@ final class CompareUITests: XCTestCase {
         field.typeKey(.return, modifierFlags: [])
     }
 
-    /// «Порівняти» на виділеному вірші → вибір перекладів → режим у головному вікні.
+    /// "Compare" on a selected verse → translation picker → the mode in the main window.
     private func openCompare(_ reference: String) -> XCUIElement {
         search(reference)
         guard let button = app.visibleButton("compare-button") else {
@@ -51,7 +51,7 @@ final class CompareUITests: XCTestCase {
     func testCompareModeInMainWindowRemembersTranslations() {
         launch(reset: true)
         let window = openCompare("John 3:16")
-        // Переклад на екрані не пропонується: він завжди перша колонка.
+        // The on-screen translation is not offered: it is always the first column.
         XCTAssertFalse(app.checkBoxes["compare-choice-kjv"].exists)
         app.checkBoxes["compare-choice-bkr"].click()
         app.buttons["compare-start"].click()
@@ -62,7 +62,7 @@ final class CompareUITests: XCTestCase {
             XCTAssertTrue(mode.descendants(matching: .any)["compare-column-\(code)"].exists, code)
         }
         XCTAssertFalse(mode.descendants(matching: .any)["compare-column-bkr"].exists)
-        // Увесь розділ: є і сусідні вірші, а виділений підсвічено.
+        // The whole chapter: neighboring verses are there too, and the selected one is highlighted.
         XCTAssertTrue(mode.descendants(matching: .any)["compare-row-15"].exists)
         XCTAssertTrue(mode.descendants(matching: .any)["compare-row-16-selected"].exists)
         XCTAssertFalse(mode.descendants(matching: .any)["compare-row-15-selected"].exists)
@@ -71,11 +71,11 @@ final class CompareUITests: XCTestCase {
         attachment.lifetime = .keepAlways
         add(attachment)
 
-        // Esc — назад до читання.
+        // Esc goes back to reading.
         window.typeKey(.escape, modifierFlags: [])
         XCTAssertTrue(mode.waitForNonExistence(timeout: 5))
 
-        // Вибір запам'ятовується.
+        // The choice is remembered.
         app.terminate()
         launch(reset: false)
         _ = openCompare("Ps 23:1")
@@ -88,11 +88,11 @@ final class CompareUITests: XCTestCase {
         launch(reset: true)
         search("John 3:16")
         XCTAssertNotNil(app.visibleButton("compare-button"), "виділення після переходу")
-        // Пункт меню з клавішею Esc. Саму клавішу на CI може перехопити поле пошуку в тулбарі старішого SDK
-        // (там воно не по центру), тож тест натискає пункт, а Esc перевірено вручну.
+        // A menu item with the Esc key. On CI the key itself may be intercepted by the toolbar search field of the older SDK
+        // (it is not centered there), so the test presses the item, and Esc was checked manually.
         let item = app.menuItems["Зняти виділення"]
         XCTAssertTrue(item.waitForExistence(timeout: 5))
-        // Меню «Правка» / «Edit» — залежно від мови системи.
+        // The «Правка» / "Edit" menu, depending on the system language.
         for name in ["Правка", "Edit"] where app.menuBarItems[name].exists {
             app.menuBarItems[name].click()
             break

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import BibleCore
 
-/// Підставна модель: відповіді за чергою, запити записуються.
+/// A stub model: answers in a queue, requests are recorded.
 final class FakeCurator: IllustrationCurator, @unchecked Sendable {
     let name = "Fake"
     var answers: [Result<String, Error>]
@@ -16,7 +16,7 @@ final class FakeCurator: IllustrationCurator, @unchecked Sendable {
         return try answers.removeFirst().get()
     }
 
-    /// Оцінки для кандидатів 1…count: `score(id)`.
+    /// Scores for candidates 1…count: `score(id)`.
     static func ranking(_ count: Int, score: (Int) -> Int) -> String {
         #"{"results":["# + (1...count).map { #"{"id":\#($0),"score":\#(score($0)),"reason":"Причина \#($0)"}"# }
             .joined(separator: ",") + "]}"
@@ -48,7 +48,7 @@ final class FakeCurator: IllustrationCurator, @unchecked Sendable {
         let verdicts = CuratorPrompts.verdicts(from: #"{"results":[{"id":1,"score":12,"reason":" Так "},{"id":2,"score":-1},{"id":9,"score":7}]}"#, count: 2)
         #expect(verdicts == [0: CuratorVerdict(score: 10, reason: "Так"), 1: CuratorVerdict(score: 0, reason: "")])
         #expect(CuratorPrompts.verdicts(from: "}{", count: 2) == nil)
-        // Дробова оцінка, нумерація з нуля, задовге пояснення.
+        // A fractional score, zero-based numbering, a too long explanation.
         let zero = CuratorPrompts.verdicts(from: #"{"results":[{"id":0,"score":8.6,"reason":"\#(String(repeating: "я", count: 400))"},{"id":1,"score":6.4}]}"#, count: 2)
         #expect(zero?[0]?.score == 9 && zero?[0]?.reason.count == 300 && zero?[1]?.score == 6)
     }
@@ -85,19 +85,19 @@ final class FakeCurator: IllustrationCurator, @unchecked Sendable {
     // @trace FR-41
     @Test func testModelQueriesFirstThenRankedBestFirst() async throws {
         let http = F.http(stories: 25)
-        // Історії 1–21: парні отримують 8, кратні трьом — 9, решта нижче порогу.
+        // Stories 1–21: even ones get 8, multiples of three 9, the rest below the threshold.
         let curator = FakeCurator([.success(#"{"theme":"love","queries":["loving enemies story"]}"#),
                                    .success(FakeCurator.ranking(21) { $0 % 3 == 0 ? 9 : $0 % 2 == 0 ? 8 : 3 })])
         let search = search(http, curator)
         let first = try await search.next()
-        // Перший запит пошуку — від моделі.
+        // The first search query comes from the model.
         #expect(http.requests.first?.query["search"] == "loving enemies story")
         #expect(first.map(\.title).prefix(3) == ["Story 3 – forgiveness", "Story 6 – forgiveness", "Story 9 – forgiveness"])
         #expect(first.count == 7 && first.allSatisfy { $0.reason?.hasPrefix("Причина") == true })
         #expect(await search.curatorName == "Fake")
-        // Модель бачила текст вірша і список кандидатів.
+        // The model saw the verse text and the candidate list.
         #expect(curator.prompts.count == 2 && curator.prompts[1].contains("<story id=\"21\">\nStory 21"))
-        // «Отримати ще»: решта відібраних без нових запитів до моделі.
+        // "Get more": the rest of the curated ones without new model requests.
         let second = try await search.next()
         #expect(second.count == 7 && curator.prompts.count == 2)
     }
@@ -133,14 +133,14 @@ final class FakeCurator: IllustrationCurator, @unchecked Sendable {
         #expect(try await none.next().isEmpty)
         #expect(await !none.hasMore)
 
-        // Перша партія відібрана (8 з 21), далі модель відмовила.
+        // The first batch is curated (8 of 21), then the model fails.
         let http = F.http(stories: 30)
         let curator = FakeCurator([.success("{}"), .success(FakeCurator.ranking(21) { $0 <= 8 ? 7 : 1 }),
                                    .failure(IllustrationError.failed("x"))])
         let flaky = search(http, curator)
         #expect(try await flaky.next().count == 7)
         let second = try await flaky.next()
-        // Модель відмовила, добираючи наступних кандидатів: лишок відібраного показується, далі — без неї.
+        // The model fails while scoring the next candidates: the curated remainder is shown, then without it.
         #expect(second.map(\.title) == ["Story 8 – forgiveness"])
         #expect(await flaky.curatorProblem == "Fake: x")
         let third = try await flaky.next()
@@ -149,7 +149,7 @@ final class FakeCurator: IllustrationCurator, @unchecked Sendable {
 
     // @trace FR-41
     @Test func testAtMostTwoJudgementsPerBatch() async throws {
-        // Модель усе відкидає: за одне «Отримати ще» — не більше двох оцінок, далі пошук чекає наступного кліку.
+        // The model rejects everything: at most two scorings per "Get more", then search waits for the next click.
         let http = F.http(stories: 60)
         let curator = FakeCurator([.success("{}")] + Array(repeating: .success(FakeCurator.ranking(21) { _ in 1 }), count: 5))
         let search = search(http, curator)

@@ -2,10 +2,10 @@ import Foundation
 import Testing
 @testable import BibleCore
 
-/// Мережа з фікстур: відповідь за хостом і шляхом; журнал запитів — щоб перевірити, куди ходили.
+/// A network from fixtures: a response by host and path; a request log to check where requests went.
 final class FakeIllustrationHTTP: IllustrationHTTP, @unchecked Sendable {
     var responses: [String: (Int, String)] = [:]
-    /// Дописи WordPress за номером: `/wp-json/wp/v2/posts?include=…` збирає з них відповідь.
+    /// WordPress posts by id: `/wp-json/wp/v2/posts?include=…` builds the response from them.
     var posts: [Int: String] = [:]
     var postsStatus = 200
     var error: IllustrationError?
@@ -24,7 +24,7 @@ final class FakeIllustrationHTTP: IllustrationHTTP, @unchecked Sendable {
         return (status, Data(body.utf8))
     }
 
-    /// POST до API моделі: запит записується, відповідь — з `responses["host/path"]`.
+    /// POST to the model API: the request is recorded, the response comes from `responses["host/path"]`.
     private(set) var postRequests: [(host: String, path: String, headers: [String: String], body: Data)] = []
 
     func post(host: String, path: String, headers: [String: String], body: Data) async throws -> (status: Int, body: Data) {
@@ -55,7 +55,7 @@ enum IllustrationFixtures {
         "But I say unto you, Love your enemies, bless them that curse you, do good to them that hate you, and pray for them which despitefully use you, and persecute you;",
     ])
 
-    /// Сайт з `count` історіями на сторінках по 10.
+    /// A site with `count` stories on pages of 10.
     static func http(stories count: Int) -> FakeIllustrationHTTP {
         let http = FakeIllustrationHTTP()
         for page in 1...max(1, (count + 9) / 10) {
@@ -90,7 +90,7 @@ enum IllustrationFixtures {
         #expect(first[0].text == "Hudson Taylor forgave the robbers in Ningbo, 1857.\n\nSecond & last.")
         #expect(first[0].date == "2020-04-16")
         #expect(await search.hasMore)
-        // «Отримати ще»: решта 5 без повторів.
+        // "Get more": the remaining 5 without repeats.
         let second = try await search.next()
         #expect(second.map(\.title) == (8...12).map { "Story \($0) – forgiveness" })
         #expect(Set(first.map(\.id)).isDisjoint(with: second.map(\.id)))
@@ -140,7 +140,7 @@ extension IllustrationTests {
         #expect(!sources.isAllowed("https://www.catholic.com/a"))
         #expect(!sources.isAllowed("example.org/a"))
         #expect(!sources.isAllowed("https:///a"))
-        // userinfo: браузер відкрив би evil.example, а не довірений хост (security review).
+        // userinfo: the browser would open evil.example, not the trusted host (security review).
         #expect(!sources.isAllowed("https://example.org:x@evil.example/phish"))
         #expect(!sources.isAllowed("https://example.org@evil.example/phish"))
         #expect(!sources.isAllowed("https://evil.example\\@example.org/"))
@@ -158,7 +158,7 @@ extension IllustrationTests {
     // @trace FR-34
     @Test func testStoryOutsideAllowlistIsDropped() async throws {
         let http = F.http(stories: 2)
-        // Допис посилається на чужий домен — історію відкинуто.
+        // The post links to a foreign domain, so the story is dropped.
         http.posts[2] = F.wpPost(2).replacingOccurrences(of: "www.example.org", with: "www.catholic.com")
         let search = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
         #expect(try await search.next().map(\.title) == ["Story 1 – forgiveness"])
@@ -173,17 +173,17 @@ extension IllustrationTests {
 
     // @trace FR-33
     @Test func testOneFailingSourceDoesNotStopOthers() async throws {
-        // Сайт обмежив частоту (403) на текстах — Вікіпедія все одно дає історії; помилки не показуємо.
+        // The site rate-limited (403) the texts, Wikipedia still gives stories; no error is shown.
         let http = F.http(stories: 3)
         http.postsStatus = 403
         http.responses["en.wikipedia.org/w/api.php"] = (200, Self.wikipedia)
         let search = IllustrationSearch(request: F.request, sources: F.sources,
                                         providers: IllustrationSearch.providers(sources: F.sources, braveKey: nil), http: http)
         #expect(try await search.next().map(\.title) == ["General Butt Naked"])
-        // Лише зламане джерело — помилка з поясненням.
+        // Only a broken source: an error with an explanation.
         let alone = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
         await #expect(throws: IllustrationError.failed("www.example.org: HTTP 403")) { try await alone.next() }
-        // Зіпсована відповідь (не JSON) — теж помилка джерела, а не падіння.
+        // A corrupted response (not JSON) is also a source error, not a crash.
         http.responses["www.example.org/wp-json/wp/v2/search#1"] = (200, "<html>")
         let garbled = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
         await #expect(throws: (any Error).self) { try await garbled.next() }
@@ -251,7 +251,7 @@ extension IllustrationTests {
         let with = IllustrationSearch.providers(sources: F.sources, braveKey: "k")
         let brave = try? #require(with.last as? BraveAdapter)
         #expect(brave?.sites == ["example.org"])  // Вікіпедію Brave не шукає
-        // 12 сайтів — три запити по ≤5 `site:`: ліміт Brave 400 знаків / 50 слів.
+        // 12 sites: three queries of ≤5 `site:`: Brave's limit is 400 characters / 50 words.
         let many = IllustrationSources(allow: (1...12).map { "s\($0).org" }, block: [], wordpress: [])
         let groups = IllustrationSearch.providers(sources: many, braveKey: "k").compactMap { ($0 as? BraveAdapter)?.sites.count }
         #expect(groups == [5, 5, 2])
@@ -261,7 +261,7 @@ extension IllustrationTests {
 extension IllustrationTests {
     // @trace FR-33
     @Test func testExcerptCutsLongTextAtParagraph() {
-        let paragraph = String(repeating: "word ", count: 180)  // ~900 символів
+        let paragraph = String(repeating: "word ", count: 180)  // ~900 characters
         let (text, truncated) = IllustrationExcerpt.cut(paragraph + "\n\n" + paragraph + "\n\n" + paragraph)
         #expect(truncated && text.hasSuffix(" …") && text.count <= IllustrationExcerpt.limit + 2)
         #expect(IllustrationExcerpt.cut("short").truncated == false)
@@ -281,7 +281,7 @@ extension IllustrationTests {
     @Test func testCopyTextCarriesSource() {
         let story = Illustration(title: "T", text: "Body", source: "https://www.imb.org/x", siteName: "IMB")
         #expect(story.copyText == "T\n\nBody\n\nДжерело: IMB, https://www.imb.org/x")
-        // Перекладена картка копіюється перекладом, джерело лишається англомовним посиланням.
+        // A translated card is copied as the translation, the source stays an English link.
         #expect(story.copyText(title: "Т", text: "Текст") == "Т\n\nТекст\n\nДжерело: IMB, https://www.imb.org/x")
     }
 }
@@ -295,7 +295,7 @@ extension IllustrationTests {
         #expect(model.illustrations?.reference == "Genesis 1:1")
         model.showIllustrations(for: [2, 3])
         #expect(model.illustrations?.reference == "Genesis 1:2-3")
-        model.showIllustrations(for: [])  // нема що шукати — панель лишається
+        model.showIllustrations(for: [])  // nothing to search, the panel stays
         #expect(model.illustrations?.reference == "Genesis 1:2-3")
         model.closeIllustrations()
         #expect(model.illustrations == nil)
@@ -321,7 +321,7 @@ extension IllustrationTests {
     // @trace FR-34
     @Test func testWikipediaSparsePagesAndFullPage() async throws {
         let http = FakeIllustrationHTTP()
-        // Без index і без категорій — не біографія; повна сторінка (10) — є наступна.
+        // Without index and without categories it is not a biography; a full page (10) means there is a next one.
         let pages = (1...10).map { #"{"title":"P\#($0)","extract":"x","fullurl":"https://en.wikipedia.org/wiki/P\#($0)"}"# }
         http.responses["en.wikipedia.org/w/api.php"] = (200, #"{"query":{"pages":["# + pages.joined(separator: ",") + "]}}")
         let page = try await WikipediaAdapter().page("x", page: 2, http: http)
@@ -360,7 +360,7 @@ extension IllustrationTests {
         http.posts[3] =
             #"{"id":3,"title":{"rendered":"Love your enemies"},"content":{"rendered":"<p>They chose to love their enemies.</p>"},"link":"https://www.example.org/story-3/"}"#
         let search = IllustrationSearch(request: F.request, sources: F.sources, providers: [WordPressAdapter(site: F.sources.wordpress[0])], http: http)
-        // Ключові слова в заголовку важать удвічі; без збігів — в кінці, у порядку сайту.
+        // Keywords in the title count double; no matches go last, in site order.
         #expect(try await search.next().map(\.title) == ["Love your enemies", "Story 2 – forgiveness", "Story 1 – forgiveness"])
     }
 
@@ -373,7 +373,7 @@ extension IllustrationTests {
          {"title":"Gone","url":"https://www.example.org/g","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/8"}]}},
          {"title":"Empty","url":"https://www.example.org/e","subtype":"post","_links":{"self":[{"href":"https://www.example.org/wp-json/wp/v2/posts/9"}]}}]
         """#)
-        // Допису 8 сайт не віддав, 9 — порожній.
+        // The site did not return post 8, post 9 is empty.
         http.posts[9] = #"{"id":9,"title":{"rendered":"E"},"content":{"rendered":"<p> </p>"},"link":"https://www.example.org/e"}"#
         let adapter = WordPressAdapter(site: F.sources.wordpress[0])
         let page = try await adapter.page("x", page: 1, http: http)

@@ -1,8 +1,8 @@
 import XCTest
 
 extension XCUIApplication {
-    /// Видима кнопка з ідентифікатором. Після зміни виділення SwiftUI якийсь час лишає в дереві
-    /// стару копію кнопки з рамкою 0×0, і `firstMatch` інколи повертає саме її.
+    /// A visible button with an identifier. After a selection change SwiftUI keeps an old copy of the button
+    /// with a 0×0 frame in the tree for a while, and `firstMatch` sometimes returns exactly that one.
     func visibleButton(_ identifier: String, timeout: TimeInterval = 5) -> XCUIElement? {
         let buttons = self.buttons.matching(identifier: identifier)
         let deadline = Date().addingTimeInterval(timeout)

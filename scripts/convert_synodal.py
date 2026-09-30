@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Конвертує RusSynodal.json (scrollmapper/bible_databases) у формат thiagobodruk.
+"""Converts RusSynodal.json (scrollmapper/bible_databases) into the thiagobodruk format.
 
-Бере 66 канонічних книг у протестантському порядку, відкидає неканонічні
-книги і порожні вірші. Використання:
+Takes the 66 canonical books in Protestant order, drops non-canonical
+books and empty verses. Usage:
     python3 scripts/convert_synodal.py RusSynodal.json data/raw/ru_synodal.json
 """
 import json
@@ -24,17 +24,17 @@ CANON = [
 
 
 def verses_of(book, chapter):
-    """Тексти віршів розділу; порожні дозволені лише в кінці.
+    """Verse texts of a chapter; empty ones are allowed only at the end.
 
-    Імпорт нумерує вірші за позицією, тож порожній вірш посередині зсунув би номери.
+    The import numbers verses by position, so an empty verse in the middle would shift the numbers.
     """
     texts = [v["text"].strip() for v in chapter["verses"]]
     if [v["verse"] for v in chapter["verses"]] != list(range(1, len(texts) + 1)):
-        sys.exit(f"{book} {chapter['chapter']}: номери віршів не 1..N")
+        sys.exit(f"{book} {chapter['chapter']}: verse numbers are not 1..N")
     while texts and not texts[-1]:
         texts.pop()
     if not all(texts):
-        sys.exit(f"{book} {chapter['chapter']}: порожній вірш посередині розділу")
+        sys.exit(f"{book} {chapter['chapter']}: an empty verse in the middle of a chapter")
     return texts
 
 

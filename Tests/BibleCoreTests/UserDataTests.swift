@@ -18,7 +18,7 @@ import Testing
         #expect(data.isBookmarked(Bookmark.Target(book: 43, chapter: 3, verse: 16)))
         #expect(data.isBookmarked(Bookmark.Target(book: 1, chapter: 1, verse: nil)))
         #expect(!data.isBookmarked(Bookmark.Target(book: 1, chapter: 1, verse: 1)))
-        // Список у порядку книг.
+        // The list is in book order.
         #expect(data.bookmarks.map(\.target) == [
             Bookmark.Target(book: 1, chapter: 1, verse: nil), Bookmark.Target(book: 43, chapter: 3, verse: 16),
         ])
@@ -48,7 +48,7 @@ import Testing
         #expect(data.searchNotes("створення").map(\.key) == [VerseKey(book: 1, chapter: 1, verse: 1)])
         #expect(data.searchNotes("вірш").map(\.key) == [john316])
         #expect(data.searchNotes("  ").isEmpty)
-        // Порожній текст видаляє нотатку.
+        // Empty text deletes the note.
         data.setNote("  \n", for: john316)
         #expect(data.note(for: john316) == nil)
         #expect(data.notes.count == 1)
@@ -142,7 +142,7 @@ import Testing
         let model = ReaderViewModel(positionStore: storage) { FakeRepository() }
         #expect(model.location == Location(book: 1, chapter: 1))
         storage.set(Data(#"{"translation":"kjv","book":2,"chapter":70}"#.utf8), forKey: ReaderViewModel.positionKey)
-        // FakeRepository: 3 розділи в кожній книзі.
+        // FakeRepository: 3 chapters in every book.
         #expect(ReaderViewModel(positionStore: storage) { FakeRepository() }.location == Location(book: 2, chapter: 3))
     }
 }

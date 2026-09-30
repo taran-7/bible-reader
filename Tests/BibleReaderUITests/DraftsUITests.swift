@@ -1,7 +1,7 @@
 import AppKit
 import XCTest
 
-/// FR-38…FR-40: чорнетка з віршем переживає перезапуск; режим «Проповідь» закривається Esc.
+/// FR-38…FR-40: a draft with a verse survives a restart; "Sermon" mode closes with Esc.
 @MainActor
 final class DraftsUITests: XCTestCase {
     private var app: XCUIApplication!
@@ -51,7 +51,7 @@ final class DraftsUITests: XCTestCase {
         title.click()
         title.typeText("Про любов")
 
-        // Вірш на виділенні — у кінець чорнетки.
+        // The verse on the selection goes to the end of the draft.
         search("John 3:16")
         guard let button = app.visibleButton("draft-button") else { return XCTFail("кнопки «В чорнетку» не видно") }
         button.click()
@@ -59,11 +59,11 @@ final class DraftsUITests: XCTestCase {
         let predicate = NSPredicate(format: "value CONTAINS %@", "(John 3:16)")
         wait(for: [XCTNSPredicateExpectation(predicate: predicate, object: text)], timeout: 5)
         XCTAssertTrue(element("draft-references").exists, "живе посилання під текстом")
-        // Рядок вірша — один елемент доступності (children: .ignore): позначку видно в його мітці.
+        // A verse row is one accessibility element (children: .ignore): the marker is visible in its label.
         let marked = NSPredicate(format: "label CONTAINS %@", "є в чорнетках")
         wait(for: [XCTNSPredicateExpectation(predicate: marked, object: element("verse-16"))], timeout: 5)
 
-        // Режим «Проповідь» і Esc.
+        // "Sermon" mode and Esc.
         element("draft-present").click()
         XCTAssertTrue(element("sermon-mode").waitForExistence(timeout: 5))
         app.windows.firstMatch.typeKey(.escape, modifierFlags: [])
@@ -75,7 +75,7 @@ final class DraftsUITests: XCTestCase {
         element("drafts-toolbar").click()
         let row = element("draft-row")
         XCTAssertTrue(row.waitForExistence(timeout: 5))
-        // Рядок — кнопка: назва в її мітці (на CI окремого staticText усередині немає).
+        // The row is a button: the title is in its label (on CI there is no separate staticText inside).
         XCTAssertTrue(app.buttons.matching(identifier: "draft-row").matching(NSPredicate(format: "label CONTAINS %@", "Про любов")).count
                       + app.staticTexts.matching(NSPredicate(format: "label == %@", "Про любов")).count > 0, "чорнетка «Про любов» після перезапуску")
     }

@@ -19,8 +19,8 @@ import Testing
 
     // @trace NFR-3
     @Test func testOpeningRealDatabaseIsFast() throws {
-        // Найважча частина запуску в BibleCore: відкриття бази й перший розділ.
-        // Найкращий із трьох: паралельні тести інколи забирають процесор, а ми міряємо код, а не навантаження.
+        // The heaviest part of launch in BibleCore: opening the database and the first chapter.
+        // Best of three: parallel tests sometimes take the CPU, and we measure the code, not the load.
         let clock = ContinuousClock()
         let times = try (0..<3).map { _ in
             try clock.measure {
@@ -44,7 +44,7 @@ import Testing
         #expect(first != nil)
         model.markFirstChapterShown(now: Date().addingTimeInterval(60))
         #expect(model.launchMilliseconds == first)
-        // Екран помилки бази (віршів немає) не рахується запуском.
+        // The database error screen (no verses) does not count as a launch.
         let broken = ReaderViewModel { throw FakeRepository.Boom() }
         broken.markFirstChapterShown()
         #expect(broken.launchMilliseconds == nil)

@@ -31,7 +31,7 @@ import Testing
     @Test func testYoFoldsToYe() throws {
         let results = try repository.search("четвертый", translation: .synodal)
         let withYo = try #require(results.first { $0.verse.text.contains("четвёртый") })
-        // Фрагмент показує оригінальний текст із «ё», а не згорнутий.
+        // The snippet shows the original text with «ё», not the folded one.
         #expect(withYo.segments.filter(\.isMatch).contains { $0.text.lowercased() == "четвёртый" })
         #expect(try repository.search("четвёртый", translation: .synodal).map(\.verse.id) == results.map(\.verse.id))
     }
@@ -90,7 +90,7 @@ import Testing
         let result = try #require(try repository.search("love", translation: .kjv, limit: 2_000)
             .first { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
         #expect(result.segments.filter(\.isMatch).map(\.text) == ["loved"])
-        // Сегменти складаються в повний текст вірша.
+        // The segments add up to the full verse text.
         #expect(result.segments.map(\.text).joined() == result.verse.text)
     }
 
@@ -100,10 +100,10 @@ import Testing
         #expect(phrase.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
         #expect(phrase.allSatisfy { $0.verse.text.lowercased().contains("only begotten son") })
         #expect(phrase.first?.segments.filter(\.isMatch).map { $0.text.lowercased() } == ["only", "begotten", "son"])
-        // Слова фрази поза фразою не підсвічуються: у Буття 1:1 лише «In the beginning», а не друге «the».
+        // Phrase words outside the phrase are not highlighted: in Genesis 1:1 only "In the beginning", not the second "the".
         let genesis = try #require(try repository.search(#""in the beginning""#, translation: .kjv).first)
         #expect(genesis.segments.filter(\.isMatch).map(\.text) == ["In", "the", "beginning"])
-        // Точна форма: «loved» у лапках не знаходить «love».
+        // Exact form: a quoted "loved" does not find "love".
         let exact = try repository.search(#""loved""#, translation: .kjv, limit: 2_000)
         #expect(!exact.isEmpty)
         #expect(exact.allSatisfy { SearchText.fold($0.verse.text).lowercased().contains("loved") })
@@ -141,7 +141,7 @@ import Testing
 
     // @trace NFR-3
     @Test func testSearchIsFastOnWholeBible() throws {
-        // Найчастіші слова кожної мови: найгірший випадок для підрахунку й першої сторінки.
+        // The most frequent words of each language: the worst case for counting and the first page.
         for (query, translation) in [("the", Translation.kjv), ("и", .synodal), ("і", .ohienko), ("a", .bkr), (#""and the""#, .kjv)] {
             _ = try repository.searchPage(query, translation: translation, scope: .bible, offset: 0, limit: 100)
             let clock = ContinuousClock()
@@ -157,14 +157,14 @@ import Testing
     @Test func testSearchInUkrainianAndCzech() throws {
         let uk = try repository.search("полюбив світ", translation: .ohienko)
         #expect(uk.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
-        // Без чеської діакритики: «buh miloval» знаходить «Bůh miloval».
+        // Without Czech diacritics: «buh miloval» finds «Bůh miloval».
         let cs = try repository.search("buh miloval", translation: .bkr)
         #expect(cs.contains { $0.verse.book == 43 && $0.verse.chapter == 3 && $0.verse.verse == 16 })
     }
 
     // @trace FR-28
     @Test func testUkrainianApostropheVariants() throws {
-        // Дані мають ASCII-апостроф; розкладка macOS може дати ’ або ʼ.
+        // The data has an ASCII apostrophe; a macOS layout may give ’ or ʼ.
         for query in ["п'ять", "п’ять", "пʼять"] {
             #expect(try !repository.search(query, translation: .ohienko).isEmpty, "\(query)")
         }

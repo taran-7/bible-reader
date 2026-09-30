@@ -2,9 +2,9 @@ import Foundation
 import Testing
 @testable import BibleCore
 
-/// NFR-2: додаток офлайн — мережеві API і адреси заборонені в коді, окрім модуля ілюстрацій (FR-33…FR-35).
+/// NFR-2: the app is offline: network APIs and addresses are forbidden in code, except the illustrations module (FR-33…FR-35).
 @Suite struct NetworkIsolationTests {
-    /// Файли (шлях від кореня репозиторію), яким мережа дозволена: єдиний мережевий файл ілюстрацій.
+    /// Files (path from the repository root) allowed to use the network: the single illustrations network file.
     static let allowedFiles: Set<String> = ["Sources/BibleCore/IllustrationNetwork.swift"]
 
     // @trace NFR-2
@@ -26,7 +26,7 @@ import Testing
             relativeTo: root,
             allowing: Self.allowedFiles)
         #expect(report.findings.isEmpty, "\(report.findings)")
-        // Порожній скоуп — не доказ (vacuous pass): шляхи мають вести до реального коду.
+        // An empty scope is not evidence (vacuous pass): the paths must lead to real code.
         #expect(report.scannedFiles >= 20, "переглянуто \(report.scannedFiles) файлів")
     }
 }

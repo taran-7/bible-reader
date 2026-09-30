@@ -33,7 +33,7 @@ const total = {
 mkdirSync("coverage", { recursive: true });
 writeFileSync("coverage/coverage-summary.json", `${JSON.stringify({ total }, null, 2)}\n`);
 console.log(`coverage: lines ${total.lines.pct}% · regions ${total.statements.pct}% · functions ${total.functions.pct}% · branches ${total.branches.pct ?? "n/a"}% (${files.length} files)`);
-// Файли з непокритими функціями — щоб падіння ratchet у CI було видно без локального прогону.
+// Files with uncovered functions, so a ratchet failure in CI is visible without a local run.
 for (const f of files) {
   const fn = f.summary.functions;
   if (fn.covered < fn.count) {
@@ -48,7 +48,7 @@ for (const fn of report.data.flatMap((d) => d.functions ?? [])) {
     console.log(`    never called: ${fn.filenames[0].replace(/^.*\/Sources\//, "Sources/")}:${fn.regions?.[0]?.[0] ?? "?"} ${name}`);
   }
 }
-// Непокриті регіони (гілки всередині функцій): файл і рядки початку.
+// Uncovered regions (branches inside functions): the file and start lines.
 for (const f of files) {
   const lines = f.segments.filter((s) => s[3] && s[4] && s[2] === 0 && !s[5]).map((s) => s[0]);
   if (lines.length) console.log(`    uncovered regions: ${f.filename.replace(/^.*\/Sources\//, "Sources/")} lines ${[...new Set(lines)].join(", ")}`);

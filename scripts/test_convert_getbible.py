@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Тести конвертера getBible: python3 scripts/test_convert_getbible.py"""
+"""getBible converter tests: python3 scripts/test_convert_getbible.py"""
 import os
 import sys
 import unittest
@@ -48,7 +48,7 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(clean("„ви боги\"?"), "„ви боги“?")
 
     def test_bolls_flat_list(self):
-        # Плаский список віршів у довільному порядку → книги 1..66, розділи й вірші за номерами.
+        # A flat verse list in arbitrary order → books 1..66, chapters and verses by number.
         verses = [{"book": nr, "chapter": 1, "verse": 1, "text": "a"} for nr in range(66, 0, -1)]
         verses += [{"book": 19, "chapter": 2, "verse": 2, "text": "Господи"},
                    {"book": 19, "chapter": 2, "verse": 1, "text": "Псалом Давидів."}]
@@ -59,13 +59,13 @@ class ConvertTests(unittest.TestCase):
     def test_align_to_kjv(self):
         books = [{"abbrev": str(n), "name": str(n), "chapters": [["a"]]} for n in range(1, 67)]
         reference = [{"chapters": [["x"]]} for _ in range(66)]
-        # Пс 1: надпис у двох віршах → зливаються з першим віршем тексту.
+        # Ps 1: a superscription in two verses → merged into the first verse of the text.
         books[18]["chapters"] = [["Надпис.", "Продовження надпису.", "Перший.", "Другий."]]
         reference[18]["chapters"] = [["1", "2"]]
-        # 1 Сам 20–21: 21:1 — кінець 20-го розділу.
+        # 1 Sam 20–21: 21:1 is the end of chapter 20.
         books[8]["chapters"] = [["a"]] * 19 + [["20:1", "20:2"], ["хвіст", "21:1"]]
         reference[8]["chapters"] = [["x"]] * 19 + [["1", "2"], ["1"]]
-        # 3 Ів: останні два вірші — один у KJV.
+        # 3 John: the last two verses are one in KJV.
         books[63]["chapters"] = [["1", "14", "15"]]
         reference[63]["chapters"] = [["1", "14"]]
         out = align_to(books, reference)
