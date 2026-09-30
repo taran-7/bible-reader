@@ -1,47 +1,47 @@
 # platform Specification
 
 ## Purpose
-Платформа, приватність, розмір, швидкість запуску й доступність: macOS 14+ лише на Apple Silicon, без мережі, `.app` < 100 МБ, запуск < 1 с, VoiceOver і клавіатура.
+Platform, privacy, size, launch speed and accessibility: macOS 14+ on Apple Silicon only, no network, `.app` < 100 MB, launch < 1 s, VoiceOver and keyboard.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): NFR-1, NFR-2, NFR-3, NFR-4, NFR-5.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): NFR-1, NFR-2, NFR-3, NFR-4, NFR-5.
 
 ## Requirements
 
-### Requirement: Платформа
-Додаток SHALL збиратися для macOS 14 і новіших і SHALL містити код для Apple Silicon (`arm64`); збірка під Intel не підтримується (NFR-1).
+### Requirement: Platform
+The app SHALL build for macOS 14 and newer and SHALL contain code for Apple Silicon (`arm64`); an Intel build is not supported (NFR-1).
 
-#### Scenario: Release-збірка
-- **WHEN** виконується `node scripts/check-platform.mjs`
-- **THEN** `LSMinimumSystemVersion` зібраного додатка — `14.0`, а `lipo -archs` бінарника містить `arm64`
+#### Scenario: Release build
+- **WHEN** `node scripts/check-platform.mjs` runs
+- **THEN** the built app's `LSMinimumSystemVersion` is `14.0`, and the binary's `lipo -archs` contains `arm64`
 
-### Requirement: Без мережі
-Код додатка SHALL не використовувати мережеві API (`URLSession`, `URLRequest`, `NSURLConnection`, `Network`, `WKWebView`) і не містити адрес `http(s)://`, окрім файлів модуля ілюстрацій, явно дозволених у тесті (NFR-2).
+### Requirement: No network
+The app code SHALL NOT use network APIs (`URLSession`, `URLRequest`, `NSURLConnection`, `Network`, `WKWebView`) or contain `http(s)://` addresses, except the illustrations module files explicitly allowed in the test (NFR-2).
 
-#### Scenario: Мережевий виклик у коді
-- **WHEN** у файлі з `Sources/` з'являється `URLSession`
-- **THEN** тест `NetworkIsolationTests` падає з назвою файлу і номером рядка
+#### Scenario: A network call in code
+- **WHEN** `URLSession` appears in a file under `Sources/`
+- **THEN** the `NetworkIsolationTests` test fails with the file name and line number
 
-### Requirement: Розмір додатка
-Зібраний Release `.app` SHALL бути меншим за 100 МБ; від 80 МБ перевірка SHALL друкувати попередження (NFR-5).
+### Requirement: App size
+The built Release `.app` SHALL be smaller than 100 MB; from 80 MB the check SHALL print a warning (NFR-5).
 
-#### Scenario: Наближення до межі
-- **WHEN** `.app` важить 85 МБ
-- **THEN** `check-platform` друкує WARN, але результат PASS
+#### Scenario: Approaching the limit
+- **WHEN** the `.app` weighs 85 MB
+- **THEN** `check-platform` prints WARN, but the result is PASS
 
-### Requirement: Швидкий запуск
-Додаток SHALL показувати перший розділ менш ніж за 1 секунду від старту процесу при повторному запуску (NFR-3).
+### Requirement: Fast launch
+The app SHALL show the first chapter in less than 1 second from process start on a repeated launch (NFR-3).
 
-#### Scenario: Повторний запуск
-- **WHEN** додаток запускають удруге
-- **THEN** від старту процесу до першого кадру з віршами минає < 1000 мс
+#### Scenario: Repeated launch
+- **WHEN** the app is launched a second time
+- **THEN** < 1000 ms pass from process start to the first frame with verses
 
-### Requirement: Доступність
-VoiceOver SHALL читати номер і текст кожного вірша, а кнопки тулбара SHALL мати текстові назви. Читання, пошук, копіювання, закладки, перехід між розділами й перекладами SHALL бути доступні лише з клавіатури (NFR-4).
+### Requirement: Accessibility
+VoiceOver SHALL read the number and text of every verse, and toolbar buttons SHALL have text names. Reading, search, copying, bookmarks, moving between chapters and translations SHALL be available from the keyboard alone (NFR-4).
 
-#### Scenario: Мітка вірша
-- **WHEN** VoiceOver фокусується на першому вірші Genesis 1
-- **THEN** мітка починається з «1 In the beginning God created»
+#### Scenario: Verse label
+- **WHEN** VoiceOver focuses the first verse of Genesis 1
+- **THEN** the label starts with "1 In the beginning God created"
 
-#### Scenario: Без миші
-- **WHEN** користувач натискає ⌘F, вводить `John 3:16`, Return, ↓, ⌘C, ⌘D, ⌘], ⌘[, ⌘⌥3
-- **THEN** відкривається John 3, копіюється цитата John 3:17, з'являється закладка розділу, відкриваються John 4 і знову John 3, а потім «Від Івана 3» в Огієнка
+#### Scenario: No mouse
+- **WHEN** the user presses ⌘F, types `John 3:16`, Return, ↓, ⌘C, ⌘D, ⌘], ⌘[, ⌘⌥3
+- **THEN** John 3 opens, the John 3:17 quote is copied, a chapter bookmark appears, John 4 and then John 3 open again, and then «Від Івана 3» in Ohienko

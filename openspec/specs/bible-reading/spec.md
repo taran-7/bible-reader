@@ -2,171 +2,171 @@
 
 ## Purpose
 
-Дає користувачу читати текст Біблії в одному з двох перекладів, переходячи між книгами і розділами.
+Lets the user read the Bible text in one of the translations, moving between books and chapters.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-4, FR-5, FR-6, FR-7, FR-15, FR-16, FR-31, FR-32, FR-28, FR-29, FR-37.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-4, FR-5, FR-6, FR-7, FR-15, FR-16, FR-31, FR-32, FR-28, FR-29, FR-37.
 
 ## Requirements
 
-### Requirement: Вибір перекладу
-Додаток SHALL показувати один переклад на екрані і дозволяти перемикати KJV ↔ Синодальний; при перемиканні SHALL залишатися на тих самих книзі й розділі.
+### Requirement: Choosing a translation
+The app SHALL show one translation on screen and allow switching KJV ↔ Synodal; switching SHALL stay on the same book and chapter.
 
-#### Scenario: Перемикання перекладу
-- **WHEN** відкрито John 3 у KJV і користувач обирає Синодальний
-- **THEN** показано Иоанна 3 Синодального перекладу
+#### Scenario: Switching translation
+- **WHEN** John 3 is open in KJV and the user chooses the Synodal
+- **THEN** Synodal Иоанна 3 is shown
 
-### Requirement: Список книг
-Додаток SHALL показувати 66 книг, згрупованих на Старий і Новий Заповіт, з назвами мовою активного перекладу.
+### Requirement: Book list
+The app SHALL show 66 books grouped into the Old and New Testaments, with names in the active translation's language.
 
-#### Scenario: Назви книг мовою перекладу
-- **WHEN** активний Синодальний переклад
-- **THEN** перша книга називається «Бытие», сорокова — «От Матфея»
+#### Scenario: Book names in the translation's language
+- **WHEN** the Synodal translation is active
+- **THEN** the first book is called «Бытие», the fortieth «От Матфея»
 
-### Requirement: Навігація розділами
-Додаток SHALL показувати всі вірші обраного розділу з номерами, дозволяти обрати розділ і листати на попередній/наступний розділ; на межах книги листання SHALL переходити до сусідньої книги, а на межах Біблії кнопка SHALL бути неактивною. Розділ SHALL обиратися у вікні з номерами розділів, яке відкривається кліком по книзі в бічній панелі збоку від неї або кліком по назві розділу в тулбарі донизу від неї, не закриваючи текст поточного розділу; тулбар SHALL NOT містити окремого вибору розділу (FR-37).
+### Requirement: Chapter navigation
+The app SHALL show all verses of the chosen chapter with numbers, allow choosing a chapter and paging to the previous/next chapter; at book boundaries paging SHALL move to the neighboring book, and at the ends of the Bible the button SHALL be disabled. A chapter SHALL be chosen in a window of chapter numbers that opens by clicking a book in the sidebar (beside it) or clicking the chapter title in the toolbar (below it), without hiding the current chapter's text; the toolbar SHALL NOT contain a separate chapter picker (FR-37).
 
-#### Scenario: Наступний розділ у кінці книги
-- **WHEN** відкрито Genesis 50 і користувач натискає ▶
-- **THEN** відкривається Exodus 1
+#### Scenario: Next chapter at the end of a book
+- **WHEN** Genesis 50 is open and the user presses ▶
+- **THEN** Exodus 1 opens
 
-#### Scenario: Початок Біблії
-- **WHEN** відкрито Genesis 1
-- **THEN** кнопка ◀ неактивна
+#### Scenario: Start of the Bible
+- **WHEN** Genesis 1 is open
+- **THEN** the ◀ button is disabled
 
-#### Scenario: Вибір розділу з бічної панелі
-- **WHEN** відкрито Genesis 1 і користувач клікає по книзі Ruth
-- **THEN** поверх тексту Genesis 1 з'являється вікно з номерами 1–4, а Genesis 1 лишається відкритим
-- **WHEN** користувач клікає по номеру 4
-- **THEN** відкривається Ruth 4, вікно закривається
+#### Scenario: Choosing a chapter from the sidebar
+- **WHEN** Genesis 1 is open and the user clicks the book Ruth
+- **THEN** a window with numbers 1–4 appears over the Genesis 1 text, and Genesis 1 stays open
+- **WHEN** the user clicks the number 4
+- **THEN** Ruth 4 opens, the window closes
 
-#### Scenario: Закриття без переходу
-- **WHEN** відкрито вікно розділів книги і користувач натискає Esc або клікає поза вікном
-- **THEN** вікно закривається, відкритий розділ не змінюється
+#### Scenario: Closing without navigating
+- **WHEN** a book's chapter window is open and the user presses Esc or clicks outside it
+- **THEN** the window closes, the open chapter does not change
 
-### Requirement: Помилка бази
-Якщо базу не вдалося відкрити, додаток MUST показати екран помилки з поясненням замість порожнього читача.
+### Requirement: Database error
+If the database cannot be opened, the app MUST show an error screen with an explanation instead of an empty reader.
 
-#### Scenario: База відсутня
-- **WHEN** файл бази відсутній або пошкоджений
-- **THEN** показано екран помилки, додаток не падає
+#### Scenario: Database missing
+- **WHEN** the database file is missing or corrupted
+- **THEN** an error screen is shown, the app does not crash
 
-### Requirement: Шлях до бази для тестів
-Додаток SHALL відкривати базу за шляхом зі змінної середовища `BIBLE_READER_DB`, якщо вона задана й непорожня; інакше SHALL відкривати `bible.sqlite` з бандла.
+### Requirement: Database path for tests
+The app SHALL open the database at the path from the `BIBLE_READER_DB` environment variable if it is set and non-empty; otherwise it SHALL open `bible.sqlite` from the bundle.
 
-#### Scenario: Змінна середовища вказує на відсутній файл
-- **WHEN** додаток запущено з `BIBLE_READER_DB=/nonexistent/bible.sqlite`
-- **THEN** показано екран помилки бази
+#### Scenario: The variable points to a missing file
+- **WHEN** the app is launched with `BIBLE_READER_DB=/nonexistent/bible.sqlite`
+- **THEN** the database error screen is shown
 
-#### Scenario: Змінна не задана
-- **WHEN** `BIBLE_READER_DB` не задана
-- **THEN** відкривається база з бандла
+#### Scenario: The variable is not set
+- **WHEN** `BIBLE_READER_DB` is not set
+- **THEN** the database from the bundle opens
 
-### Requirement: Масштаб шрифтів
-Додаток SHALL дозволяти командами ⌘+, ⌘− і ⌘0 синхронно змінювати розмір шрифту тексту віршів і списку книг, а в Settings — задавати кожен із них окремо. Розміри SHALL зберігатися між запусками (FR-15).
+### Requirement: Font scale
+The app SHALL let ⌘+, ⌘− and ⌘0 change the font size of verse text and the book list together, and Settings SHALL set each of them separately. Sizes SHALL persist between launches (FR-15).
 
-#### Scenario: Збільшення шрифту віршів
-- **WHEN** користувач натискає ⌘+
-- **THEN** текст віршів і назви книг стають на 1 pt більшими, але не більшими за 32 pt
+#### Scenario: Increasing the verse font
+- **WHEN** the user presses ⌘+
+- **THEN** verse text and book names become 1 pt larger, but not larger than 32 pt
 
-#### Scenario: Стандартний розмір
-- **WHEN** користувач натискає ⌘0
-- **THEN** текст віршів повертається до 15 pt, а список книг — до 13 pt
+#### Scenario: Default size
+- **WHEN** the user presses ⌘0
+- **THEN** verse text returns to 15 pt and the book list to 13 pt
 
-#### Scenario: Збереження між запусками
-- **WHEN** користувач змінив розмір і перезапустив додаток
-- **THEN** розмір той самий, що й перед перезапуском
+#### Scenario: Persisting between launches
+- **WHEN** the user changed the size and restarted the app
+- **THEN** the size is the same as before the restart
 
-#### Scenario: Пошкоджені налаштування
-- **WHEN** збережені налаштування не читаються
-- **THEN** використовуються стандартні розміри
+#### Scenario: Corrupted settings
+- **WHEN** the saved settings cannot be read
+- **THEN** default sizes are used
 
-### Requirement: Масштаб інтерфейсу
-Додаток SHALL пропонувати в Settings масштаб інтерфейсу «Малий», «Стандарт», «Великий», «Дуже великий», який змінює розмір тексту результатів пошуку, екранів-повідомлень і контролів відносно системного розміру шрифту macOS, і SHALL зберігати вибір між запусками (FR-16).
+### Requirement: Interface scale
+The app SHALL offer in Settings an interface scale «Малий», «Стандарт», «Великий», «Дуже великий» (Small, Standard, Large, Extra large), which changes the text size of search results, message screens and controls relative to the macOS system font size, and SHALL persist the choice between launches (FR-16).
 
-#### Scenario: Великий масштаб
-- **WHEN** користувач вибирає «Великий»
-- **THEN** текст результатів пошуку в 1,2 раза більший за системний розмір
+#### Scenario: Large scale
+- **WHEN** the user chooses «Великий» (Large)
+- **THEN** search result text is 1.2 times the system size
 
-### Requirement: Теми оформлення
-Додаток SHALL пропонувати теми «Як у системі», «Світла», «Темна», «Скло», «Пастельна», «Манускрипт» у Settings і в меню «Вигляд»; вибрана тема SHALL змінювати фон, текст, панелі, підсвітку пошуку, виділення і шрифт віршів без перезапуску і SHALL зберігатися між запусками (FR-31).
+### Requirement: Themes
+The app SHALL offer the themes «Як у системі», «Світла», «Темна», «Скло», «Пастельна», «Манускрипт» (System, Light, Dark, Glass, Pastel, Manuscript) in Settings and in the «Вигляд» (View) menu; the chosen theme SHALL change the background, text, panels, search highlight, selection and verse font without a restart and SHALL persist between launches (FR-31).
 
-#### Scenario: Перемикання теми
-- **WHEN** користувач вибирає «Манускрипт»
-- **THEN** фон під віршами стає пергаментним `#EFE4CC` з блідою текстурою, текст віршів — EB Garamond кольору `#3B2A1A`, номери віршів — `#8B2E1F`
+#### Scenario: Switching theme
+- **WHEN** the user chooses «Манускрипт»
+- **THEN** the background under verses becomes parchment `#EFE4CC` with a faint texture, verse text becomes EB Garamond in `#3B2A1A`, verse numbers `#8B2E1F`
 
-#### Scenario: Як у системі
-- **WHEN** вибрано «Як у системі» і macOS у темному режимі
-- **THEN** застосовано тему «Темна»
+#### Scenario: System
+- **WHEN** «Як у системі» is chosen and macOS is in dark mode
+- **THEN** the «Темна» theme is applied
 
-#### Scenario: Збереження
-- **WHEN** користувач вибрав «Пастельна» і перезапустив додаток
-- **THEN** застосовано «Пастельна»
+#### Scenario: Persistence
+- **WHEN** the user chose «Пастельна» and restarted the app
+- **THEN** «Пастельна» is applied
 
-#### Scenario: Зменшити прозорість
-- **WHEN** у macOS увімкнено «Зменшити прозорість» і вибрано «Скло»
-- **THEN** панелі й підкладка під віршами непрозорі
+#### Scenario: Reduce transparency
+- **WHEN** "Reduce transparency" is on in macOS and «Скло» is chosen
+- **THEN** panels and the backing under verses are opaque
 
-### Requirement: Контраст тем
-Кожна тема SHALL бути набором токенів у `BibleCore`, і для кожної теми з увімкненими й вимкненими «Зменшити прозорість» та «Збільшити контраст» основний текст SHALL мати контраст до свого фону не менше 7:1, а другорядний текст, акцент, підсвітка пошуку й кнопка копіювання — не менше 4,5:1 (FR-32, NFR-4).
+### Requirement: Theme contrast
+Each theme SHALL be a set of tokens in `BibleCore`, and for each theme with "Reduce transparency" and "Increase contrast" on and off, body text SHALL have a contrast against its background of at least 7:1, and secondary text, accent, search highlight and the copy button at least 4.5:1 (FR-32, NFR-4).
 
-#### Scenario: Перевірка всіх пар
-- **WHEN** виконується тест контрасту
-- **THEN** кожна пара «текст/фон» кожної теми проходить свій поріг
+#### Scenario: Checking all pairs
+- **WHEN** the contrast test runs
+- **THEN** every text/background pair of every theme passes its threshold
 
-#### Scenario: Скло поверх будь-яких шпалер
-- **WHEN** підкладка Скла з непрозорістю 0,92 лежить на чорному або білому тлі
-- **THEN** основний текст на ній має контраст не менше 7:1
+#### Scenario: Glass over any wallpaper
+- **WHEN** the Glass backing with 0.92 opacity lies on a black or white background
+- **THEN** body text on it has a contrast of at least 7:1
 
-### Requirement: Вибір із чотирьох перекладів
-Додаток SHALL пропонувати в тулбарі меню перекладів у порядку KJV, Kralická, Огієнко, Синодальний з мовою кожного та команди ⌘⌥1…4 у тому самому порядку; список книг і заголовок розділу SHALL показуватися мовою вибраного перекладу (FR-28, FR-29).
+### Requirement: Choosing among four translations
+The app SHALL offer in the toolbar a translation menu in the order KJV, Kralická, Огієнко, Синодальний with each one's language, and the commands ⌘⌥1…4 in the same order; the book list and chapter title SHALL be shown in the chosen translation's language (FR-28, FR-29).
 
-#### Scenario: Перемикання на Огієнка
-- **WHEN** користувач вибирає «Огієнко» на Genesis 1
-- **THEN** заголовок «Буття 1», текст віршів українською
+#### Scenario: Switching to Ohienko
+- **WHEN** the user chooses «Огієнко» on Genesis 1
+- **THEN** the title is «Буття 1», verse text is in Ukrainian
 
-#### Scenario: Порядок у меню
-- **WHEN** користувач відкриває меню перекладів
-- **THEN** пункти йдуть так: KJV — English, Kralická — čeština, Огієнко — українська, Синодальний — русский
+#### Scenario: Menu order
+- **WHEN** the user opens the translation menu
+- **THEN** the items are: KJV — English, Kralická — čeština, Огієнко — українська, Синодальний — русский
 
-### Requirement: Листання з клавіатури
-Команди ⌘[ і ⌘] SHALL відкривати попередній і наступний розділ так само, як ◀ і ▶, а ◀ ▶ і ⌘[ ⌘] SHALL закривати відкриті результати пошуку або помилку пошуку (FR-6).
+### Requirement: Paging from the keyboard
+The commands ⌘[ and ⌘] SHALL open the previous and next chapter just like ◀ and ▶, and ◀ ▶ and ⌘[ ⌘] SHALL close open search results or a search error (FR-6).
 
-#### Scenario: Листання закриває результати
-- **WHEN** на екрані результати пошуку `love` і користувач натискає ⌘]
-- **THEN** результати закриваються і відкривається наступний розділ
+#### Scenario: Paging closes results
+- **WHEN** search results for `love` are on screen and the user presses ⌘]
+- **THEN** the results close and the next chapter opens
 
-#### Scenario: Межа Біблії
-- **WHEN** відкрито Revelation 22
-- **THEN** ⌘] і ▶ неактивні
+#### Scenario: End of the Bible
+- **WHEN** Revelation 22 is open
+- **THEN** ⌘] and ▶ are disabled
 
-### Requirement: Розділ поза книгою
-Посилання або збережене місце з номером розділу більшим за кількість розділів книги SHALL відкривати останній розділ книги (FR-8).
+### Requirement: A chapter outside the book
+A reference or a saved position with a chapter number greater than the book's chapter count SHALL open the book's last chapter (FR-8).
 
 #### Scenario: John 99
-- **WHEN** користувач шукає `John 99`
-- **THEN** відкривається John 21
+- **WHEN** the user searches `John 99`
+- **THEN** John 21 opens
 
-### Requirement: Повтор після помилки читання
-Якщо база відкрилась, але розділ не вдалося прочитати, додаток SHALL показати екран «Не вдалося прочитати базу» з кнопкою «Спробувати ще раз», яка повторює читання; після успішного читання екран помилки SHALL зникнути. Навігація SHALL NOT відкривати розділ 0, якщо книга не має розділів (FR-7).
+### Requirement: Retry after a read error
+If the database opened but a chapter could not be read, the app SHALL show the screen «Не вдалося прочитати базу» (Could not read the database) with a «Спробувати ще раз» (Try again) button that repeats the read; after a successful read the error screen SHALL disappear. Navigation SHALL NOT open chapter 0 if a book has no chapters (FR-7).
 
-#### Scenario: Разова помилка
-- **WHEN** читання розділу один раз завершилось помилкою і користувач натискає «Спробувати ще раз»
-- **THEN** розділ показано, екрана помилки немає
+#### Scenario: A one-off error
+- **WHEN** reading a chapter failed once and the user presses «Спробувати ще раз»
+- **THEN** the chapter is shown, there is no error screen
 
-#### Scenario: Книга без розділів у зіпсованій базі
-- **WHEN** у попередньої книги 0 розділів і відкрито розділ 1
-- **THEN** ◀ неактивна
+#### Scenario: A book without chapters in a corrupted database
+- **WHEN** the previous book has 0 chapters and chapter 1 is open
+- **THEN** ◀ is disabled
 
-### Requirement: Поле пошуку в темі й масштабі
-Поле пошуку в тулбарі SHALL мати розмір шрифту масштабу інтерфейсу, колір тексту й фон активної теми; форма Settings SHALL мати фон активної теми (FR-16, FR-31).
+### Requirement: Search field in theme and scale
+The toolbar search field SHALL have the interface scale's font size and the active theme's text color and background; the Settings form SHALL have the active theme's background (FR-16, FR-31).
 
-#### Scenario: Темна тема і великий масштаб
-- **WHEN** обрано тему «Темна» і масштаб «Великий»
-- **THEN** текст у полі пошуку світлий на темному фоні і в 1,2 раза більший за системний
+#### Scenario: Dark theme and large scale
+- **WHEN** the «Темна» theme and the «Великий» scale are chosen
+- **THEN** the text in the search field is light on a dark background and 1.2 times the system size
 
-### Requirement: Колонка тексту
-Без паралельного перекладу текст розділу SHALL стояти колонкою по центру шириною ~75 знаків (40 кеглів шрифту віршів), щоб рядок не тягнувся на все широке вікно (FR-15).
+### Requirement: Text column
+Without a parallel translation the chapter text SHALL stand as a centered column ~75 characters wide (40 em of the verse font), so a line does not stretch across a wide window (FR-15).
 
-#### Scenario: Широке вікно
-- **WHEN** вікно ширше за колонку, шрифт віршів 15 pt
-- **THEN** рядки віршів не ширші за 600 pt і стоять по центру
+#### Scenario: A wide window
+- **WHEN** the window is wider than the column, verse font 15 pt
+- **THEN** verse lines are no wider than 600 pt and centered

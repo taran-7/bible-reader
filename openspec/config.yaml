@@ -1,8 +1,8 @@
 schema: spec-driven
 
 context: |
-  Language: uk
-  All artifacts must be written in uk.
+  Language: en
+  All artifacts must be written in English. App UI strings and Bible text samples stay in their original language.
   Keep OpenSpec structural headings and SHALL/MUST keywords in English.
 
   Project: Bible Reader, native macOS app (SwiftUI, macOS 14+).

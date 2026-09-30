@@ -2,59 +2,59 @@
 
 ## Purpose
 
-Перетворює вихідні тексти KJV і Синодального перекладу у базу, з якої додаток читає вірші та шукає за текстом.
+Turns the KJV and Synodal source texts into the database from which the app reads verses and runs text search.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-1, FR-2, FR-3, FR-28, FR-29.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-1, FR-2, FR-3, FR-28, FR-29.
 
 ## Requirements
 
-### Requirement: Імпорт обох перекладів
-Інструмент імпорту SHALL зчитувати вихідні JSON-файли KJV і Синодального перекладу і записувати всі вірші в одну базу з позначкою перекладу, номером книги (1–66), розділу і вірша.
+### Requirement: Import of both translations
+The import tool SHALL read the KJV and Synodal source JSON files and write all verses into one database with the translation tag, book number (1–66), chapter and verse.
 
-#### Scenario: Повний імпорт
-- **WHEN** імпорт запущено на `data/raw` з обома файлами
-- **THEN** база містить 66 книг для кожного перекладу
-- **AND** кількість віршів KJV збігається з кількістю у вихідному файлі (≈31 102)
+#### Scenario: Full import
+- **WHEN** the import runs on `data/raw` with both files
+- **THEN** the database contains 66 books for each translation
+- **AND** the KJV verse count matches the count in the source file (≈31,102)
 
-#### Scenario: Контрольні вірші
-- **WHEN** імпорт завершено
-- **THEN** KJV Genesis 1:1 починається з «In the beginning God created»
-- **AND** Синодальний Бытие 1:1 починається з «В начале сотворил Бог»
-- **AND** KJV John 3:16 і Синодальний Иоанна 3:16 присутні й непорожні
+#### Scenario: Control verses
+- **WHEN** the import is finished
+- **THEN** KJV Genesis 1:1 starts with "In the beginning God created"
+- **AND** Synodal Бытие 1:1 starts with «В начале сотворил Бог»
+- **AND** KJV John 3:16 and Synodal Иоанна 3:16 are present and non-empty
 
-### Requirement: Повнотекстовий індекс
-Імпорт SHALL будувати повнотекстовий індекс по тексту віршів, нечутливий до регістру і діакритики, для латиниці й кирилиці.
+### Requirement: Full-text index
+The import SHALL build a full-text index over verse text that is case- and diacritic-insensitive, for Latin and Cyrillic.
 
-#### Scenario: Індекс заповнено
-- **WHEN** імпорт завершено
-- **THEN** кількість записів індексу дорівнює кількості віршів
+#### Scenario: Index is filled
+- **WHEN** the import is finished
+- **THEN** the number of index entries equals the number of verses
 
-### Requirement: Помилка вхідних даних
-Імпорт MUST завершуватися з ненульовим кодом і зрозумілим повідомленням, якщо вихідний файл відсутній або має неочікуваний формат, і MUST NOT залишати частково записану базу.
+### Requirement: Input data error
+The import MUST exit with a non-zero code and a clear message if a source file is missing or has an unexpected format, and MUST NOT leave a partially written database.
 
-#### Scenario: Відсутній файл
-- **WHEN** у вхідній теці немає файлу одного з перекладів
-- **THEN** імпорт завершується з помилкою, що називає відсутній файл
-- **AND** вихідна база не створюється
+#### Scenario: Missing file
+- **WHEN** the input folder lacks the file of one of the translations
+- **THEN** the import exits with an error naming the missing file
+- **AND** the output database is not created
 
-### Requirement: Українські й чеські тексти
-Імпорт SHALL записувати в базу чотири переклади — KJV, Синодальний, Огієнко і Біблію Кралицьку — по 66 книг кожен; порожній вірш у вхідному файлі SHALL пропускатися без зсуву номерів наступних віршів (FR-28, FR-29).
+### Requirement: Ukrainian and Czech texts
+The import SHALL write four translations into the database (KJV, Synodal, Ohienko and Bible kralická), 66 books each; an empty verse in the input file SHALL be skipped without shifting the numbers of the following verses (FR-28, FR-29).
 
-#### Scenario: Контрольні вірші
-- **WHEN** імпорт завершився
-- **THEN** Буття 1:1 Огієнка починається з «На початку Бог створив», а Gn 1:1 BKR — з «Na počátku stvořil Bůh»
+#### Scenario: Control verses
+- **WHEN** the import has finished
+- **THEN** Ohienko Буття 1:1 starts with «На початку Бог створив», and BKR Gn 1:1 with «Na počátku stvořil Bůh»
 
-#### Scenario: Пропущений вірш
-- **WHEN** у розділі вхідного файлу вірш 1 порожній, а вірш 2 заповнений
-- **THEN** у базі немає вірша 1, а вірш 2 має номер 2
+#### Scenario: Skipped verse
+- **WHEN** in a chapter of the input file verse 1 is empty and verse 2 is filled
+- **THEN** the database has no verse 1, and verse 2 has number 2
 
-### Requirement: Неповний вхідний файл
-Імпорт SHALL відхиляти файл перекладу, у якому менше 66 книг: CLI SHALL завершуватися з кодом 1 і повідомленням у stderr з іменем файлу, а база SHALL NOT створюватися. Виклик без двох аргументів SHALL завершуватися з кодом 64 і підказкою використання (FR-3).
+### Requirement: Incomplete input file
+The import SHALL reject a translation file with fewer than 66 books: the CLI SHALL exit with code 1 and a stderr message naming the file, and the database SHALL NOT be created. A call without two arguments SHALL exit with code 64 and a usage hint (FR-3).
 
-#### Scenario: Урізаний JSON
-- **WHEN** `en_kjv.json` містить 2 книги
-- **THEN** `bible-import` виходить з кодом 1, stderr містить `en_kjv.json`, вихідного файлу немає
+#### Scenario: Truncated JSON
+- **WHEN** `en_kjv.json` contains 2 books
+- **THEN** `bible-import` exits with code 1, stderr contains `en_kjv.json`, there is no output file
 
-#### Scenario: Без аргументів
-- **WHEN** `bible-import` запущено без аргументів
-- **THEN** код виходу 64, stderr починається з «Використання:»
+#### Scenario: No arguments
+- **WHEN** `bible-import` is run without arguments
+- **THEN** the exit code is 64, stderr starts with «Використання:» (Usage:)

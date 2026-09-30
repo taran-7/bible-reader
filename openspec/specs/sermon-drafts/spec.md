@@ -1,62 +1,62 @@
 # sermon-drafts Specification
 
 ## Purpose
-Чорнетки проповідей і думок поруч із текстом Біблії: редактор Markdown, вірші й ілюстрації одним кліком, живі посилання, позначки біля віршів, режим «Проповідь» і експорт.
+Drafts of sermons and thoughts next to the Bible text: a Markdown editor, verses and illustrations in one click, live references, markers next to verses, a "Sermon" mode and export.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-38, FR-39, FR-40.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-38, FR-39, FR-40.
 
 ## Requirements
 
-### Requirement: Чорнетки
-Додаток SHALL мати «Чорнетки»: панель праворуч від тексту розділу (відкриття закриває панель ілюстрацій) зі списком чорнеток (назва, дата зміни, початок тексту; пошук за назвою й текстом; найновіші першими) і редактором Markdown з кнопками форматування. Зміни SHALL зберігатися автоматично в базі користувача й переживати перезапуск. Порожня назва SHALL показуватися як «Без назви». Видалення SHALL питати підтвердження (FR-38).
+### Requirement: Drafts
+The app SHALL have «Чорнетки» (Drafts): a panel to the right of the chapter text (opening it closes the illustrations panel) with a list of drafts (title, modification date, start of the text; search by title and text; newest first) and a Markdown editor with formatting buttons. Changes SHALL be saved automatically in the user database and survive a restart. An empty title SHALL show as «Без назви» (Untitled). Deleting SHALL ask for confirmation (FR-38).
 
-#### Scenario: Нова чорнетка переживає перезапуск
-- **WHEN** користувач створив чорнетку, написав «Про любов» і перезапустив додаток
-- **THEN** чорнетка з цим текстом є в списку першою
+#### Scenario: A new draft survives a restart
+- **WHEN** the user created a draft, wrote «Про любов» and restarted the app
+- **THEN** the draft with this text is first in the list
 
-#### Scenario: Пошук
-- **WHEN** у пошуку чорнеток введено «любов»
-- **THEN** у списку лише чорнетки, де це слово є в назві чи тексті
+#### Scenario: Search
+- **WHEN** «любов» is typed into the draft search
+- **THEN** the list shows only drafts with this word in the title or text
 
-### Requirement: Вірш у чорнетку
-На виділенні віршів SHALL бути «В чорнетку» (кнопка на виділенні, коли панель чорнеток відкрита, і пункт контекстного меню завжди). Вона SHALL дописувати в кінець активної чорнетки ту саму цитату з посиланням, що й копіювання; якщо активної чорнетки немає — створювати нову (FR-38).
+### Requirement: A verse into a draft
+On a verse selection there SHALL be «В чорнетку» (To draft): a button on the selection when the drafts panel is open, and a context menu item always. It SHALL append to the end of the active draft the same quote with a reference as copying does; if there is no active draft, it creates a new one (FR-38).
 
-#### Scenario: Вставити вірш
-- **WHEN** у KJV виділено John 3:16 і натиснуто «В чорнетку»
-- **THEN** в кінці активної чорнетки з'являється «For God so loved…» (John 3:16)
+#### Scenario: Insert a verse
+- **WHEN** John 3:16 is selected in KJV and «В чорнетку» is pressed
+- **THEN** "For God so loved…" (John 3:16) appears at the end of the active draft
 
-### Requirement: Живі посилання
-Посилання на місця в тексті чорнетки (назва або скорочення книги будь-якою мовою додатка, розділ:вірш, необов'язковий діапазон) SHALL розпізнаватися. У перегляді чорнетки SHALL бути посиланнями, що відкривають місце в тексті ліворуч; у редакторі SHALL бути списком під текстом із текстом вірша в підказці. Номери трактуються в нумерації KJV (FR-38).
+### Requirement: Live references
+References to passages in the draft text (a book name or abbreviation in any app language, chapter:verse, an optional range) SHALL be recognized. In the draft preview they SHALL be links that open the passage in the text on the left; in the editor they SHALL be a list under the text with the verse text in a tooltip. Numbers are interpreted in KJV numbering (FR-38).
 
-#### Scenario: Розпізнавання
-- **WHEN** у тексті «див. Ин 3:16 і 1 Кор 13:4-7, а також John 3:16–18»
-- **THEN** розпізнано три посилання: Ин 3:16, 1 Кор 13:4–7, John 3:16–18
+#### Scenario: Recognition
+- **WHEN** the text says «див. Ин 3:16 і 1 Кор 13:4-7, а також John 3:16–18»
+- **THEN** three references are recognized: Ин 3:16, 1 Кор 13:4–7, John 3:16–18
 
-#### Scenario: Без хибних збігів
-- **WHEN** у тексті «о 10:30 зустріч, 3:1 — рахунок матчу»
-- **THEN** посилань не розпізнано
+#### Scenario: No false matches
+- **WHEN** the text says «о 10:30 зустріч, 3:1 — рахунок матчу»
+- **THEN** no references are recognized
 
-### Requirement: Шаблон проповіді та ілюстрації
-«Нова проповідь» SHALL створювати чорнетку зі структурою: тема, основний текст, вступ, пункти 1–3, ілюстрація, застосування, заклик. Картка ілюстрації SHALL мати «В чорнетку», що дописує заголовок, текст (показаний на картці) і джерело (FR-39).
+### Requirement: Sermon template and illustrations
+«Нова проповідь» (New sermon) SHALL create a draft with a structure: theme, main text, introduction, points 1–3, illustration, application, call. An illustration card SHALL have «В чорнетку», which appends the title, text (as shown on the card) and source (FR-39).
 
-#### Scenario: Шаблон
-- **WHEN** натиснуто «Нова проповідь»
-- **THEN** чорнетка містить розділи «Тема», «Основний текст», «Вступ», «1.», «2.», «3.», «Ілюстрація», «Застосування», «Заклик»
+#### Scenario: Template
+- **WHEN** «Нова проповідь» is pressed
+- **THEN** the draft contains the sections «Тема», «Основний текст», «Вступ», «1.», «2.», «3.», «Ілюстрація», «Застосування», «Заклик»
 
-### Requirement: Позначка віршів у чорнетках
-Вірш, на який є посилання хоча б в одній чорнетці, SHALL мати позначку біля номера; клік по ній SHALL відкривати панель чорнеток зі списком цих чорнеток. Діапазон позначає всі вірші діапазону (FR-39).
+### Requirement: Marking verses used in drafts
+A verse referenced in at least one draft SHALL have a marker next to its number; a click on it SHALL open the drafts panel with a list of those drafts. A range marks all verses of the range (FR-39).
 
-#### Scenario: Діапазон
-- **WHEN** у чорнетці є «1 Кор 13:4-7»
-- **THEN** вірші 1 Кор 13:4, 5, 6, 7 мають позначку, а 13:8 — ні
+#### Scenario: Range
+- **WHEN** a draft has «1 Кор 13:4-7»
+- **THEN** verses 1 Cor 13:4, 5, 6, 7 have a marker, and 13:8 does not
 
-### Requirement: Режим «Проповідь» і експорт
-Режим «Проповідь» SHALL показувати лише текст активної чорнетки (з форматуванням) великим шрифтом на все вікно; ⌘+ / ⌘− змінюють розмір, Esc повертає назад. Чорнетку SHALL можна скопіювати повністю, зберегти як Markdown-файл (`# назва` + текст) і надрукувати (з діалогу друку — PDF) (FR-40).
+### Requirement: "Sermon" mode and export
+«Проповідь» (Sermon) mode SHALL show only the active draft's text (formatted) in a large font across the whole window; ⌘+ / ⌘− change the size, Esc goes back. A draft SHALL be copyable in full, savable as a Markdown file (`# title` + text) and printable (PDF from the print dialog) (FR-40).
 
-#### Scenario: Проповідь
-- **WHEN** у чорнетці натиснуто «Проповідь», а потім Esc
-- **THEN** спершу видно лише текст чорнетки великим шрифтом, після Esc — знову розділ і панель
+#### Scenario: Sermon
+- **WHEN** «Проповідь» is pressed in a draft, and then Esc
+- **THEN** first only the draft text in a large font is visible, after Esc the chapter and panel again
 
 #### Scenario: Markdown
-- **WHEN** чорнетку «Про любов» з текстом «Бог є любов» зберігають як Markdown
-- **THEN** файл містить `# Про любов`, порожній рядок і `Бог є любов`
+- **WHEN** the draft «Про любов» with the text «Бог є любов» is saved as Markdown
+- **THEN** the file contains `# Про любов`, an empty line and `Бог є любов`

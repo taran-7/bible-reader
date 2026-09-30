@@ -1,70 +1,70 @@
 # illustrations Specification
 
 ## Purpose
-Показує до виділених віршів реальні історії-ілюстрації з дозволених протестантських джерел і Вікіпедії: живий пошук під час кліку, без індексу і без збереження.
+Shows real illustration stories for the selected verses from allowed Protestant sources and Wikipedia: live search on click, no index and no storage.
 
-Вимоги в [docs/requirements.md](../../../docs/requirements.md): FR-33, FR-34, FR-35, NFR-2.
+Requirements in [docs/requirements.md](../../../docs/requirements.md): FR-33, FR-34, FR-35, NFR-2.
 
 ## Requirements
 
-### Requirement: Вікно ілюстрацій
-Кнопка «Пошук ілюстрацій» на виділенні одного чи кількох віршів і однойменний пункт контекстного меню SHALL відкривати в тому самому вікні панель праворуч від тексту (текст 35 %, панель 65 %, межа тягнеться і запам'ятовується; ✕ або Esc закриває; новий запит замінює вміст) з не більш ніж 7 історіями до цих віршів: заголовок, сайт і дата, текст і посилання на джерело. «Отримати ще» SHALL підвантажувати наступні до 7 історій без повторів, поки вони знаходяться. Кнопка «Скопіювати» на картці SHALL класти в буфер заголовок, текст і джерело. Якщо переклад Біблії на екрані не англійський, картка SHALL мати «Перекласти» (мовою цього перекладу, на пристрої, macOS 15+) і «Оригінал»; «Скопіювати» SHALL брати те, що зараз на картці. Історії SHALL NOT зберігатися (FR-33).
+### Requirement: Illustrations window
+The «Пошук ілюстрацій» (Find illustrations) button on a selection of one or more verses and the context menu item of the same name SHALL open, in the same window, a panel to the right of the text (text 35 %, panel 65 %, the divider is draggable and remembered; ✕ or Esc closes it; a new request replaces the content) with at most 7 stories for these verses: title, site and date, text and a source link. «Отримати ще» (Get more) SHALL load the next up to 7 stories without repeats while any are found. The «Скопіювати» (Copy) button on a card SHALL put the title, text and source on the clipboard. If the on-screen Bible translation is not English, the card SHALL have «Перекласти» (Translate; into that translation's language, on-device, macOS 15+) and «Оригінал» (Original); «Скопіювати» SHALL take what is currently on the card. Stories SHALL NOT be stored (FR-33).
 
-#### Scenario: Перша партія і «Отримати ще»
-- **WHEN** джерела знаходять 12 історій і користувач відкриває вікно
-- **THEN** показано 7 карток і кнопку «Отримати ще»
-- **WHEN** користувач натискає «Отримати ще»
-- **THEN** додаються решта 5 без повторів, кнопки «Отримати ще» більше немає
+#### Scenario: First batch and "Get more"
+- **WHEN** the sources find 12 stories and the user opens the window
+- **THEN** 7 cards and the «Отримати ще» button are shown
+- **WHEN** the user presses «Отримати ще»
+- **THEN** the remaining 5 are added without repeats, and the «Отримати ще» button is gone
 
-#### Scenario: Без мережі
-- **WHEN** мережі немає
-- **THEN** вікно показує «Немає підключення до мережі» і «Повторити»
+#### Scenario: No network
+- **WHEN** there is no network
+- **THEN** the window shows «Немає підключення до мережі» (No network connection) and «Повторити» (Retry)
 
-#### Scenario: Помилка сайту
-- **WHEN** сайт відповідає помилкою
-- **THEN** вікно показує «Не вдалося знайти ілюстрації» з поясненням і «Повторити»
+#### Scenario: Site error
+- **WHEN** a site responds with an error
+- **THEN** the window shows «Не вдалося знайти ілюстрації» (Could not find illustrations) with an explanation and «Повторити»
 
-#### Scenario: Копіювання
-- **WHEN** користувач натискає «Скопіювати» на картці
-- **THEN** буфер містить заголовок, текст і рядок `Джерело: <сайт>, <адреса>`
+#### Scenario: Copying
+- **WHEN** the user presses «Скопіювати» on a card
+- **THEN** the clipboard contains the title, text and the line `Джерело: <site>, <address>`
 
-#### Scenario: Переклад
-- **WHEN** на екрані Огієнко і користувач натискає «Перекласти»
-- **THEN** заголовок і текст картки українською, кнопка — «Оригінал», «Скопіювати» бере український текст з англомовним посиланням на джерело
+#### Scenario: Translation
+- **WHEN** Ohienko is on screen and the user presses «Перекласти»
+- **THEN** the card title and text are in Ukrainian, the button reads «Оригінал», and «Скопіювати» takes the Ukrainian text with the English source link
 
-### Requirement: Лише дозволені джерела
-Історія SHALL показуватися лише з адреси https у домені allowlist; домени blocklist (католицькі й православні) SHALL відкидатися, навіть якщо вони піддомени allowlist. У Вікіпедії SHALL лишатися тільки біографії (категорія «… births» або «… deaths») без категорій зі словами catholic, orthodox, pope, saint, cardinal, monk, nun, monastery, patriarch, jesuit, franciscan, dominican, benedictine, beatified, canonized, venerated (FR-34).
+### Requirement: Allowed sources only
+A story SHALL be shown only from an https address in an allowlisted domain; blocklisted domains (Catholic and Orthodox) SHALL be dropped, even if they are subdomains of the allowlist. On Wikipedia only biographies (category "… births" or "… deaths") SHALL remain, without categories containing the words catholic, orthodox, pope, saint, cardinal, monk, nun, monastery, patriarch, jesuit, franciscan, dominican, benedictine, beatified, canonized, venerated (FR-34).
 
-#### Scenario: Посилання поза allowlist
-- **WHEN** допис сайту з allowlist веде на `catholic.com`
-- **THEN** історію відкинуто
+#### Scenario: A link outside the allowlist
+- **WHEN** a post on an allowlisted site links to `catholic.com`
+- **THEN** the story is dropped
 
-#### Scenario: Вікіпедія
-- **WHEN** Вікіпедія знаходить статтю про вірш, біографію протестантського євангеліста і біографію католицького святого
-- **THEN** показано лише біографію євангеліста
+#### Scenario: Wikipedia
+- **WHEN** Wikipedia finds an article about the verse, a biography of a Protestant evangelist and a biography of a Catholic saint
+- **THEN** only the evangelist's biography is shown
 
-### Requirement: Живий пошук без індексу
-Додаток SHALL NOT робити мережевих запитів до кліку по кнопці і SHALL NOT мати локального індексу ілюстрацій. Пошук SHALL іти англійською за ключовими словами тексту KJV виділених віршів у WordPress REST сайтів з конфігурації, у Вікіпедії і, якщо користувач ввів ключ Brave Search у Settings, у Brave Search з `site:` по allowlist. Для статей під авторським правом картка SHALL показувати не більше 1500 символів початку і посилання «Читати на сайті» (FR-35).
+### Requirement: Live search without an index
+The app SHALL NOT make network requests before the button is clicked and SHALL NOT have a local illustration index. Search SHALL run in English by keywords from the KJV text of the selected verses in the WordPress REST of the configured sites, in Wikipedia and, if the user entered a Brave Search key in Settings, in Brave Search with `site:` over the allowlist. For copyrighted articles the card SHALL show at most the first 1500 characters and a «Читати на сайті» (Read on site) link (FR-35).
 
-#### Scenario: Запит без змістовних слів
-- **WHEN** у виділенні немає слів, з яких можна побудувати запит
-- **THEN** мережевих запитів немає, вікно показує «Нічого не знайдено»
+#### Scenario: A query without meaningful words
+- **WHEN** the selection has no words to build a query from
+- **THEN** there are no network requests, the window shows «Нічого не знайдено» (Nothing found)
 
-#### Scenario: Довга стаття
-- **WHEN** текст допису довший за 1500 символів
-- **THEN** картка показує його початок до межі абзацу чи речення і «Читати на сайті»
+#### Scenario: A long article
+- **WHEN** the post text is longer than 1500 characters
+- **THEN** the card shows its beginning up to a paragraph or sentence boundary and «Читати на сайті»
 
-### Requirement: Відбір ілюстрацій моделлю
-Якщо доступна модель (Claude з ключем користувача в Keychain; без ключа — модель Apple на Mac), пошук ілюстрацій SHALL: спершу просити модель сформулювати до 3 англійських пошукових запитів за темою виділених віршів і шукати ними першими; оцінювати кандидатів пулом до 21 (0–10) і показувати лише з оцінкою ≥ 6, найкращі першими, по 7; на картці показувати рядок «Чому ця історія: …» мовою перекладу Біблії, з якого відкрито пошук; під історіями — «Відібрано моделлю: <назва>». Якщо модель не відповіла або відповідь не розібрано, пошук SHALL продовжуватися без неї (як без моделі) з позначкою «Без відбору моделлю — <причина>». Без моделі поведінка незмінна (FR-41).
+### Requirement: Model curation of illustrations
+If a model is available (Claude with the user's key in the Keychain; without a key, the Apple on-device model), illustration search SHALL: first ask the model to write up to 3 English search queries on the theme of the selected verses and search with them first; score candidates in a pool of up to 21 (0–10) and show only those scoring ≥ 6, best first, 7 at a time; show on the card the line «Чому ця історія: …» (Why this story) in the language of the Bible translation the search was opened from; under the stories, «Відібрано моделлю: <name>» (Curated by model). If the model did not respond or its response could not be parsed, search SHALL continue without it (as without a model) with the mark «Без відбору моделлю — <reason>» (Without model curation). Without a model the behavior is unchanged (FR-41).
 
-#### Scenario: Запити моделі
-- **WHEN** модель для Мт 5:44 повертає запит «loving enemies story»
-- **THEN** перший запит до сайтів — «loving enemies story»
+#### Scenario: Model queries
+- **WHEN** the model returns the query "loving enemies story" for Matt 5:44
+- **THEN** the first query to the sites is "loving enemies story"
 
-#### Scenario: Відбір і сортування
-- **WHEN** модель оцінила 21 кандидата, частина нижче 6
-- **THEN** показано до 7 історій з оцінкою ≥ 6, найвищі першими, кожна з рядком «Чому ця історія» мовою перекладу
+#### Scenario: Curation and ordering
+- **WHEN** the model scored 21 candidates, some below 6
+- **THEN** up to 7 stories scoring ≥ 6 are shown, highest first, each with a «Чому ця історія» line in the translation's language
 
-#### Scenario: Модель недоступна
-- **WHEN** Claude відповідає «недійсний ключ API»
-- **THEN** історії показано без відбору, а під ними «Без відбору моделлю — Claude: недійсний ключ API»
+#### Scenario: Model unavailable
+- **WHEN** Claude responds «недійсний ключ API» (invalid API key)
+- **THEN** the stories are shown without curation, and under them «Без відбору моделлю — Claude: недійсний ключ API»
