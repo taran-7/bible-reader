@@ -149,6 +149,13 @@ class NewTestamentTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             check_complete([{"abbrev": "66", "name": "66", "chapters": [["a ^b"]]}], first_book=40)
 
+    def test_check_complete_rejects_a_footnote_digit_glued_to_a_word(self):
+        # Eph 2:22 in the source reads «На15 Якому»: a stray number inside the text.
+        with self.assertRaises(SystemExit):
+            check_complete([{"abbrev": "49", "name": "49", "chapters": [["На15 Якому і ви разом"]]}], first_book=40)
+        # Numbers apart from words are fine («1 Кор», «у 2 рази»).
+        check_complete([{"abbrev": "49", "name": "49", "chapters": [["Як у 1 Кор 13 і 2 рази"]]}], first_book=40)
+
     def test_load_fixes_parses_keys(self):
         import json
         import tempfile
