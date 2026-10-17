@@ -130,9 +130,14 @@ Order: BKR first (KJV numbering, cheapest), then Ohienko (after 6.13).
 Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the text marks verses 4–7 and opens the passage on click.
 
 ### v2.4 Visit history
-**6.21 History panel on the right.** The free space to the right of the ~75-character column shows a list of recently visited verses, newest first. Each row: the reference in the translation's language, the translation name, the start of the verse text, the time. Clicking a row opens that verse **in the same translation** it was visited in (e.g. Ohienko, Ів. 3:16 opens Ohienko, not the current translation), scrolls to it and briefly highlights it. Stored locally in the user database, survives a restart; "Clear history". Owner request 2026-10-17.
-Draft defaults (to confirm with the owner, see HANDOFF): a visit is a jump to a verse (reference search, search result, link, Compare, bookmark) or a click/selection of a verse; plain chapter navigation records the chapter without a verse; the same translation + verse moves to the top instead of duplicating; limit 200 entries; the panel shares the right slot with Drafts and Illustrations (one at a time) and hides when the window is too narrow; a toolbar toggle and ⌘Y.
-Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the history row: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart.
+**6.21 History panel on the right.** The free space to the right of the ~75-character column always shows a flat list of recently visited verses, newest first, updated continuously (no grouping by day). A row is only the reference in the translation's language: the book name, chapter:verse, e.g. `Иоанна 3:16`, `Івана 3:16`, `John 3:16`; the language shows the translation, so there is no translation label, text excerpt or time. Clicking a row opens that verse **in the same translation** it was visited in, scrolls to it and briefly highlights it. Stored locally in the user database, survives a restart; "Clear history". Owner request 2026-10-17, decisions 2026-10-17:
+- A visit is a jump to a verse (reference search, search result, link from a draft, Compare, bookmark) or a click/selection of a verse; a plain chapter open (◀ ▶, book list) records the chapter without a verse (`Иоанна 3`).
+- The same translation + verse moves to the top instead of duplicating; the same verse in another translation is a separate entry.
+- Limit 50 entries: a new entry goes to the top and everything shifts down by one (the 49th becomes the 50th); the entry that would become the 51st is deleted.
+- When Drafts or Illustrations are open, history hides; a toolbar toggle can show it next to them, and then the Bible text column becomes narrower.
+- In the parallel view or Compare, a click keeps that mode and navigates it to the verse (rows aligned through the FR-26 mapping table), with the entry's translation as the main one.
+
+Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:16`: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart; after 51 different visits the list holds 50 and the first visit is gone.
 
 ## 7. Non-functional requirements
 - macOS 14+, Apple Silicon only. Intel is out of scope: the project is open source, whoever needs it can build it.
