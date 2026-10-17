@@ -143,11 +143,15 @@ final class ReaderUITests: XCTestCase {
         launch()
         search("John 3:16")
         expectSelected(16)
-        let verse = verseRow(16)
+        // `verse-N` is the whole list row, so the buttons are checked against its halves, not against the text.
+        let row = verseRow(16)
+        var previousMaxX = row.frame.minX
         for identifier in ["illustrations-button", "compare-button", "copy-button"] {
             guard let button = app.visibleButton(identifier) else { return XCTFail("\(identifier) не видно") }
-            XCTAssertLessThanOrEqual(button.frame.maxX, verse.frame.minX + 1, "\(identifier) зліва від вірша")
+            XCTAssertLessThan(button.frame.midX, row.frame.midX, "\(identifier) у лівій половині рядка")
+            XCTAssertGreaterThanOrEqual(button.frame.minX, previousMaxX - 1, "\(identifier) правіше за попередню кнопку")
             XCTAssertLessThan(button.frame.width, 60, "\(identifier) компактна: лише іконка")
+            previousMaxX = button.frame.maxX
         }
     }
 

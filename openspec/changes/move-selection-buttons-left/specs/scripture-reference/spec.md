@@ -18,4 +18,4 @@ When one or more verses are selected, the app SHALL show, to the left of the fir
 
 #### Scenario: Left of the verse
 - **WHEN** John 3:16 is selected
-- **THEN** the buttons end before the verse's left edge and left of the history panel
+- **THEN** the buttons are in the left half of the verse row, in the order illustrations, compare, copy, and left of the history panel
