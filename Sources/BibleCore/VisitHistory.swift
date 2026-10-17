@@ -63,9 +63,9 @@ public final class VisitHistory {
 
     private func load() {
         guard let database else { return }
-        let rows = (try? database.queue.read { db in
+        guard let rows = try? database.queue.read({ db in
             try Row.fetchAll(db, sql: "SELECT translation, book, chapter, verse FROM visit ORDER BY id DESC LIMIT \(Self.limit)")
-        }) ?? []
+        }) else { return }
         // A code no longer in the manifest loses only that row.
         entries = rows.compactMap { row in
             guard let translation = Translation(rawValue: row["translation"]) else { return nil }

@@ -130,7 +130,10 @@ public final class ReaderViewModel {
             return
         }
         availableTranslations = Translation.allCases.filter { translation in
-            !translation.isOptional || (try? repository?.hasTranslation(translation)) ?? true
+            guard translation.isOptional else { return true }
+            // An unreadable check keeps the translation offered, as before.
+            guard let repository, let present = try? repository.hasTranslation(translation) else { return true }
+            return present
         }
         if let data = positionStore?.data(forKey: Self.positionKey),
            let position = try? JSONDecoder().decode(Position.self, from: data),

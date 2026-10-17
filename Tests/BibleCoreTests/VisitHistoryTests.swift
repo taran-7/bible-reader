@@ -24,6 +24,15 @@ import Testing
     }
 
     // @trace FR-42
+    @Test func testIdentityIsTranslationAndPlace() {
+        #expect(Self.entry(43, 3, 16, .kjv).id == "kjv:43:3:16")
+        #expect(Self.entry(43, 3, nil, .kjv).id == "kjv:43:3:0")
+        #expect(Self.entry(43, 3, 16, .kjv).id != Self.entry(43, 3, 16, .ohienko).id)
+        // A book number outside the canon (a corrupted row) still gets a title instead of crashing.
+        #expect(Self.entry(99, 1, 1, .kjv).title == "99 1:1")
+    }
+
+    // @trace FR-42
     @Test func testNewestFirst() {
         let history = VisitHistory(database: nil)
         history.record(Self.entry(1, 1))
@@ -213,6 +222,15 @@ import Testing
         // The entry's translation is the main (first) column; the earlier columns stay.
         #expect(comparison?.translations.first == .ohienko)
         #expect(Set(comparison?.translations ?? []) == [.ohienko, .kjv, .synodal])
+    }
+
+    // @trace FR-42
+    @Test func testCompareOnAChapterEntryHighlightsTheFirstVerse() {
+        let model = makeModel()
+        model.showComparison(of: [3], with: [.ohienko])
+        model.openVisit(VisitEntry(translation: .kjv, book: 43, chapter: 2, verse: nil))
+        #expect(model.comparison?.location == Location(book: 43, chapter: 2))
+        #expect(model.comparison?.highlighted == [1])
     }
 
     // @trace FR-42
