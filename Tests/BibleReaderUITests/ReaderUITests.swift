@@ -141,6 +141,10 @@ final class ReaderUITests: XCTestCase {
     // @trace FR-17
     func testCopyButtonCopiesQuote() {
         launch()
+        // The history panel narrows the text (FR-42), so verses 16-18 and the buttons above them need a bigger window
+        // than the default one to stay on screen while the range grows.
+        let zoom = app.windows.firstMatch.buttons[XCUIIdentifierZoomWindow]
+        if zoom.waitForExistence(timeout: 3) { zoom.click() }
         XCTAssertTrue(verseRow(1).waitForExistence(timeout: 5))
         let button = app.buttons.matching(identifier: "copy-button").firstMatch
         XCTAssertFalse(button.exists, "без виділення кнопки немає")

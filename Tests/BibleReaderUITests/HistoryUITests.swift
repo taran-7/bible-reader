@@ -66,9 +66,9 @@ final class HistoryUITests: XCTestCase {
         XCTAssertTrue(rows().element(boundBy: 1).waitForExistence(timeout: 5))
         XCTAssertEqual(rows().element(boundBy: 0).label, "Genesis 1:1")
         rows().element(boundBy: 1).click()
-        // John 3 is now open: its chapter title is in the toolbar.
-        XCTAssertTrue(app.staticTexts["John 3"].firstMatch.waitForExistence(timeout: 5)
-                      || app.buttons["John 3"].firstMatch.waitForExistence(timeout: 5))
+        // John 3 is now open: the window title is the chapter.
+        let window = app.windows.matching(NSPredicate(format: "title == %@", "John 3")).firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 5), "вікно «John 3»")
     }
 
     // @trace FR-42
