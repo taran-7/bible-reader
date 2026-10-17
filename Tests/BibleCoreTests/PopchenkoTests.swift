@@ -296,6 +296,9 @@ final class NewTestamentRepository: BibleRepository, @unchecked Sendable {
         // Print fixes: 2 Tim 2:15 without the source typo, Rev 22:21 patched in.
         #expect(try text(55, 2, 15).contains("якому нічого соромитись"))
         #expect(try text(66, 22, 21) == "Благодать нашого Господа Ісуса Христа хай буде з усіма вами! Амінь.")
+        // Eph 2:22: the source had a stray footnote number «На15 Якому».
+        #expect(try text(49, 2, 22).hasPrefix("На Якому і ви разом"))
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'popchenko' AND text GLOB '*[а-яіїєґА-ЯІЇЄҐ][0-9]*'", in: db) == 0)
         #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'popchenko' AND (text LIKE '%^%' OR text = '')", in: db) == 0)
     }
 }

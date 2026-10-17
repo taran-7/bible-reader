@@ -149,6 +149,8 @@ def check_complete(books, first_book=1):
                     sys.exit(f"{where}: the verse is missing in the source; add it to the fixes file from the printed edition")
                 if "^" in text:
                     sys.exit(f"{where}: a typo mark ^ in the source; add the verse to the fixes file from the printed edition")
+                if re.search(r"[^\W\d_]\d|\d[^\W\d_]", text):
+                    sys.exit(f"{where}: a number glued to a word (a footnote mark?); add the verse to the fixes file from the printed edition")
 
 
 def main(src, dst, align=None, first_book=1, fixes=None):
