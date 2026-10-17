@@ -8,6 +8,8 @@ struct ContentView: View {
     @Environment(DraftStore.self) private var drafts
     /// The selected verses for which the "Compare" translation picker is open.
     @State private var compareSelection: CompareSelection?
+    /// Where the verse list is: a click inside it is not "outside the text" (deselecting, FR-17).
+    @State private var readingArea = ReadingAreaTracker()
     /// With Drafts or Illustrations open the history is hidden unless the toolbar toggle shows it next to them (FR-42).
     @AppStorage(HistoryLayout.alongsidePanelsKey) private var historyAlongsidePanels = false
 
@@ -118,7 +120,7 @@ struct ContentView: View {
             }
             .modifier(SearchField(query: $model.query))
             .background(SearchFieldStyler())
-            .background(SelectionDismissal(model: model, drafts: drafts))
+            .background(SelectionDismissal(model: model, drafts: drafts, readingArea: readingArea))
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
@@ -129,7 +131,7 @@ struct ContentView: View {
 
 extension ContentView {
     private var chapter: some View {
-        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize) { verses in
+        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize, readingArea: readingArea) { verses in
             guard !verses.isEmpty else { return }
             compareSelection = CompareSelection(verses: verses)
         }

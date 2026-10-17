@@ -10,5 +10,5 @@
 
 ## 3. Verification
 
-- [x] 3.1 `make test` (307 tests), app build
-- [ ] 3.2 A look in the running app: Esc and a click on the empty header deselect; the translation menu in the toolbar keeps the selection (manual, owner)
+- [x] 3.1 `make test` (309 tests), app build
+- [ ] 3.2 A look in the running app: Esc, a click on the empty header and a click in the history panel / book list deselect; Esc in full screen does not leave it; the translation menu in the toolbar keeps the selection (manual, owner)

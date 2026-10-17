@@ -101,4 +101,17 @@ final class CompareUITests: XCTestCase {
         let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button", timeout: 0) == nil }
         wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 10)
     }
+
+    // @trace FR-17
+    func testClickOutsideTheTextClearsSelection() {
+        launch(reset: true)
+        search("John 3:16")
+        XCTAssertNotNil(app.visibleButton("compare-button"), "виділення після переходу")
+        // The empty bottom of the history panel: a click outside the verse text.
+        let panel = app.descendants(matching: .any)["history-panel"].firstMatch
+        XCTAssertTrue(panel.waitForExistence(timeout: 5))
+        panel.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.97)).click()
+        let gone = NSPredicate { _, _ in self.app.visibleButton("compare-button", timeout: 0) == nil }
+        wait(for: [XCTNSPredicateExpectation(predicate: gone, object: nil)], timeout: 10)
+    }
 }

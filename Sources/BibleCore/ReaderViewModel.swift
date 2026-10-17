@@ -57,6 +57,18 @@ public final class ReaderViewModel {
     public func headerClickClearsSelection() -> Bool {
         canClearSelection && results == nil && searchError == nil
     }
+
+    /// A click anywhere else outside the verse text (the book list, the history panel) deselects too. Not with the drafts
+    /// panel open: the selection is what «В чорнетку» takes, and a click in the draft must not drop it.
+    public func outsideClickClearsSelection(draftsOpen: Bool) -> Bool {
+        !draftsOpen && headerClickClearsSelection()
+    }
+
+    /// Nothing in the app uses Esc now: no text field, sheet or drafts panel (`otherOwnsEscape`), no panel or picker to close.
+    /// In full screen AppKit leaves the mode on an unused Esc, so the window swallows it.
+    public func escapeIsFree(otherOwnsEscape: Bool = false) -> Bool {
+        !otherOwnsEscape && illustrations == nil && comparison == nil && chapterPicker == nil
+    }
     /// The second translation alongside (FR-26); `nil` means the parallel view is off.
     public var parallelTranslation: Translation? {
         didSet { if parallelTranslation != oldValue { rebuildParallel() } }

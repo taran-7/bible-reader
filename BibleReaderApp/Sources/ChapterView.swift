@@ -6,6 +6,8 @@ import SwiftUI
 struct ChapterView: View {
     let model: ReaderViewModel
     let fontSize: Double
+    /// Reports the list's frame for `SelectionDismissal`.
+    var readingArea: ReadingAreaTracker?
     /// "Compare" (FR-36): the translation picker and comparison mode live in `ContentView`.
     var compare: (Set<Int>) -> Void = { _ in }
     @State private var selection = Set<Int>()
@@ -81,6 +83,7 @@ struct ChapterView: View {
                     .onChange(of: geometry.size.width) { _, width in listWidth = width }
             })
             .background(ThemeBackground())
+            .background { if let readingArea { ReadingAreaMarker(tracker: readingArea) } }
             .focused($listFocused)
             // Esc is the Edit → Deselect menu item and `SelectionDismissal` (Esc and a click on the header), whatever has focus (FR-17).
             .onChange(of: model.clearSelectionRequest) { _, _ in selection = [] }

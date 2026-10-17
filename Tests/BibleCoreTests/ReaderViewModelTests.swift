@@ -428,4 +428,35 @@ extension ReaderViewModelTests {
         model.submitSearch()
         #expect(!model.headerClickClearsSelection(), "the chapter with the selection is not on screen")
     }
+
+    // @trace FR-17
+    @Test func testClickOutsideTheTextKeepsSelectionWhileDraftsAreOpen() {
+        // With the drafts panel open the selection is what «В чорнетку» takes, so a click in the draft must not drop it.
+        let model = makeModel()
+        #expect(!model.outsideClickClearsSelection(draftsOpen: false), "nothing selected")
+        model.updateSelection(first: 2)
+        #expect(model.outsideClickClearsSelection(draftsOpen: false))
+        #expect(!model.outsideClickClearsSelection(draftsOpen: true))
+    }
+
+    // @trace FR-17
+    @Test func testEscapeIsFreeOnlyWhenNothingUsesIt() {
+        // A free Esc is swallowed in full screen: AppKit would leave the mode on it.
+        let model = makeModel()
+        #expect(model.escapeIsFree())
+        #expect(!model.escapeIsFree(otherOwnsEscape: true), "a text field, sheet or the drafts panel")
+        model.showIllustrations(for: [2])
+        #expect(!model.escapeIsFree() || model.illustrations == nil)
+        model.closeIllustrations()
+        #expect(model.escapeIsFree())
+        model.showComparison(of: [2], with: [.synodal])
+        #expect(model.comparison != nil)
+        #expect(!model.escapeIsFree(), "Esc closes the comparison")
+        model.closeComparison()
+        #expect(model.escapeIsFree())
+        model.pickCurrentBook()
+        #expect(!model.escapeIsFree(), "Esc closes the chapter picker")
+        model.dismissChapterPicker()
+        #expect(model.escapeIsFree())
+    }
 }

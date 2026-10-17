@@ -4,8 +4,8 @@ Owner report 2026-10-17: with a verse selected, Esc and a click on the window he
 
 ## What Changes
 
-- `SelectionDismissal` (app layer): a local event monitor for the reader window catches Esc and a click on the empty window header (title bar, toolbar space without controls) whatever has the focus.
-- `ReaderViewModel` decides: `escapeClearsSelection(otherOwnsEscape:)`, `headerClickClearsSelection()`, `updateSelection(first:)`; deselecting also clears the jump emphasis (`focusedVerse`).
+- `SelectionDismissal` (app layer): a local event monitor for the reader window catches Esc, a click on the empty window header (title bar, toolbar space without controls) and a click anywhere else outside the verse list (book list, history panel, not on a control, not while Drafts are open) whatever has the focus. An Esc nobody uses is swallowed in full screen, where AppKit would leave the mode on it (owner report, same day).
+- `ReaderViewModel` decides: `escapeClearsSelection(otherOwnsEscape:)`, `escapeIsFree(otherOwnsEscape:)`, `headerClickClearsSelection()`, `outsideClickClearsSelection(draftsOpen:)`, `updateSelection(first:)`; deselecting also clears the jump emphasis (`focusedVerse`).
 - `ChapterView` syncs the anchor verse explicitly after a jump, so a re-selected identical verse does not leave `canClearSelection` false.
 
 ## Non-goals
