@@ -61,6 +61,10 @@ enum TestSupport {
         try DatabaseQueue(path: db.path).read { try String.fetchOne($0, sql: sql) }
     }
 
+    static func strings(_ sql: String, in db: URL) throws -> [String] {
+        try DatabaseQueue(path: db.path).read { try String.fetchAll($0, sql: sql) }
+    }
+
     /// A database from real data, imported once per test run.
     static let realDatabase: URL = {
         let out = try! tempDirectory().appendingPathComponent("bible.sqlite")

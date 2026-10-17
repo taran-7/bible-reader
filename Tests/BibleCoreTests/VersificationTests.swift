@@ -81,7 +81,8 @@ extension VersificationTests {
         let synodal = try TestSupport.keys(.synodal, in: TestSupport.realDatabase)
         let missing = synodal.filter { v.kjv(fromSynodal: $0) == nil }
         let chapters = Set(missing.map { "\($0.book):\($0.chapter)" })
-        #expect(chapters == ["6:24", "20:4", "20:13", "20:18", "27:3", "27:13", "27:14", "19:151"], "\(chapters.sorted())")
+        // Joshua 24:34-36 and Proverbs 4:28-29 are bracketed Greek additions that the converter drops (as in Esther).
+        #expect(chapters == ["20:13", "20:18", "27:3", "27:13", "27:14", "19:151"], "\(chapters.sorted())")
         #expect(missing.filter { $0.book == 27 && $0.chapter == 3 }.map(\.verse) == Array(24...90))
     }
 }

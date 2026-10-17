@@ -11,6 +11,7 @@ endif
 
 test:
 	python3 scripts/test_convert_getbible.py
+	python3 scripts/test_convert_synodal.py
 	swift test $(TEST_FLAGS)
 
 DB := BibleReaderApp/Resources/bible.sqlite

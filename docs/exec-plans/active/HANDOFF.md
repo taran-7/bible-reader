@@ -42,6 +42,7 @@ Updated: 2026-10-17. The plan queue up to PR #26 is merged; Popchenko NT (FR-43)
 - 2026-09-29 PR #25: Хуки: pre-push сканер секретів і хуки Claude Code (PD-19)
 
 Not in master yet (current branch):
+- 2026-10-17 Deselect: a click outside the verse text clears the selection, an unused Esc no longer leaves full screen (FR-17)
 - 2026-10-17 Deselect: Esc and a click on the empty window header clear the selection and the jump emphasis (FR-17)
 - 2026-10-17 UI tests: copy a short range (Genesis 1:3-5) so it fits the narrower text column (FR-42)
 - 2026-10-17 UI tests: fix the history row click check, enlarge the window for the copy-range test (FR-42)
@@ -65,5 +66,5 @@ Not in master yet (current branch):
 - 2026-10-17 Plan: visit history decisions from the owner (PRD 6.21, FR-42)
 - 2026-10-17 Plan: visit history panel on the right (PRD 6.21, FR-42)
 
-Active openspec changes: `add-popchenko-nt`, `add-visit-history`, `fix-deselect-selection`.
+Active openspec changes: `add-popchenko-nt`, `add-visit-history`, `fix-deselect-selection`, `strip-synodal-additions`.
 <!-- END GENERATED -->
