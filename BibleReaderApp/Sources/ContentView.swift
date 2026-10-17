@@ -118,6 +118,7 @@ struct ContentView: View {
             }
             .modifier(SearchField(query: $model.query))
             .background(SearchFieldStyler())
+            .background(SelectionDismissal(model: model, drafts: drafts))
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }

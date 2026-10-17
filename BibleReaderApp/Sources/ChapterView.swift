@@ -82,7 +82,7 @@ struct ChapterView: View {
             })
             .background(ThemeBackground())
             .focused($listFocused)
-            // Esc is the Edit → Deselect menu item: works with any focus (FR-17).
+            // Esc is the Edit → Deselect menu item and `SelectionDismissal` (Esc and a click on the header), whatever has focus (FR-17).
             .onChange(of: model.clearSelectionRequest) { _, _ in selection = [] }
             .navigationTitle(title)
             .contextMenu(forSelectionType: Int.self) { verses in
@@ -122,7 +122,7 @@ struct ChapterView: View {
             // The same number in another translation may mean different content; the verse will re-select the focus.
             .onChange(of: model.translation) { _, _ in selection = [] }
             // The first selected verse: switching translation opens exactly this one (FR-27).
-            .onChange(of: selection) { _, selection in model.anchorVerse = selection.min() }
+            .onChange(of: selection) { _, selection in model.updateSelection(first: selection.min()) }
             .onAppear {
                 // After the first frame with verses is committed (NFR-3).
                 CATransaction.setCompletionBlock { model.markFirstChapterShown() }
@@ -130,6 +130,9 @@ struct ChapterView: View {
             .onChange(of: model.focusRequest, initial: true) { _, _ in
                 guard let verse = model.takeFocus() else { return }
                 selection = [verse]
+                // Not left to `onChange(of: selection)`: when the same verse is reselected after the location or translation
+                // handler emptied the selection, the value does not change and that handler never runs.
+                model.updateSelection(first: verse)
                 listFocused = true
                 DispatchQueue.main.async { proxy.scrollTo(verse, anchor: .top) }
             }

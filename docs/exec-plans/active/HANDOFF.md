@@ -13,7 +13,7 @@ Updated: 2026-10-17. The plan queue up to PR #26 is merged; Popchenko NT (FR-43)
 - How to add a translation: [translation-modules.md](../../translation-modules.md).
 
 ## Next (for the agent)
-1. **Visit history (PRD 6.21, FR-42): built, awaiting CI and a visual check**, change `openspec/changes/add-visit-history` (branch `feature/visit-history`, stacked on the Popchenko branch until PR #33 merges). `VisitHistory` + migration `v3` + `ReaderViewModel.openVisit`, `HistoryPanel`, toolbar toggle, selection buttons anchored to the text column edge; `VisitHistoryTests` (24) pass in `make test`, `HistoryUITests` were compiled but not run locally. **Not done:** the owner's look in the running app (task 3.2); archive the change and sync `openspec/specs/visit-history` after that.
+1. **Visit history (PRD 6.21, FR-42): built, awaiting CI and a visual check**, change `openspec/changes/add-visit-history` (branch `feature/visit-history`, stacked on the Popchenko branch until PR #33 merges). `VisitHistory` + migration `v3` + `ReaderViewModel.openVisit`, `HistoryPanel`, toolbar toggle, selection buttons anchored to the text column edge; `VisitHistoryTests` (24) pass in `make test`, `HistoryUITests` were compiled but not run locally. **Not done:** the owner's look in the running app (task 3.2); archive the change and sync `openspec/specs/visit-history` after that. Same branch: `fix-deselect-selection` (Esc and a click on the empty window header deselect; deselecting also clears the semibold jump emphasis), `SelectionDismissal` + `ReaderViewModel.escapeClearsSelection`; its owner check is task 3.2 of that change.
 2. **Popchenko New Testament (PRD 6.22, FR-43): built, text fetched, awaiting a visual check**, change `openspec/changes/add-popchenko-nt` (branch `claude/stoic-ramanujan-ineyvj`). `scripts/fetch_ppch.sh` produced the local text (27 books, 7957 verses, Rev 22:21 and 2 Tim 2:15 from the print); `PopchenkoTests` and the converter tests pass (`make test`), the app builds. **Not done:** a look in the running app (task 3.3: Ів. 3:16, Genesis 1 → Matthew 1, the "not in this translation" cell in Compare); then archive the change and sync the spec into `openspec/specs/translation-modules`.
 3. **Later: Popchenko Psalms (PRD 6.22, FR-44)**, waits for the owner's photos of the printed Psalms: recognize into a local git-ignored file, check numbering, extend coverage to NT + Psalms.
 4. Other slices, the owner's choice: (a) Foster "New Cyclopaedia of Prose Illustrations" (public domain), a local illustration source next to the online search; (b) KJV cross-references (TSK / OpenBible.info). Open: verify the denomination of the illustration allowlist domains before release.
@@ -42,6 +42,11 @@ Updated: 2026-10-17. The plan queue up to PR #26 is merged; Popchenko NT (FR-43)
 - 2026-09-29 PR #25: Хуки: pre-push сканер секретів і хуки Claude Code (PD-19)
 
 Not in master yet (current branch):
+- 2026-10-17 UI tests: copy a short range (Genesis 1:3-5) so it fits the narrower text column (FR-42)
+- 2026-10-17 UI tests: fix the history row click check, enlarge the window for the copy-range test (FR-42)
+- 2026-10-17 Popchenko NT: avoid an uncovered autoclosure in the availability check (coverage ratchet)
+- 2026-10-17 Popchenko NT: remove the stray footnote number from Eph 2:22; converter rejects digits glued to words (FR-43)
+- 2026-10-17 Visit history: panel right of the text, 50 entries, reopen in the same translation (FR-42)
 - 2026-10-17 Popchenko NT: Rev 22:21 and 2 Tim 2:15 from the printed edition, local-text test (FR-43)
 - 2026-10-17 Popchenko NT: optional 27-book module, local fetch script, NT-aware reader (FR-43)
 - 2026-10-17 Plan: Popchenko Psalms as a separate slice (FR-44)
@@ -59,5 +64,5 @@ Not in master yet (current branch):
 - 2026-10-17 Plan: visit history decisions from the owner (PRD 6.21, FR-42)
 - 2026-10-17 Plan: visit history panel on the right (PRD 6.21, FR-42)
 
-Active openspec changes: `add-popchenko-nt`, `add-visit-history`.
+Active openspec changes: `add-popchenko-nt`, `add-visit-history`, `fix-deselect-selection`.
 <!-- END GENERATED -->

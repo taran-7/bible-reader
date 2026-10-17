@@ -412,7 +412,8 @@
     {
       "id": "FR-17",
       "specs": [
-        "openspec/specs/scripture-reference/spec.md"
+        "openspec/specs/scripture-reference/spec.md",
+        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -420,11 +421,19 @@
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleReaderUITests/CompareUITests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleReaderUITests/CompareUITests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
@@ -627,7 +636,8 @@
     {
       "id": "FR-27",
       "specs": [
-        "openspec/specs/parallel-reading/spec.md"
+        "openspec/specs/parallel-reading/spec.md",
+        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -1342,6 +1352,10 @@
     {
       "check": "active-changes",
       "msg": "active change \"add-visit-history\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"fix-deselect-selection\" is not archived"
     }
   ]
 }

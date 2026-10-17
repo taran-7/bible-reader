@@ -37,6 +37,25 @@ public final class ReaderViewModel {
 
     public func clearSelection() {
         clearSelectionRequest += 1
+        focusedVerse = nil
+    }
+
+    /// The selection in `ChapterView` changed: the first selected verse is the anchor (FR-27). An empty selection takes the
+    /// semibold emphasis of the jumped-to verse with it, so nothing looks selected after a click on blank space.
+    public func updateSelection(first verse: Int?) {
+        anchorVerse = verse
+        if verse == nil { focusedVerse = nil }
+    }
+
+    /// Esc clears the selection unless something else owns the key: a text field being edited, a sheet or popover, the drafts
+    /// panel (`otherOwnsEscape`), the chapter picker, or search results (the chapter is not on screen then).
+    public func escapeClearsSelection(otherOwnsEscape: Bool = false) -> Bool {
+        !otherOwnsEscape && headerClickClearsSelection() && chapterPicker == nil
+    }
+
+    /// A click on the window header (toolbar, title bar) outside its controls deselects, like a click outside a list.
+    public func headerClickClearsSelection() -> Bool {
+        canClearSelection && results == nil && searchError == nil
     }
     /// The second translation alongside (FR-26); `nil` means the parallel view is off.
     public var parallelTranslation: Translation? {
