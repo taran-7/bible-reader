@@ -42,6 +42,9 @@
     "FR-39": "MVP",
     "FR-40": "MVP",
     "FR-41": "MVP",
+    "FR-42": "MVP",
+    "FR-43": "MVP",
+    "FR-44": "MVP",
     "NFR-1": "MVP",
     "NFR-2": "MVP",
     "NFR-3": "MVP",
@@ -1016,10 +1019,86 @@
         "tests/BibleCoreTests/IllustrationNetworkTests.swift"
       ],
       "recordings": []
+    },
+    {
+      "id": "FR-42",
+      "specs": [
+        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md"
+      ],
+      "planned": true,
+      "tests": [],
+      "recordings": []
+    },
+    {
+      "id": "FR-43",
+      "specs": [
+        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md"
+      ],
+      "planned": true,
+      "tests": [
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "Tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift",
+        "tests/BibleCoreTests/PopchenkoTests.swift"
+      ],
+      "recordings": []
+    },
+    {
+      "id": "FR-44",
+      "specs": [
+        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md"
+      ],
+      "planned": true,
+      "tests": [],
+      "recordings": []
     }
   ],
   "failures": [],
   "warnings": [
+    {
+      "check": "test-trace",
+      "msg": "FR-42 has no test annotated \"@trace FR-42\""
+    },
+    {
+      "check": "test-trace",
+      "msg": "FR-44 has no test annotated \"@trace FR-44\""
+    },
     {
       "check": "recording-evidence",
       "msg": "FR-1 is not referenced by any recording manifest under docs/qa/"
@@ -1183,6 +1262,22 @@
     {
       "check": "recording-evidence",
       "msg": "FR-41 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-42 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-43 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "recording-evidence",
+      "msg": "FR-44 is not referenced by any recording manifest under docs/qa/"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"add-popchenko-nt\" is not archived"
     }
   ]
 }

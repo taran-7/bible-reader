@@ -16,8 +16,12 @@ A new translation is added as data, with no code changes:
      66 objects `{"name": …, "abbreviation": …}` in canonical order, and search matches exact word forms;
    - `numbering`: `kjv` (like KJV, Kralická, Ohienko), `synodal` (like the Synodal; built-in mapping table) or a new system, e.g. `vulgate`;
    - `versification`: for a new system, `{"segments": [{"book": 19, "chapter": 10, "from": 1, "to": 18, "localChapter": 9, "localVerse": 22}]}`, only the differences from KJV (`merge: true` means several KJV verses in one). One module of that system is enough; between two non-KJV systems a verse is mapped through KJV;
+   - `coverage`: `bible` (default, 66 books) or `nt` (New Testament only: the file holds 27 books, `books` lists 27 names for books 40…66; Old Testament books are hidden for it and Compare / the parallel view mark them "not in this translation");
+   - `optional`: `true` for a local-only text that is not in the repository (copyright): when its file is absent `make db` skips the module and the app does not offer it. Example: `popchenko` (`scripts/fetch_ppch.sh`, FR-43);
    - line order is menu order; the first nine get ⌘⌥1…9;
    - the codes `kjv`, `bkr`, `ohienko`, `synodal` are required (the code relies on them).
 3. `make db` rebuilds the database; the app shows the translation in the menu, search, "Compare" and the parallel view.
+
+Local-only text: `scripts/fetch_ppch.sh` downloads Popchenko's New Testament (bolls.life `PPCH`), converts it with `convert_getbible.py --nt --align-to data/raw/en_kjv.json --fixes scripts/ppch_print_fixes.json` into the git-ignored `data/raw/uk_popchenko.json`, then `make db` includes it. `ppch_print_fixes.json` lists verses taken whole from the owner's printed edition (a source typo or a missing verse); the converter fails if a `^` or an empty verse remains.
 
 The manifest is validated on load: a duplicate code, a new numbering without a `versification` table, or a language without book names is an error.

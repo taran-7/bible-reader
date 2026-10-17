@@ -6,7 +6,7 @@ import Testing
     // @trace FR-30
     @Test func testBuiltInCatalogComesFromManifest() throws {
         let manifest = try TranslationCatalog.load(from: TranslationCatalog.bundledManifest)
-        #expect(manifest.map(\.rawValue) == ["kjv", "bkr", "ohienko", "synodal"])
+        #expect(manifest.map(\.rawValue) == ["kjv", "bkr", "ohienko", "synodal", "popchenko"])
         #expect(Translation.allCases == manifest)
         #expect(Translation.synodal.numbering == .synodal)
         #expect(Translation.kjv.numbering == .kjv)

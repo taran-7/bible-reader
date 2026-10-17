@@ -34,6 +34,9 @@ Order per [PRD](product-specs/prd.md) §6. The owner approved the plan on 2026-0
 | 4 | `add-illustrations` (v2.2) | FR-33, FR-34, FR-35 | 1a (button next to 6.3) | done 2026-09-28 (archive `2026-09-28-add-illustrations`) |
 | 7 | `add-sermon-drafts` (v2.3) | FR-38, FR-39, FR-40 | 1a (button on the selection), 4 (illustration card) | done 2026-09-28 (archive `2026-09-28-add-sermon-drafts`) |
 | 4b | `add-illustration-curation` (v2.4) | FR-41 | 4 | done 2026-09-29 (archive `2026-09-29-add-illustration-curation`) |
+| 8 | `add-visit-history` (v2.4) | FR-42 | 7 (drafts panel layout) | planned |
+| 9 | `add-popchenko-nt` (v2.5) | FR-43 | 6a | in progress: core and app built; the local text is not fetched yet (`openspec/changes/add-popchenko-nt/tasks.md` section 3) |
+| 10 | `add-popchenko-psalms` (v2.5) | FR-44 | 9 | planned, waits for the owner's photos |
 
 NFR mechanisms (approved 2026-09-27):
 

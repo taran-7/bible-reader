@@ -9,9 +9,13 @@ numbers are kept). Removes U+0301 stress marks, <…> tags and lone
 curly braces; in BKR alternative words {word} become (word).
 ASCII quotes become Ukrainian „…“, italics <i>…</i> become plain text.
 With --align-to <data/raw file> the numbering is aligned verse by verse to another translation (KJV), see align_to.
+With --nt the source is a New Testament only (books 40..66) and the result has 27 books (the local Popchenko module).
+With --fixes <json> whole verses are replaced (or added) before cleaning: {"book:chapter:verse": "text"}.
 Usage:
     python3 scripts/convert_getbible.py UBIO.json data/raw/uk_ohienko.json --align-to data/raw/en_kjv.json
     python3 scripts/convert_getbible.py bkr.json data/raw/cs_bkr.json
+    python3 scripts/convert_getbible.py PPCH.json data/raw/uk_popchenko.json --nt --align-to data/raw/en_kjv.json \\
+        --fixes scripts/ppch_print_fixes.json
 """
 import json
 import re
@@ -59,10 +63,21 @@ def from_bolls(verses):
     }
 
 
-def convert(source):
+def load_fixes(path):
+    """{"book:chapter:verse": "text"} → {(book, chapter, verse): "text"}."""
+    fixes = {}
+    for key, text in json.load(open(path, encoding="utf-8")).items():
+        book, chapter, verse = (int(n) for n in key.split(":"))
+        fixes[(book, chapter, verse)] = text
+    return fixes
+
+
+def convert(source, first_book=1, overrides=None):
+    """`first_book` 40 means a New Testament source (books 40..66). `overrides` replace or add whole verses."""
+    overrides = overrides or {}
     books = sorted(source["books"], key=lambda b: b["nr"])
-    if [b["nr"] for b in books] != list(range(1, 67)):
-        sys.exit("expected 66 books with nr 1..66")
+    if [b["nr"] for b in books] != list(range(first_book, 67)):
+        sys.exit(f"expected {67 - first_book} books with nr {first_book}..66")
     out = []
     for book in books:
         chapters = []
@@ -75,9 +90,13 @@ def convert(source):
                 continue
             if len(set(numbers)) != len(numbers) or min(numbers) < 1:
                 sys.exit(f"{book['name']} {chapter['chapter']}: duplicate or invalid verse numbers")
-            texts = [""] * max(numbers)
+            fixed = {n: t for (b, c, n), t in overrides.items() if (b, c) == (book["nr"], chapter["chapter"])}
+            texts = [""] * max(numbers + list(fixed))
             for verse in chapter["verses"]:
-                texts[verse["verse"] - 1] = clean(verse["text"])
+                if verse["verse"] not in fixed:
+                    texts[verse["verse"] - 1] = clean(verse["text"])
+            for number, text in fixed.items():
+                texts[number - 1] = clean(text)
             chapters.append(texts)
         # Empty stub chapters at the end of a book (Ohienko: Esther 11–16, Ps 151) are dropped.
         while chapters and not chapters[-1]:
@@ -88,15 +107,18 @@ def convert(source):
     return out
 
 
-def align_to(books, reference):
+def align_to(books, reference, first_book=1):
     """Aligns verse numbering to `reference` (data/raw format) verse by verse.
+    With `first_book` 40 the books are a New Testament and are compared with the same books of the reference.
 
     Known differences of the Hebrew numbering from KJV; anything else is an error:
     - Psalms: a superscription as a separate verse (1–2 verses) → merged into the first verse of the text, as in KJV;
     - 1 Sam 21:1 → the end of 1 Sam 20:42;
     - 3 John 1:14–15 → one verse 14.
     """
-    for bi, (book, ref) in enumerate(zip(books, reference)):
+    reference = reference[first_book - 1:]
+    for index, (book, ref) in enumerate(zip(books, reference)):
+        bi = index + first_book - 1
         if len(book["chapters"]) != len(ref["chapters"]):
             sys.exit(f"book {bi + 1}: {len(book['chapters'])} chapters, the reference has {len(ref['chapters'])}")
         for ci, (verses, ref_verses) in enumerate(zip(book["chapters"], ref["chapters"])):
@@ -117,16 +139,32 @@ def align_to(books, reference):
     return books
 
 
-def main(src, dst, align=None):
+def check_complete(books, first_book=1):
+    """After the fixes no verse may be empty and no `^` typo mark may remain (a defect in the source we did not fix)."""
+    for index, book in enumerate(books):
+        for ci, chapter in enumerate(book["chapters"]):
+            for vi, text in enumerate(chapter):
+                where = f"{first_book + index}:{ci + 1}:{vi + 1}"
+                if text == "":
+                    sys.exit(f"{where}: the verse is missing in the source; add it to the fixes file from the printed edition")
+                if "^" in text:
+                    sys.exit(f"{where}: a typo mark ^ in the source; add the verse to the fixes file from the printed edition")
+                if re.search(r"[^\W\d_]\d|\d[^\W\d_]", text):
+                    sys.exit(f"{where}: a number glued to a word (a footnote mark?); add the verse to the fixes file from the printed edition")
+
+
+def main(src, dst, align=None, first_book=1, fixes=None):
     source = json.load(open(src, encoding="utf-8"))
     if isinstance(source, list):
         source = from_bolls(source)
-    books = convert(source)
+    books = convert(source, first_book, load_fixes(fixes) if fixes else None)
     if align:
-        books = align_to(books, json.load(open(align, encoding="utf-8-sig")))
+        books = align_to(books, json.load(open(align, encoding="utf-8-sig")), first_book)
+    if first_book > 1:
+        check_complete(books, first_book)
     code = source.get("abbreviation", "")
     for (b, c, v), prefix in CHECKS.get(code, {}).items():
-        text = books[b - 1]["chapters"][c - 1][v - 1]
+        text = books[b - first_book]["chapters"][c - 1][v - 1]
         if not text.startswith(prefix):
             sys.exit(f"control verse {b}:{c}:{v}: «{text[:40]}» does not start with «{prefix}»")
     with open(dst, "w", encoding="utf-8") as f:
@@ -134,7 +172,7 @@ def main(src, dst, align=None):
     gaps = [f"{b['abbrev']}:{ci + 1}:{vi + 1}" for b in books
             for ci, c in enumerate(b["chapters"]) for vi, t in enumerate(c) if t == ""]
     total = sum(len(c) for b in books for c in b["chapters"])
-    print(f"{dst}: 66 books, {total - len(gaps)} verses, {len(gaps)} missing")
+    print(f"{dst}: {len(books)} books, {total - len(gaps)} verses, {len(gaps)} missing")
     if gaps:
         print("missing (book:chapter:verse):", " ".join(gaps))
 
@@ -146,6 +184,15 @@ if __name__ == "__main__":
         i = args.index("--align-to")
         align = args[i + 1]
         del args[i:i + 2]
+    fixes = None
+    if "--fixes" in args:
+        i = args.index("--fixes")
+        fixes = args[i + 1]
+        del args[i:i + 2]
+    first_book = 1
+    if "--nt" in args:
+        args.remove("--nt")
+        first_book = 40
     if len(args) != 2:
         sys.exit(__doc__)
-    main(args[0], args[1], align)
+    main(args[0], args[1], align, first_book, fixes)

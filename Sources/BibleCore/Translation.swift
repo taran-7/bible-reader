@@ -50,6 +50,22 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
         public var isBuiltIn: Bool { self == .kjv || self == .synodal }
     }
 
+    /// Which books a module contains. A module with `nt` is New Testament only (FR-43): its files hold books 40…66,
+    /// the Old Testament is hidden in the app.
+    public enum Coverage: String, Codable, Hashable, Sendable {
+        case bible
+        case nt
+
+        public var bookRange: ClosedRange<Int> {
+            switch self {
+            case .bible: 1...66
+            case .nt: 40...66
+            }
+        }
+
+        public var bookCount: Int { bookRange.count }
+    }
+
     public struct BookName: Codable, Hashable, Sendable {
         public let name: String
         public let abbreviation: String
@@ -63,8 +79,13 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public let numbering: Numbering
     /// The source file name in `data/raw`.
     public let sourceFileName: String
-    /// Book names for a language without built-in names (66, in canonical order).
+    /// Book names of the module in canonical order: for a language without built-in names, or the module's own names
+    /// (one per covered book: 66, or 27 for a New Testament module).
     public let books: [BookName]?
+    /// The books the module contains.
+    public let coverage: Coverage
+    /// The text is local-only (not in the repository): when its file is absent the import skips the module (FR-43).
+    public let isOptional: Bool
     /// The mapping table to KJV for a new numbering system (from the manifest).
     public let versificationTable: VersificationTable?
 
@@ -75,7 +96,8 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public var menuTitle: String { "\(title) — \(languageTitle)" }
 
     public init(rawValue: String, title: String, language: Language, languageTitle: String, numbering: Numbering,
-                sourceFileName: String, books: [BookName]? = nil, versificationTable: VersificationTable? = nil) {
+                sourceFileName: String, books: [BookName]? = nil, versificationTable: VersificationTable? = nil,
+                coverage: Coverage = .bible, isOptional: Bool = false) {
         self.rawValue = rawValue
         self.title = title
         self.language = language
@@ -84,6 +106,16 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
         self.sourceFileName = sourceFileName
         self.books = books
         self.versificationTable = versificationTable
+        self.coverage = coverage
+        self.isOptional = isOptional
+    }
+
+    public func covers(book: Int) -> Bool { coverage.bookRange.contains(book) }
+
+    /// The module's own name and abbreviation of a book; `nil` if the module has no names or does not cover the book.
+    public func bookName(_ number: Int) -> BookName? {
+        guard let books, covers(book: number) else { return nil }
+        return books[number - coverage.bookRange.lowerBound]
     }
 
     /// A translation from the catalog by code.
@@ -105,6 +137,8 @@ public struct Translation: Hashable, Sendable, CaseIterable, Identifiable, Custo
     public static let bkr = builtIn("bkr")
     public static let ohienko = builtIn("ohienko")
     public static let synodal = builtIn("synodal")
+    /// Yuriy Popchenko, New Testament; optional, the text is local-only (FR-43).
+    public static let popchenko = builtIn("popchenko")
 }
 
 /// Stored by code (in settings and the database); an unknown code is a decoding error.
@@ -134,7 +168,7 @@ public enum TranslationCatalog {
             switch self {
             case .duplicateCode(let code): "переклад «\(code)» у маніфесті двічі"
             case .missingBookNames(let code): "переклад «\(code)»: мова без вбудованих назв книг — потрібен список books (66)"
-            case .badBookNames(let code): "переклад «\(code)»: books має містити 66 назв"
+            case .badBookNames(let code): "переклад «\(code)»: books має містити назви всіх книг модуля (66, а для NT — 27)"
             case .missingVersification(let code):
                 "переклад «\(code)»: нова система нумерації без таблиці відповідностей — потрібне поле versification"
             }
@@ -146,6 +180,8 @@ public enum TranslationCatalog {
         let numbering: Translation.Numbering
         let books: [Translation.BookName]?
         let versification: VersificationTable?
+        let coverage: Translation.Coverage?
+        let optional: Bool?
     }
 
     public static var bundledManifest: Data {
@@ -164,11 +200,12 @@ public enum TranslationCatalog {
             guard seen.insert(entry.code).inserted else { throw Error.duplicateCode(entry.code) }
             if !entry.numbering.isBuiltIn, !tabled.contains(entry.numbering) { throw Error.missingVersification(entry.code) }
             let language = Language(code: entry.language)
-            if let books = entry.books, books.count != 66 { throw Error.badBookNames(entry.code) }
+            let coverage = entry.coverage ?? .bible
+            if let books = entry.books, books.count != coverage.bookCount { throw Error.badBookNames(entry.code) }
             if !language.hasBuiltInBookNames, entry.books == nil { throw Error.missingBookNames(entry.code) }
             return Translation(rawValue: entry.code, title: entry.title, language: language, languageTitle: entry.languageTitle,
                                numbering: entry.numbering, sourceFileName: entry.file, books: entry.books,
-                               versificationTable: entry.versification)
+                               versificationTable: entry.versification, coverage: coverage, isOptional: entry.optional ?? false)
         }
     }
 }

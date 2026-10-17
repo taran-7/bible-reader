@@ -129,6 +129,63 @@ Order: BKR first (KJV numbering, cheapest), then Ohienko (after 6.13).
 **6.20 Drafts.** A place for a sermon draft or a few thoughts next to the text: a list and a Markdown editor on the right, a verse into the draft in one click, live passage links, a sermon template, illustrations into the draft, markers next to verses, a "Sermon" mode and export (Markdown, print / PDF). Owner request 2026-09-28.
 Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the text marks verses 4–7 and opens the passage on click.
 
+### v2.4 Visit history
+**6.21 History panel on the right.** The free space to the right of the ~75-character column always shows a flat list of recently visited verses, newest first, updated continuously (no grouping by day). A row is only the reference in the translation's language: the book name, chapter:verse, e.g. `Иоанна 3:16`, `Івана 3:16`, `John 3:16`; the language shows the translation, so there is no translation label, text excerpt or time. Clicking a row opens that verse **in the same translation** it was visited in, scrolls to it and briefly highlights it. Stored locally in the user database, survives a restart; "Clear history". Owner request 2026-10-17, decisions 2026-10-17:
+- A visit is a jump to a verse (reference search, search result, link from a draft, Compare, bookmark) or a click/selection of a verse; a plain chapter open (◀ ▶, book list) records the chapter without a verse (`Иоанна 3`).
+- The same translation + verse moves to the top instead of duplicating; the same verse in another translation is a separate entry.
+- Limit 50 entries: a new entry goes to the top and everything shifts down by one (the 49th becomes the 50th); the entry that would become the 51st is deleted.
+- When Drafts or Illustrations are open, history hides; a toolbar toggle can show it next to them, and then the Bible text column becomes narrower.
+- **Layout: no overlap with the selection.** Today the selection highlight and its buttons (Ілюстрації / Порівняти / Копіювати) span the full window width and sit at its right edge, exactly where the panel goes. The panel is therefore a separate column next to the reading area (like the Drafts panel), not an overlay: the reading area, its highlight and the selection buttons end at the panel's left border, so a selection never covers a history row and every row stays clickable. Owner remark 2026-10-17.
+- **Selection buttons next to the text.** The buttons are anchored to the right edge of the ~75-character reading column, not to the right edge of the reading area: they stand right after the column, in the free gap. If the gap is too narrow, they sit inside the column at the top-right of the selected row, as today. In the parallel view (no fixed-width column) they stay at the right edge of the reading area. In every case they stay left of the history panel. Owner decision 2026-10-17.
+- In the parallel view or Compare, a click keeps that mode and navigates it to the verse (rows aligned through the FR-26 mapping table), with the entry's translation as the main one.
+
+Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:16`: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart; with verse 2 selected, the selection buttons sit right next to the text column and left of the panel and the history row at the same height opens on click; after 51 different visits the list holds 50 and the first visit is gone.
+
+### v2.5 Popchenko New Testament (personal use)
+**6.22 Yuriy Popchenko's translation, New Testament only.** Source: bolls.life `PPCH` (https://bolls.life/PPCH/40/1/), 27 books. A modern translation under copyright, no license stated on bolls.life; the owner uses it for personal use only. Owner request and decisions 2026-10-17:
+- **The text is never committed** (the repository is public). A local script (`scripts/fetch_ppch.sh`) downloads it from bolls.life and converts it with `scripts/convert_getbible.py` into a git-ignored file on the owner's Mac. The manifest entry is `optional`: without the file `make db` skips the translation, and CI stays green without it.
+- **New Testament-only modules:** the manifest gets a coverage field (e.g. `"coverage": "nt"`); the import accepts 27 books.
+- With Popchenko selected, Old Testament books are **hidden** from the book list.
+- Switching to Popchenko while reading an Old Testament book opens **Matthew 1**.
+- Compare and the parallel view show an empty Popchenko cell with a "not in this translation" mark for Old Testament verses; search with the "Old Testament" scope returns 0 results without an error; visit history works as usual.
+- Menu title: **«Попченко Ю.»**, language `uk` (Ukrainian stemmer), but **its own book names and abbreviations, taken from the table of contents of the owner's printed edition** (photos 2026-10-17), not the built-in Ohienko ones and not the bolls.life list (which has mixed Latin `i`/`I` and other forms: `коринтян`, `солунян`, `Іуда`). The app shows the short name (the print's full title without «Євангеліє» / «Послання апостола (Павла)» and without «до» (owner, 2026-10-17: «Римлян», «1 Коринфян»); «Перше / Друге / Третє» becomes 1 / 2 / 3); the full print title is kept for a tooltip. The reference shows the short name everywhere (reader title, quotes, visit history: `Одкровення 22:21`), and the abbreviations are parsed as references (`Одк 22:21`, `Ін. 3:16`). The manifest `books` field accepts 27 entries for a `coverage: nt` module.
+
+  | # | Short name | Abbr. | Print title |
+  |---|---|---|---|
+  | 40 | Від Матвія | Мт. | Євангеліє від Матвія |
+  | 41 | Від Марка | Мк. | Євангеліє від Марка |
+  | 42 | Від Луки | Лк. | Євангеліє від Луки |
+  | 43 | Від Іоана | Ін. | Євангеліє від Іоана |
+  | 44 | Дії апостолів | Дії | Дії апостолів |
+  | 45 | Римлян | Рим. | Послання апостола Павла до римлян |
+  | 46 | 1 Коринфян | 1 Кор. | Перше послання апостола Павла до коринфян |
+  | 47 | 2 Коринфян | 2 Кор. | Друге послання апостола Павла до коринфян |
+  | 48 | Галатів | Гал. | Послання апостола Павла до галатів |
+  | 49 | Ефесян | Еф. | Послання апостола Павла до ефесян |
+  | 50 | Филип’ян | Флп. | Послання апостола Павла до филип’ян |
+  | 51 | Колоссян | Кол. | Послання апостола Павла до колоссян |
+  | 52 | 1 Фессалонікійців | 1 Фес. | Перше послання апостола Павла до фессалонікійців |
+  | 53 | 2 Фессалонікійців | 2 Фес. | Друге послання апостола Павла до фессалонікійців |
+  | 54 | 1 Тимофія | 1 Тим. | Перше послання апостола Павла до Тимофія |
+  | 55 | 2 Тимофія | 2 Тим. | Друге послання апостола Павла до Тимофія |
+  | 56 | Тита | Тит. | Послання апостола Павла до Тита |
+  | 57 | Филимона | Флм. | Послання апостола Павла до Филимона |
+  | 58 | Євреїв | Євр. | Послання апостола Павла до євреїв |
+  | 59 | Якова | Як. | Послання апостола Якова |
+  | 60 | 1 Петра | 1 Пет. | Перше послання апостола Петра |
+  | 61 | 2 Петра | 2 Пет. | Друге послання апостола Петра |
+  | 62 | 1 Іоана | 1 Ін. | Перше послання апостола Іоана |
+  | 63 | 2 Іоана | 2 Ін. | Друге послання апостола Іоана |
+  | 64 | 3 Іоана | 3 Ін. | Третє послання апостола Іоана |
+  | 65 | Іуди | Іуд. | Послання апостола Іуди |
+  | 66 | Одкровення | Одк. | Одкровення Іоана Богослова |
+
+- The printed edition also contains the Psalms («Книга псалмів», `Пс.`) and a dictionary of biblical names; bolls.life `PPCH` has no Psalms. **Later (owner, 2026-10-17):** the owner may photograph the printed Psalms; then a separate step recognizes the text from the photos into a local, git-ignored file (like the rest of the text), checks the numbering (150 psalms, superscriptions, Hebrew vs Synodal numbering) and extends the module's coverage to NT + Psalms. Not part of the first Popchenko slice.
+- Numbering (checked 2026-10-17 on `bolls.life/static/translations/PPCH.zip`, file dated 2024-12-25): 27 books 40–66, 7,957 verses (as many as KJV NT), no tags, no stress marks, `’` apostrophes and «…» quotes. Same as KJV except two places: **3 John 1:15** is a separate verse (KJV keeps it in 14), merged into 14 like Ohienko (the existing `--align-to` rule); **Rev 22:21 is missing** in the source; the owner's printed edition has it (photo 2026-10-17, book title «Одкровення» as on bolls.life), so the local fetch script fills it from the printed text. The print also words 22:20 slightly differently («Так, Я скоро прийду!» vs bolls.life «Так, прийду скоро!»): bolls.life likely carries another edition; only the missing verse is patched, other verses stay as in the source. One source typo: 2 Tim 2:15 has `якому ^чого соромитись`; the owner's printed edition (photo 2026-10-17) reads `якому нічого соромитись`, so the script replaces the whole verse with the printed text (owner, 2026-10-17): «Постарайся представити себе Богу гідним, працівником, якому нічого соромитись, який правильно навчає слову істини.» (without the print's stress mark). The printed 2 Tim 2:15 also differs elsewhere (`гідним` vs `випробуваним`, `правильно навчає слову істини` vs `правильно розділяє слово істини`), confirming bolls.life carries another edition.
+- **Print fixes list.** The fetch script applies a short committed list of fixes, each confirmed by a photo of the owner's printed edition: only verses with a defect in the source (missing, a typo); such a verse is taken whole from the print; verses without a defect keep the bolls.life wording. Today: Rev 22:21 (missing), 2 Tim 2:15 (typo `^чого`, whole verse from the print), Eph 2:22 (a stray footnote number in `На15 Якому`; the owner checked the print on 2026-10-17 and asked to remove the digits). After the fixes the converter checks that no `^`, no digit glued to a letter and no empty NT verse remain. `scripts/convert_getbible.py` today requires 66 books, so the NT coverage needs a converter change too.
+
+Criterion: without the file the app and CI work as before; after the script and `make db`, «Попченко Ю.» shows 27 books, Ів. 3:16 opens, switching to it from Genesis 1 opens Matthew 1, and `git status` shows no Popchenko text.
+
 ## 7. Non-functional requirements
 - macOS 14+, Apple Silicon only. Intel is out of scope: the project is open source, whoever needs it can build it.
 - Offline; no telemetry. Network only for illustrations (6.17): index updates and live search, only to allowlisted domains; the request carries only the search query text.

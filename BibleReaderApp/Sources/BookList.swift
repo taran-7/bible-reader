@@ -52,9 +52,16 @@ struct BookList: View {
         .modifier(ChromeBackground(color: theme.sidebar))
     }
 
+    /// A testament the translation lacks (the Old Testament in a New Testament module, FR-43) has no section at all.
+    @ViewBuilder
     private func section(_ title: String, _ testament: Testament) -> some View {
+        let books = model.books.filter { $0.testament == testament }
+        if !books.isEmpty { section(title, books) }
+    }
+
+    private func section(_ title: String, _ books: [Book]) -> some View {
         Section {
-            ForEach(model.books.filter { $0.testament == testament }) { book in
+            ForEach(books) { book in
                 // A click shows the book's chapters over the text (FR-37) instead of opening the first one right away.
                 Text(book.name(in: model.translation))
                     .font(.system(size: fontSize))

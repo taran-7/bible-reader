@@ -11,6 +11,8 @@ xcuserdata/
 node_modules/
 coverage/
 **/raw/
+# Popchenko's New Testament is under copyright and local-only (FR-43): never commit it.
+data/raw/uk_popchenko.json
 trace/ledger.jsonl
 trace/ledger-*.jsonl
 

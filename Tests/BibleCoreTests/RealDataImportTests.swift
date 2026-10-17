@@ -6,7 +6,8 @@ import Testing
 
     // @trace FR-1
     @Test func testSixtySixBooksPerTranslation() throws {
-        for translation in Translation.allCases {
+        // The optional local-only Popchenko is covered by PopchenkoTests.
+        for translation in Translation.allCases where !translation.isOptional {
             #expect(try TestSupport.count("SELECT COUNT(DISTINCT book) FROM verses WHERE translation = '\(translation.rawValue)'", in: db) == 66)
         }
     }

@@ -52,6 +52,12 @@ public struct Comparison: Sendable {
     public let highlighted: Set<Int>
     public let rows: [CompareRow]
 
+    /// The column's translation does not contain this chapter's book (Old Testament in a New Testament module):
+    /// the column shows a "not in this translation" mark instead of text (FR-43).
+    public func isMissing(_ translation: Translation) -> Bool {
+        !translation.covers(book: location.book)
+    }
+
     /// A column header in its translation's language; the chapter is the main one's (`location` is always within the canon).
     public func title(of translation: Translation) -> String {
         "\(Book.all[location.book - 1].name(in: translation)) \(location.chapter)"

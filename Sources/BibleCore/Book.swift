@@ -37,7 +37,7 @@ public struct Book: Hashable, Identifiable, Sendable {
 
     /// The name in the translation's language; a module with its own book names takes priority.
     public func name(in translation: Translation) -> String {
-        if let books = translation.books { return books[number - 1].name }
+        if let own = translation.bookName(number) { return own.name }
         switch translation.language {
         case .english, .other: return englishName
         case .russian: return russianName
@@ -47,7 +47,7 @@ public struct Book: Hashable, Identifiable, Sendable {
     }
 
     public func abbreviation(in translation: Translation) -> String {
-        if let books = translation.books { return books[number - 1].abbreviation }
+        if let own = translation.bookName(number) { return own.abbreviation }
         switch translation.language {
         case .english, .other: return englishAbbreviation
         case .russian: return russianAbbreviation
@@ -67,7 +67,7 @@ public struct Book: Hashable, Identifiable, Sendable {
     private static let moduleSpellings = spellings(from: Translation.allCases)
 
     static func spellings(from translations: [Translation]) -> [[String]] {
-        (0..<66).map { index in translations.compactMap { $0.books?[index] }.flatMap { [$0.name, $0.abbreviation] } }
+        (1...66).map { number in translations.compactMap { $0.bookName(number) }.flatMap { [$0.name, $0.abbreviation] } }
     }
 
     public static let all: [Book] = [

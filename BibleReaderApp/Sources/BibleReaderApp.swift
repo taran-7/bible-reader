@@ -121,9 +121,9 @@ struct FontCommands: Commands {
         token = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             guard event.modifierFlags.intersection([.command, .option, .control, .shift]) == [.command, .option],
                   let index = TranslationShortcut.index(forKeyCode: event.keyCode),
-                  index < Translation.allCases.count
+                  index < model.availableTranslations.count
             else { return event }
-            model.translation = Translation.allCases[index]
+            model.translation = model.availableTranslations[index]
             return nil
         }
     }
@@ -136,7 +136,7 @@ struct TranslationCommands: Commands {
 
     var body: some Commands {
         CommandMenu("Переклад") {
-            ForEach(Array(Translation.allCases.enumerated()), id: \.element) { index, translation in
+            ForEach(Array(model.availableTranslations.enumerated()), id: \.element) { index, translation in
                 let toggle = Toggle(translation.menuTitle, isOn: Binding(
                     get: { model.translation == translation },
                     set: { if $0 { model.translation = translation } }))
@@ -152,7 +152,7 @@ struct TranslationCommands: Commands {
                 Toggle("Вимкнено", isOn: Binding(
                     get: { model.parallelTranslation == nil },
                     set: { if $0 { preferences.preferences.parallelTranslation = nil } }))
-                ForEach(Translation.allCases.filter { $0 != model.translation }, id: \.self) { translation in
+                ForEach(model.availableTranslations.filter { $0 != model.translation }, id: \.self) { translation in
                     Toggle(translation.title, isOn: Binding(
                         get: { model.parallelTranslation == translation },
                         set: { if $0 { preferences.preferences.parallelTranslation = translation } }))
