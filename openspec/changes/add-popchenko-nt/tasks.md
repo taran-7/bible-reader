@@ -10,5 +10,6 @@
 
 ## 3. Local text
 
-- [ ] 3.1 Rev 22:21 from the owner's printed edition added to `scripts/ppch_print_fixes.json` (text not in the repository yet)
-- [ ] 3.2 `scripts/fetch_ppch.sh` run on the owner's Mac, `make db`, the text checked in the app (Ів. 3:16, switch from Genesis 1 opens Matthew 1)
+- [x] 3.1 Rev 22:21 and 2 Tim 2:15 from the owner's printed edition (photos 2026-10-17) in `scripts/ppch_print_fixes.json`
+- [x] 3.2 `scripts/fetch_ppch.sh` run on the owner's Mac (27 books, 7957 verses), `make db`; local-text test `PopchenkoLocalTextTests`
+- [ ] 3.3 Look in the running app: Ів. 3:16, switch from Genesis 1 opens Matthew 1, Compare cell for Genesis (manual, owner)

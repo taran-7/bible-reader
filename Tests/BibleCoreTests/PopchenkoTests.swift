@@ -270,3 +270,32 @@ final class NewTestamentRepository: BibleRepository, @unchecked Sendable {
         #expect(model.comparison?.isMissing(.ohienko) == false)
     }
 }
+
+/// Runs only on a Mac that fetched the text with `scripts/fetch_ppch.sh`; CI has no such file and skips it.
+@Suite struct PopchenkoLocalTextTests {
+    static let hasText = FileManager.default.fileExists(
+        atPath: TestSupport.rawData.appendingPathComponent(Translation.popchenko.sourceFileName).path)
+
+    // @trace FR-43
+    @Test(.enabled(if: PopchenkoLocalTextTests.hasText)) func testRealTextNumberingAndPrintFixes() throws {
+        let db = try TestSupport.tempDirectory().appendingPathComponent("bible.sqlite")
+        try BibleImporter.run(rawDirectory: TestSupport.rawData, output: db)
+        func text(_ book: Int, _ chapter: Int, _ verse: Int) throws -> String {
+            try TestSupport.string("SELECT text FROM verses WHERE translation = 'popchenko' AND book = \(book) AND chapter = \(chapter) AND verse = \(verse)", in: db) ?? ""
+        }
+        #expect(try TestSupport.count("SELECT COUNT(DISTINCT book) FROM verses WHERE translation = 'popchenko'", in: db) == 27)
+        // As many verses as the KJV New Testament, chapter by chapter.
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'popchenko'", in: db)
+                == TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'kjv' AND book >= 40", in: db))
+        #expect(try TestSupport.count("""
+            SELECT COUNT(*) FROM (SELECT book, chapter, COUNT(*) n FROM verses WHERE translation = 'popchenko' GROUP BY 1, 2) p
+            JOIN (SELECT book, chapter, COUNT(*) n FROM verses WHERE translation = 'kjv' GROUP BY 1, 2) k USING (book, chapter)
+            WHERE p.n != k.n
+            """, in: db) == 0)
+        #expect(try text(43, 3, 16).hasPrefix("Бо так полюбив Бог світ"))
+        // Print fixes: 2 Tim 2:15 without the source typo, Rev 22:21 patched in.
+        #expect(try text(55, 2, 15).contains("якому нічого соромитись"))
+        #expect(try text(66, 22, 21) == "Благодать нашого Господа Ісуса Христа хай буде з усіма вами! Амінь.")
+        #expect(try TestSupport.count("SELECT COUNT(*) FROM verses WHERE translation = 'popchenko' AND (text LIKE '%^%' OR text = '')", in: db) == 0)
+    }
+}

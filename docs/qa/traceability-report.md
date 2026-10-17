@@ -50,7 +50,7 @@ Result: PASS, 47 warning(s)
 | FR-40 | yes | yes | 4 | - |
 | FR-41 | yes | yes | 20 | - |
 | FR-42 | yes | yes | - | - |
-| FR-43 | yes | yes | 38 | - |
+| FR-43 | yes | yes | 40 | - |
 | FR-44 | yes | yes | - | - |
 
 ## Failures

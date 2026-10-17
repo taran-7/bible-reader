@@ -14,7 +14,7 @@ Updated: 2026-10-17. The plan queue up to PR #26 is merged; Popchenko NT (FR-43)
 
 ## Next (for the agent)
 1. **Next slice: visit history (PRD 6.21, FR-42)**, owner request 2026-10-17: a panel in the free space right of the reading column; a click on a verse opens it in the translation it was visited in. The owner answered the open questions (2026-10-17, recorded in PRD 6.21): limit 50 with the oldest dropped, a flat list without days, always visible, a row is just `Иоанна 3:16`, a toggle to show it next to Drafts / Illustrations with a narrower text column, Compare / parallel view keep their mode on click. Next: `/opsx:propose`. Plan: `BibleCore` `VisitHistory` (record, dedupe, limit, persistence in the user DB) TDD-first, then a `HistoryPanel` view that only renders and calls `BibleRepository`/`ReaderViewModel`.
-2. **In progress: Popchenko New Testament (PRD 6.22, FR-43)**, change `openspec/changes/add-popchenko-nt` (branch `claude/stoic-ramanujan-ineyvj`). Built and covered by `PopchenkoTests` + the converter tests: manifest `coverage`/`optional`, optional import, `hasTranslation`, Matthew 1 on switch, OT hidden, "not in this translation" cell, `scripts/fetch_ppch.sh`, `--nt`/`--fixes` converter. **Not done:** (a) Rev 22:21 is missing in the source and its text is not in the repo: the owner must give it from the printed edition and it goes into `scripts/ppch_print_fixes.json` (until then the converter fails on `66:22`); (b) `scripts/fetch_ppch.sh` was not run, so the real text was not checked in the app (tasks 3.1, 3.2).
+2. **Popchenko New Testament (PRD 6.22, FR-43): built, text fetched, awaiting a visual check**, change `openspec/changes/add-popchenko-nt` (branch `claude/stoic-ramanujan-ineyvj`). `scripts/fetch_ppch.sh` produced the local text (27 books, 7957 verses, Rev 22:21 and 2 Tim 2:15 from the print); `PopchenkoTests` and the converter tests pass (`make test`), the app builds. **Not done:** a look in the running app (task 3.3: Ів. 3:16, Genesis 1 → Matthew 1, the "not in this translation" cell in Compare); then archive the change and sync the spec into `openspec/specs/translation-modules`.
 3. **Later: Popchenko Psalms (PRD 6.22, FR-44)**, waits for the owner's photos of the printed Psalms: recognize into a local git-ignored file, check numbering, extend coverage to NT + Psalms.
 4. Other slices, the owner's choice: (a) Foster "New Cyclopaedia of Prose Illustrations" (public domain), a local illustration source next to the online search; (b) KJV cross-references (TSK / OpenBible.info). Open: verify the denomination of the illustration allowlist domains before release.
 5. Open tech debt: [tech-debt-tracker.md](../tech-debt-tracker.md) (notably #20 Ohienko rights, #26 a newer Xcode in CI). The batch #8, #9, #11–#15, #18, #23, #25 was closed by the `close-tech-debt-batch` slice.
@@ -42,6 +42,7 @@ Updated: 2026-10-17. The plan queue up to PR #26 is merged; Popchenko NT (FR-43)
 - 2026-09-29 PR #25: Хуки: pre-push сканер секретів і хуки Claude Code (PD-19)
 
 Not in master yet (current branch):
+- 2026-10-17 Popchenko NT: optional 27-book module, local fetch script, NT-aware reader (FR-43)
 - 2026-10-17 Plan: Popchenko Psalms as a separate slice (FR-44)
 - 2026-10-17 Plan: Popchenko Psalms from photos later (PRD 6.22)
 - 2026-10-17 Plan: Popchenko short book names without «до» (PRD 6.22)
