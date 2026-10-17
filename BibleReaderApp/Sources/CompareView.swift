@@ -75,7 +75,9 @@ struct CompareView: View {
         let highlighted = comparison.highlighted.contains(row.primary.verse)
         return HStack(alignment: .firstTextBaseline, spacing: 16) {
             column([row.primary])
-            ForEach(Array(row.others.enumerated()), id: \.offset) { _, verses in column(verses) }
+            ForEach(Array(row.others.enumerated()), id: \.offset) { index, verses in
+                column(verses, missing: comparison.isMissing(comparison.translations[index + 1]))
+            }
             // Under the header buttons, so the columns stand exactly under their titles.
             Color.clear.frame(width: 44 * scale.factor, height: 1)
         }
@@ -88,9 +90,11 @@ struct CompareView: View {
         .accessibilityAddTraits(highlighted ? .isSelected : [])
     }
 
-    /// An empty cell means the verse is merged with the previous one or has no counterpart.
-    private func column(_ verses: [Verse]) -> some View {
+    /// An empty cell means the verse is merged with the previous one or has no counterpart;
+    /// `missing`: the translation does not contain this book at all (FR-43), the cell says so.
+    private func column(_ verses: [Verse], missing: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 4) {
+            if missing { NotInTranslationMark() }
             ForEach(verses) { verse in
                 (Text(ParallelColumn.label(verse, primaryChapter: comparison.location.chapter) + " ")
                     .foregroundStyle(Color(theme.verseNumber)) + Text(verse.text))
@@ -109,13 +113,15 @@ struct CompareView: View {
 /// The on-screen translation is always the first column, so it is not in the list.
 struct CompareSetup: View {
     let current: BibleCore.Translation
+    /// Translations whose text is in the database.
+    let available: [BibleCore.Translation]
     @Bindable var preferences: PreferencesStore
     let compare: ([BibleCore.Translation]) -> Void
     @Environment(\.dismiss) private var dismiss
 
-    private var choices: [BibleCore.Translation] { BibleCore.Translation.allCases.filter { $0 != current } }
+    private var choices: [BibleCore.Translation] { available.filter { $0 != current } }
     private var chosen: [BibleCore.Translation] {
-        preferences.preferences.comparePanels.visible.filter { $0 != current }
+        preferences.preferences.comparePanels.visible.filter { $0 != current && available.contains($0) }
     }
 
     var body: some View {

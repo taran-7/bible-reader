@@ -42,7 +42,7 @@ struct ChapterView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                         if let secondary = parallel[verse.verse], let other = model.parallelTranslation {
                             ParallelColumn(verses: secondary, translation: other, primaryChapter: model.location.chapter,
-                                           fontSize: fontSize)
+                                           fontSize: fontSize, isMissing: !other.covers(book: model.location.book))
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
@@ -299,10 +299,13 @@ struct ParallelColumn: View {
     let translation: BibleCore.Translation
     let primaryChapter: Int
     let fontSize: Double
+    /// The translation does not contain this book (FR-43): the cell says so instead of staying blank.
+    var isMissing = false
     @Environment(\.theme) private var theme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            if isMissing { NotInTranslationMark() }
             ForEach(verses) { verse in
                 (Text(label(verse) + " ").foregroundStyle(Color(theme.verseNumber)) + Text(verse.text))
                     .font(theme.verseFont(size: fontSize))
@@ -323,5 +326,18 @@ struct ParallelColumn: View {
     static func spoken(_ verses: [Verse], translation: BibleCore.Translation, primaryChapter: Int) -> String? {
         guard !verses.isEmpty else { return nil }
         return "\(translation.title): " + verses.map { "\(label($0, primaryChapter: primaryChapter)) \($0.text)" }.joined(separator: " ")
+    }
+}
+
+/// A cell for a book the translation does not contain, e.g. an Old Testament verse in a New Testament-only module (FR-43).
+struct NotInTranslationMark: View {
+    @Environment(\.theme) private var theme
+    @Environment(\.interfaceScale) private var scale
+
+    var body: some View {
+        Text("Немає в цьому перекладі")
+            .font(.system(size: scale.systemFontSize * 0.9).italic())
+            .foregroundStyle(Color(theme.secondaryText))
+            .accessibilityIdentifier("not-in-translation")
     }
 }

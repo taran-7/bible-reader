@@ -13,11 +13,17 @@ public enum RepositoryError: Error, CustomStringConvertible {
 
 /// The single access point to the Bible text.
 public protocol BibleRepository: Sendable {
+    /// The translation's text is in the database; an optional local-only module may be absent (FR-43).
+    func hasTranslation(_ translation: Translation) throws -> Bool
     func books(translation: Translation) throws -> [Book]
     func chapterCount(book: Int, translation: Translation) throws -> Int
     func verses(book: Int, chapter: Int, translation: Translation) throws -> [Verse]
     /// A page of results in book order and the total match count in the scope.
     func searchPage(_ query: String, translation: Translation, scope: SearchScope, offset: Int, limit: Int) throws -> SearchPage
+}
+
+extension BibleRepository {
+    public func hasTranslation(_ translation: Translation) throws -> Bool { true }
 }
 
 public final class SQLiteBibleRepository: BibleRepository {
@@ -32,6 +38,12 @@ public final class SQLiteBibleRepository: BibleRepository {
             _ = try queue.read { try Int.fetchOne($0, sql: "SELECT COUNT(*) FROM verses LIMIT 1") }
         } catch {
             throw RepositoryError.cannotOpen(path: path.path, reason: "\(error)")
+        }
+    }
+
+    public func hasTranslation(_ translation: Translation) throws -> Bool {
+        try queue.read { db in
+            try Int.fetchOne(db, sql: "SELECT 1 FROM verses WHERE translation = ? LIMIT 1", arguments: [translation.rawValue]) != nil
         }
     }
 

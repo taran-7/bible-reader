@@ -15,6 +15,8 @@ public final class ReaderViewModel {
             if results != nil || searchError != nil { runSearch(submittedQuery) }
         }
     }
+    /// Translations whose text is in the database: an optional local-only module (FR-43) is absent without its file.
+    public private(set) var availableTranslations: [Translation] = Translation.allCases
     public private(set) var location = Location(book: 1, chapter: 1)
     public private(set) var books: [Book] = []
     public private(set) var chapterCount = 0
@@ -89,7 +91,7 @@ public final class ReaderViewModel {
     /// Without a selection there is nothing to highlight, so the mode does not open.
     public func showComparison(of selectedVerses: Set<Int>, with chosen: [Translation]) {
         guard let repository, !selectedVerses.isEmpty, !verses.isEmpty else { return }
-        let others = chosen.filter { $0 != translation }
+        let others = chosen.filter { $0 != translation && availableTranslations.contains($0) }
         let columns = others.map { alignedVerses(of: $0, in: repository) }
         comparison = Comparison(location: location, translations: [translation] + others,
                                 highlighted: selectedVerses,
@@ -121,9 +123,13 @@ public final class ReaderViewModel {
             loadError = "\(error)"
             return
         }
+        availableTranslations = Translation.allCases.filter { translation in
+            !translation.isOptional || (try? repository?.hasTranslation(translation)) ?? true
+        }
         if let data = positionStore?.data(forKey: Self.positionKey),
            let position = try? JSONDecoder().decode(Position.self, from: data),
-           Book(number: position.book) != nil, position.chapter > 0 {
+           Book(number: position.book) != nil, position.chapter > 0,
+           availableTranslations.contains(position.translation), position.translation.covers(book: position.book) {
             // Assignment in init does not trigger didSet; `reload` clamps a chapter outside the book.
             translation = position.translation
             location = Location(book: position.book, chapter: position.chapter)
@@ -159,6 +165,8 @@ public final class ReaderViewModel {
     }
 
     public func open(_ target: Location, focus verse: Int? = nil) {
+        // A book the translation does not contain (the Old Testament in a New Testament module) has nothing to show.
+        guard translation.covers(book: target.book) else { return }
         chapterPicker = nil
         location = target
         focusedVerse = verse
@@ -259,7 +267,7 @@ public final class ReaderViewModel {
         if text.isEmpty {
             results = nil
             searchError = nil
-        } else if let reference = Reference.parse(text) {
+        } else if let reference = Reference.parse(text), translation.covers(book: reference.book) {
             results = nil
             searchError = nil
             open(Location(book: reference.book, chapter: reference.chapter), focus: reference.verseStart)
@@ -377,6 +385,13 @@ public final class ReaderViewModel {
 
     /// The verse with the same content in another numbering; without a selection, the chapter of the first verse.
     private func remap(from old: Translation) {
+        // The Old Testament is not in a New Testament module: its first book opens instead (FR-43).
+        guard translation.covers(book: location.book) else {
+            location = Location(book: translation.coverage.bookRange.lowerBound, chapter: 1)
+            anchorVerse = nil
+            focusedVerse = nil
+            return
+        }
         let verse = anchorVerse ?? 1
         // A verse without a counterpart (Septuagint additions) maps to the nearest previous one that has it.
         var found: VerseKey?

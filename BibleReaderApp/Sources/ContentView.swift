@@ -85,7 +85,7 @@ struct ContentView: View {
                 }
             }
             .sheet(item: $compareSelection) { selection in
-                CompareSetup(current: model.translation, preferences: preferences) { chosen in
+                CompareSetup(current: model.translation, available: model.availableTranslations, preferences: preferences) { chosen in
                     model.showComparison(of: selection.verses, with: chosen)
                 }
             }

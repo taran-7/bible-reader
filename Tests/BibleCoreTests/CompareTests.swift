@@ -13,13 +13,13 @@ import Testing
     @Test func testCloseAndRestore() {
         var panels = ComparePanels()
         panels.close(.bkr)
-        #expect(panels.visible == [.kjv, .ohienko, .synodal])
+        #expect(panels.visible == [.kjv, .ohienko, .synodal, .popchenko])
         panels.add(.bkr)
-        #expect(panels.visible == [.kjv, .ohienko, .synodal, .bkr])
+        #expect(panels.visible == [.kjv, .ohienko, .synodal, .popchenko, .bkr])
         panels.add(.bkr)
-        #expect(panels.visible.count == 4)
+        #expect(panels.visible.count == 5)
         // The last panel cannot be closed: a window without translations makes no sense.
-        for translation in [Translation.kjv, .ohienko, .synodal] { panels.close(translation) }
+        for translation in [Translation.kjv, .ohienko, .synodal, .popchenko] { panels.close(translation) }
         #expect(panels.visible == [.bkr])
         #expect(!panels.canClose)
         panels.close(.bkr)
@@ -43,7 +43,7 @@ import Testing
         var preferences = ReadingPreferences()
         preferences.comparePanels.close(.synodal)
         let decoded = try JSONDecoder().decode(ReadingPreferences.self, from: JSONEncoder().encode(preferences))
-        #expect(decoded.comparePanels.visible == [.kjv, .bkr, .ohienko])
+        #expect(decoded.comparePanels.visible == [.kjv, .bkr, .ohienko, .popchenko])
         // Unknown and repeated translations are dropped; an empty list means the default.
         let odd = try JSONDecoder().decode(ReadingPreferences.self, from: Data(#"{"comparePanels":["kjv","xx","kjv","bkr"]}"#.utf8))
         #expect(odd.comparePanels.visible == [.kjv, .bkr])

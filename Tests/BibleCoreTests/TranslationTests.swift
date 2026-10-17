@@ -3,12 +3,13 @@ import Testing
 
 @Suite struct TranslationTests {
     // @trace FR-28
-    @Test func testFourTranslationsWithLanguages() {
-        #expect(Translation.allCases == [.kjv, .bkr, .ohienko, .synodal])
-        #expect(Translation.allCases.map(\.language) == [.english, .czech, .ukrainian, .russian])
-        #expect(Translation.allCases.map(\.title) == ["KJV", "Kralická", "Огієнко", "Синодальний"])
-        #expect(Translation.allCases.map(\.sourceFileName) == ["en_kjv.json", "cs_bkr.json", "uk_ohienko.json", "ru_synodal.json"])
-        #expect(Translation.allCases.map(\.menuTitle) == ["KJV — English", "Kralická — čeština", "Огієнко — українська", "Синодальний — русский"])
+    @Test func testTranslationsWithLanguages() {
+        // The fifth, Popchenko, is an optional New Testament module (FR-43).
+        #expect(Translation.allCases == [.kjv, .bkr, .ohienko, .synodal, .popchenko])
+        #expect(Translation.allCases.map(\.language) == [.english, .czech, .ukrainian, .russian, .ukrainian])
+        #expect(Translation.allCases.map(\.title) == ["KJV", "Kralická", "Огієнко", "Синодальний", "Попченко Ю."])
+        #expect(Translation.allCases.map(\.sourceFileName) == ["en_kjv.json", "cs_bkr.json", "uk_ohienko.json", "ru_synodal.json", "uk_popchenko.json"])
+        #expect(Translation.allCases.map(\.menuTitle) == ["KJV — English", "Kralická — čeština", "Огієнко — українська", "Синодальний — русский", "Попченко Ю. — українська"])
         #expect(Translation.bkr.menuTitle == "Kralická — čeština")
     }
 

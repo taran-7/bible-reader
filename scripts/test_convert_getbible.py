@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from convert_getbible import align_to, clean, convert, from_bolls  # noqa: E402
+from convert_getbible import align_to, check_complete, clean, convert, from_bolls, load_fixes  # noqa: E402
 
 
 def book(nr, chapters):
@@ -88,6 +88,74 @@ class ConvertTests(unittest.TestCase):
     def test_rejects_unexpected_characters(self):
         with self.assertRaises(SystemExit):
             clean("текст | з трубою")
+
+
+class NewTestamentTests(unittest.TestCase):
+    """The New Testament-only mode (--nt) for the local Popchenko module (FR-43)."""
+
+    def source(self, **chapters):
+        books = {nr: [chapter(1, [(1, "a")])] for nr in range(40, 67)}
+        books.update({int(k[1:]): v for k, v in chapters.items()})
+        return {"books": [book(nr, ch) for nr, ch in books.items()]}
+
+    def test_nt_mode_takes_books_40_to_66(self):
+        out = convert(self.source(), first_book=40)
+        self.assertEqual([b["abbrev"] for b in out], [str(n) for n in range(40, 67)])
+        self.assertEqual(len(out), 27)
+
+    def test_nt_mode_rejects_a_full_bible(self):
+        with self.assertRaises(SystemExit):
+            convert(self.source(), first_book=1)
+
+    def test_nt_mode_rejects_missing_books(self):
+        source = self.source()
+        source["books"].pop()
+        with self.assertRaises(SystemExit):
+            convert(source, first_book=40)
+
+    def test_override_replaces_a_verse_before_cleaning(self):
+        # A source typo `^` would stop the conversion in clean(); the override is applied first.
+        source = self.source(b55=[chapter(1, [(1, "a")]), chapter(2, [(14, "x"), (15, "якому ^чого соромитись")])])
+        out = convert(source, first_book=40, overrides={(55, 2, 15): "якому нічого соромитись"})
+        self.assertEqual(out[55 - 40]["chapters"][1][14], "якому нічого соромитись")
+
+    def test_override_adds_a_missing_verse(self):
+        chapters = [chapter(n, [(1, "x")]) for n in range(1, 22)] + [chapter(22, [(19, "a"), (20, "b")])]
+        out = convert(self.source(b66=chapters), first_book=40, overrides={(66, 22, 21): "c"})
+        self.assertEqual(out[66 - 40]["chapters"][21][-3:], ["a", "b", "c"])
+
+    def test_unknown_character_still_stops_without_override(self):
+        with self.assertRaises(SystemExit):
+            convert(self.source(b55=[chapter(1, [(1, "якому ^чого")])]), first_book=40)
+
+    def test_align_uses_the_new_testament_slice_of_the_reference(self):
+        books = [{"abbrev": str(n), "name": str(n), "chapters": [["a"]]} for n in range(40, 67)]
+        reference = [{"chapters": [["x"]]} for _ in range(66)]
+        books[64 - 40]["chapters"] = [["1", "14", "15"]]
+        reference[63]["chapters"] = [["1", "14"]]
+        out = align_to(books, reference, first_book=40)
+        self.assertEqual(out[64 - 40]["chapters"][0], ["1", "14 15"])
+
+    def test_align_nt_rejects_unknown_mismatch(self):
+        books = [{"abbrev": str(n), "name": str(n), "chapters": [["a", "b"]]} for n in range(40, 67)]
+        with self.assertRaises(SystemExit):
+            align_to(books, [{"chapters": [["x"]]} for _ in range(66)], first_book=40)
+
+    def test_check_complete_rejects_gaps_and_leftover_markup(self):
+        ok = [{"abbrev": "40", "name": "40", "chapters": [["a", "b"]]}]
+        check_complete(ok, first_book=40)
+        with self.assertRaises(SystemExit):
+            check_complete([{"abbrev": "66", "name": "66", "chapters": [["a", ""]]}], first_book=40)
+        with self.assertRaises(SystemExit):
+            check_complete([{"abbrev": "66", "name": "66", "chapters": [["a ^b"]]}], first_book=40)
+
+    def test_load_fixes_parses_keys(self):
+        import json
+        import tempfile
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as f:
+            json.dump({"66:22:21": "c", "55:2:15": "d"}, f)
+        self.assertEqual(load_fixes(f.name), {(66, 22, 21): "c", (55, 2, 15): "d"})
+        os.unlink(f.name)
 
 
 if __name__ == "__main__":

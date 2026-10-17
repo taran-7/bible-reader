@@ -27,10 +27,20 @@ public enum BibleImporter {
     public static func run(rawDirectory: URL, output: URL, translations: [Translation] = Translation.allCases,
                            expectedBooks: Int? = nil) throws {
         // Read all sources first, so no database is created on an input data error.
-        let sources = try translations.map { ($0, try load($0, from: rawDirectory)) }
+        // An optional local-only module (FR-43) without its file is skipped: CI and a fresh clone have no such text.
+        let sources = try translations.compactMap { translation -> (Translation, [SourceBook])? in
+            if translation.isOptional, !FileManager.default.fileExists(atPath: rawDirectory.appendingPathComponent(translation.sourceFileName).path) {
+                return nil
+            }
+            return (translation, try load(translation, from: rawDirectory))
+        }
         if let expectedBooks {
-            for (translation, books) in sources where books.count < expectedBooks {
-                throw ImportError.incomplete(translation.sourceFileName, books: books.count, expected: expectedBooks)
+            for (translation, books) in sources {
+                // A New Testament module has 27 books, not the whole canon.
+                let expected = min(expectedBooks, translation.coverage.bookCount)
+                if books.count < expected {
+                    throw ImportError.incomplete(translation.sourceFileName, books: books.count, expected: expected)
+                }
             }
         }
 
@@ -45,7 +55,7 @@ public enum BibleImporter {
                     try insert(books, translation: translation, into: db)
                 }
                 try db.execute(sql: "INSERT INTO verses_fts(verses_fts) VALUES('rebuild')")
-                try indexStems(db, translations: translations)
+                try indexStems(db, translations: sources.map(\.0))
             }
             try queue.close()
             if fm.fileExists(atPath: output.path) {
@@ -123,6 +133,8 @@ public enum BibleImporter {
 
     private static func insert(_ books: [SourceBook], translation: Translation, into db: Database) throws {
         let statement = try db.makeStatement(sql: "INSERT INTO verses (translation, book, chapter, verse, text, search_text) VALUES (?, ?, ?, ?, ?, ?)")
+        // A New Testament file starts at book 40.
+        let firstBook = translation.coverage.bookRange.lowerBound
         for (bookIndex, book) in books.enumerated() {
             for (chapterIndex, verses) in book.chapters.enumerated() {
                 for (verseIndex, text) in verses.enumerated() {
@@ -130,7 +142,7 @@ public enum BibleImporter {
                     // An empty string is a verse missing in the source: we skip it, following numbers are kept.
                     guard !text.isEmpty else { continue }
                     let folded = SearchText.fold(text)
-                    try statement.execute(arguments: [translation.rawValue, bookIndex + 1, chapterIndex + 1, verseIndex + 1, text,
+                    try statement.execute(arguments: [translation.rawValue, firstBook + bookIndex, chapterIndex + 1, verseIndex + 1, text,
                                                       folded == text ? nil : folded])
                 }
             }

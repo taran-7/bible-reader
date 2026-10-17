@@ -65,7 +65,7 @@ struct ReaderToolbar: ToolbarContent {
             Menu {
                 Picker("Паралельно", selection: parallel) {
                     Text("Вимкнено").tag(BibleCore.Translation?.none)
-                    ForEach(BibleCore.Translation.allCases.filter { $0 != model.translation }, id: \.self) {
+                    ForEach(model.availableTranslations.filter { $0 != model.translation }, id: \.self) {
                         Text($0.menuTitle).tag(BibleCore.Translation?.some($0))
                     }
                 }
@@ -82,7 +82,7 @@ struct ReaderToolbar: ToolbarContent {
             // A menu, not segments: there are four translations and there will be more; items show the language.
             Menu {
                 Picker("Переклад", selection: $model.translation) {
-                    ForEach(Translation.allCases, id: \.self) { Text($0.menuTitle).tag($0) }
+                    ForEach(model.availableTranslations, id: \.self) { Text($0.menuTitle).tag($0) }
                 }
                 .pickerStyle(.inline)
             } label: {
