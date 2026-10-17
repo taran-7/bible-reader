@@ -38,8 +38,8 @@ A click on a row SHALL open the verse in the translation it was visited in, scro
 - **THEN** Compare shows the row's chapter with the verse highlighted
 
 ### Requirement: Panel layout
-The panel SHALL be a separate column next to the reading area, so the selection highlight and the selection buttons never overlap it. The selection buttons SHALL stand right after the ~75-character text column, inside the column when the gap is too narrow, and at the reading area's right edge in the parallel view. With Drafts or Illustrations open the panel SHALL hide unless a toolbar toggle shows it; then the text column narrows (FR-42).
+The panel SHALL be a separate column next to the reading area, so the selection highlight and the selection buttons never overlap it. The selection buttons are compact icons to the left of the selected verse (see `move-selection-buttons-left`), so they never reach the panel. With Drafts or Illustrations open the panel SHALL hide unless a toolbar toggle shows it; then the text column narrows (FR-42).
 
 #### Scenario: Selection next to the text
 - **WHEN** verse 2 is selected in a wide window
-- **THEN** the selection buttons stand next to the text column, left of the panel, and the history row at the same height stays clickable
+- **THEN** the selection buttons stand left of the verse, so left of the panel, and the history row at the same height stays clickable

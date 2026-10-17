@@ -11,8 +11,6 @@ struct ChapterView: View {
     /// "Compare" (FR-36): the translation picker and comparison mode live in `ContentView`.
     var compare: (Set<Int>) -> Void = { _ in }
     @State private var selection = Set<Int>()
-    /// The text column width: in a narrow one the selection buttons show icons only.
-    @State private var listWidth: CGFloat = 1000
     /// The verse whose note is being edited.
     @State private var editingNote: VerseKey?
     @Environment(UserData.self) private var userData
@@ -31,7 +29,6 @@ struct ChapterView: View {
         // User data in KJV numbering: in the Synodal the marks land on the same content.
         let marks = Dictionary(uniqueKeysWithValues: model.verses.map { ($0.verse, userData.marks(for: model.canonicalKeys($0.verse))) })
         let parallel = Dictionary(uniqueKeysWithValues: model.parallelRows.map { ($0.primary.verse, $0.secondary) })
-        let compactButtons = SelectionButton.isCompact(listWidth: listWidth, scale: scale, count: buttonCount)
         ScrollViewReader { proxy in
             List(selection: $selection) {
                 ForEach(model.verses) { verse in
@@ -50,11 +47,11 @@ struct ChapterView: View {
                     }
                         // One translation: a centered ~75-character column (FR-15): long lines are hard to read.
                         .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
-                        // A wide right margin only in the row with the copy button, otherwise a narrow window loses a quarter of its width.
-                        // The same right margin in all rows: selection buttons do not overlap the text,
-                        // and the selected verse does not shift (owner request 2026-09-28).
-                        .padding(.trailing, SelectionButton.rowWidth(for: scale, compact: compactButtons, count: buttonCount))
-                        .overlay(alignment: .topTrailing) {
+                        // The selection buttons are compact icons in the margin to the left of the verse number (owner request
+                        // 2026-10-17). The same left margin in all rows: the buttons do not overlap the text, and the selected
+                        // verse does not shift (owner request 2026-09-28).
+                        .padding(.leading, SelectionButton.rowWidth(for: scale, count: buttonCount))
+                        .overlay(alignment: .topLeading) {
                             if verse.verse == CopyButtonModel.anchorVerse(for: selection) {
                                 // The selection at render time: a click on a button in a row must not narrow it to one verse.
                                 HStack(spacing: SelectionButton.spacing) {
@@ -67,8 +64,8 @@ struct ChapterView: View {
                                 }
                             }
                         }
-                        // Centered after the buttons are attached: they stand right after the ~75-character column, not at
-                        // the window edge; in the parallel view (full width) and in a narrow window they are at the right edge (FR-42).
+                        // Centered after the buttons are attached: they stand right before the ~75-character column, not at
+                        // the window edge; in the parallel view (full width) they are at the left edge (FR-42).
                         .frame(maxWidth: .infinity)
                         .listRowBackground(rowBackground(verse.verse, marks[verse.verse]?.highlight))
                         .listRowSeparator(.hidden)
@@ -77,11 +74,7 @@ struct ChapterView: View {
                 }
             }
             .scrollContentBackground(.hidden)
-            .environment(\.compactSelectionButtons, compactButtons)
-            .background(GeometryReader { geometry in
-                Color.clear.onAppear { listWidth = geometry.size.width }
-                    .onChange(of: geometry.size.width) { _, width in listWidth = width }
-            })
+            .environment(\.compactSelectionButtons, true)
             .background(ThemeBackground())
             .background { if let readingArea { ReadingAreaMarker(tracker: readingArea) } }
             .focused($listFocused)

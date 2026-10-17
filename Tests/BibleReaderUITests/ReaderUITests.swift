@@ -139,6 +139,19 @@ final class ReaderUITests: XCTestCase {
     }
 
     // @trace FR-17
+    func testSelectionButtonsAreCompactAndLeftOfTheVerse() {
+        launch()
+        search("John 3:16")
+        expectSelected(16)
+        let verse = verseRow(16)
+        for identifier in ["illustrations-button", "compare-button", "copy-button"] {
+            guard let button = app.visibleButton(identifier) else { return XCTFail("\(identifier) не видно") }
+            XCTAssertLessThanOrEqual(button.frame.maxX, verse.frame.minX + 1, "\(identifier) зліва від вірша")
+            XCTAssertLessThan(button.frame.width, 60, "\(identifier) компактна: лише іконка")
+        }
+    }
+
+    // @trace FR-17
     func testCopyButtonCopiesQuote() {
         launch()
         XCTAssertTrue(verseRow(1).waitForExistence(timeout: 5))

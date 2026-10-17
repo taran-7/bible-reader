@@ -418,7 +418,8 @@
       "id": "FR-17",
       "specs": [
         "openspec/specs/scripture-reference/spec.md",
-        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md"
+        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md",
+        "openspec/changes/move-selection-buttons-left/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -435,6 +436,7 @@
         "Tests/BibleReaderUITests/CompareUITests.swift",
         "Tests/BibleReaderUITests/CompareUITests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
@@ -447,6 +449,7 @@
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleReaderUITests/CompareUITests.swift",
         "tests/BibleReaderUITests/CompareUITests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
@@ -1370,6 +1373,10 @@
     {
       "check": "active-changes",
       "msg": "active change \"fix-deselect-selection\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"move-selection-buttons-left\" is not archived"
     },
     {
       "check": "active-changes",
