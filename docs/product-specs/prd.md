@@ -135,9 +135,10 @@ Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the t
 - The same translation + verse moves to the top instead of duplicating; the same verse in another translation is a separate entry.
 - Limit 50 entries: a new entry goes to the top and everything shifts down by one (the 49th becomes the 50th); the entry that would become the 51st is deleted.
 - When Drafts or Illustrations are open, history hides; a toolbar toggle can show it next to them, and then the Bible text column becomes narrower.
+- **Layout: no overlap with the selection.** Today the selection highlight and its buttons (Ілюстрації / Порівняти / Копіювати) span the full window width and sit at its right edge, exactly where the panel goes. The panel is therefore a separate column next to the reading area (like the Drafts panel), not an overlay: the reading area, its highlight and the selection buttons end at the panel's left border, so a selection never covers a history row and every row stays clickable. Owner remark 2026-10-17.
 - In the parallel view or Compare, a click keeps that mode and navigates it to the verse (rows aligned through the FR-26 mapping table), with the entry's translation as the main one.
 
-Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:16`: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart; after 51 different visits the list holds 50 and the first visit is gone.
+Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:16`: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart; with verse 2 selected, the selection buttons sit left of the panel and the history row at the same height opens on click; after 51 different visits the list holds 50 and the first visit is gone.
 
 ### v2.5 Popchenko New Testament (personal use)
 **6.22 Yuriy Popchenko's translation, New Testament only.** Source: bolls.life `PPCH` (https://bolls.life/PPCH/40/1/), 27 books. A modern translation under copyright, no license stated on bolls.life; the owner uses it for personal use only. Owner request and decisions 2026-10-17:
