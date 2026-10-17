@@ -149,7 +149,7 @@ Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:
 - Switching to Popchenko while reading an Old Testament book opens **Matthew 1**.
 - Compare and the parallel view show an empty Popchenko cell with a "not in this translation" mark for Old Testament verses; search with the "Old Testament" scope returns 0 results without an error; visit history works as usual.
 - Menu title: **«Попченко Ю.»**, language `uk` (built-in Ukrainian book names and stemmer).
-- Numbering: checked against KJV after the first local download (this session could not reach bolls.life); a mismatch is handled by `--align-to` or a `versification` table.
+- Numbering (checked 2026-10-17 on `bolls.life/static/translations/PPCH.zip`, file dated 2024-12-25): 27 books 40–66, 7,957 verses (as many as KJV NT), no tags, no stress marks, `’` apostrophes and «…» quotes. Same as KJV except two places: **3 John 1:15** is a separate verse (KJV keeps it in 14), merged into 14 like Ohienko (the existing `--align-to` rule); **Rev 22:21 is missing** in the source, stored as an empty verse (the import skips it, numbering kept). One source typo: 2 Tim 2:15 contains `^чого`; kept as in the source and recorded in `data/raw/SOURCE.md`. `scripts/convert_getbible.py` today requires 66 books, so the NT coverage needs a converter change too.
 
 Criterion: without the file the app and CI work as before; after the script and `make db`, «Попченко Ю.» shows 27 books, Ів. 3:16 opens, switching to it from Genesis 1 opens Matthew 1, and `git status` shows no Popchenko text.
 
