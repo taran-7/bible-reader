@@ -148,7 +148,7 @@ Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:
 - With Popchenko selected, Old Testament books are **hidden** from the book list.
 - Switching to Popchenko while reading an Old Testament book opens **Matthew 1**.
 - Compare and the parallel view show an empty Popchenko cell with a "not in this translation" mark for Old Testament verses; search with the "Old Testament" scope returns 0 results without an error; visit history works as usual.
-- Menu title: **«Попченко Ю.»**, language `uk` (Ukrainian stemmer), but **its own book names and abbreviations, taken from the table of contents of the owner's printed edition** (photos 2026-10-17), not the built-in Ohienko ones and not the bolls.life list (which has mixed Latin `i`/`I` and other forms: `коринтян`, `солунян`, `Іуда`). The app shows the short name (the print's full title without «Євангеліє» / «Послання апостола (Павла)» / «Перше / Друге / Третє», which becomes 1 / 2 / 3); the full print title is kept for a tooltip. The reference shows the short name everywhere (reader title, quotes, visit history: `Одкровення 22:21`), and the abbreviations are parsed as references (`Одк 22:21`, `Ін. 3:16`). The manifest `books` field accepts 27 entries for a `coverage: nt` module.
+- Menu title: **«Попченко Ю.»**, language `uk` (Ukrainian stemmer), but **its own book names and abbreviations, taken from the table of contents of the owner's printed edition** (photos 2026-10-17), not the built-in Ohienko ones and not the bolls.life list (which has mixed Latin `i`/`I` and other forms: `коринтян`, `солунян`, `Іуда`). The app shows the short name (the print's full title without «Євангеліє» / «Послання апостола (Павла)» and without «до» (owner, 2026-10-17: «Римлян», «1 Коринфян»); «Перше / Друге / Третє» becomes 1 / 2 / 3); the full print title is kept for a tooltip. The reference shows the short name everywhere (reader title, quotes, visit history: `Одкровення 22:21`), and the abbreviations are parsed as references (`Одк 22:21`, `Ін. 3:16`). The manifest `books` field accepts 27 entries for a `coverage: nt` module.
 
   | # | Short name | Abbr. | Print title |
   |---|---|---|---|
@@ -157,20 +157,20 @@ Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:
   | 42 | Від Луки | Лк. | Євангеліє від Луки |
   | 43 | Від Іоана | Ін. | Євангеліє від Іоана |
   | 44 | Дії апостолів | Дії | Дії апостолів |
-  | 45 | До римлян | Рим. | Послання апостола Павла до римлян |
-  | 46 | 1 до коринфян | 1 Кор. | Перше послання апостола Павла до коринфян |
-  | 47 | 2 до коринфян | 2 Кор. | Друге послання апостола Павла до коринфян |
-  | 48 | До галатів | Гал. | Послання апостола Павла до галатів |
-  | 49 | До ефесян | Еф. | Послання апостола Павла до ефесян |
-  | 50 | До филип’ян | Флп. | Послання апостола Павла до филип’ян |
-  | 51 | До колоссян | Кол. | Послання апостола Павла до колоссян |
-  | 52 | 1 до фессалонікійців | 1 Фес. | Перше послання апостола Павла до фессалонікійців |
-  | 53 | 2 до фессалонікійців | 2 Фес. | Друге послання апостола Павла до фессалонікійців |
-  | 54 | 1 до Тимофія | 1 Тим. | Перше послання апостола Павла до Тимофія |
-  | 55 | 2 до Тимофія | 2 Тим. | Друге послання апостола Павла до Тимофія |
-  | 56 | До Тита | Тит. | Послання апостола Павла до Тита |
-  | 57 | До Филимона | Флм. | Послання апостола Павла до Филимона |
-  | 58 | До євреїв | Євр. | Послання апостола Павла до євреїв |
+  | 45 | Римлян | Рим. | Послання апостола Павла до римлян |
+  | 46 | 1 Коринфян | 1 Кор. | Перше послання апостола Павла до коринфян |
+  | 47 | 2 Коринфян | 2 Кор. | Друге послання апостола Павла до коринфян |
+  | 48 | Галатів | Гал. | Послання апостола Павла до галатів |
+  | 49 | Ефесян | Еф. | Послання апостола Павла до ефесян |
+  | 50 | Филип’ян | Флп. | Послання апостола Павла до филип’ян |
+  | 51 | Колоссян | Кол. | Послання апостола Павла до колоссян |
+  | 52 | 1 Фессалонікійців | 1 Фес. | Перше послання апостола Павла до фессалонікійців |
+  | 53 | 2 Фессалонікійців | 2 Фес. | Друге послання апостола Павла до фессалонікійців |
+  | 54 | 1 Тимофія | 1 Тим. | Перше послання апостола Павла до Тимофія |
+  | 55 | 2 Тимофія | 2 Тим. | Друге послання апостола Павла до Тимофія |
+  | 56 | Тита | Тит. | Послання апостола Павла до Тита |
+  | 57 | Филимона | Флм. | Послання апостола Павла до Филимона |
+  | 58 | Євреїв | Євр. | Послання апостола Павла до євреїв |
   | 59 | Якова | Як. | Послання апостола Якова |
   | 60 | 1 Петра | 1 Пет. | Перше послання апостола Петра |
   | 61 | 2 Петра | 2 Пет. | Друге послання апостола Петра |
