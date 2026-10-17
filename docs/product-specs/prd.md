@@ -129,6 +129,11 @@ Order: BKR first (KJV numbering, cheapest), then Ohienko (after 6.13).
 **6.20 Drafts.** A place for a sermon draft or a few thoughts next to the text: a list and a Markdown editor on the right, a verse into the draft in one click, live passage links, a sermon template, illustrations into the draft, markers next to verses, a "Sermon" mode and export (Markdown, print / PDF). Owner request 2026-09-28.
 Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the text marks verses 4–7 and opens the passage on click.
 
+### v2.4 Visit history
+**6.21 History panel on the right.** The free space to the right of the ~75-character column shows a list of recently visited verses, newest first. Each row: the reference in the translation's language, the translation name, the start of the verse text, the time. Clicking a row opens that verse **in the same translation** it was visited in (e.g. Ohienko, Ів. 3:16 opens Ohienko, not the current translation), scrolls to it and briefly highlights it. Stored locally in the user database, survives a restart; "Clear history". Owner request 2026-10-17.
+Draft defaults (to confirm with the owner, see HANDOFF): a visit is a jump to a verse (reference search, search result, link, Compare, bookmark) or a click/selection of a verse; plain chapter navigation records the chapter without a verse; the same translation + verse moves to the top instead of duplicating; limit 200 entries; the panel shares the right slot with Drafts and Illustrations (one at a time) and hides when the window is too narrow; a toolbar toggle and ⌘Y.
+Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the history row: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart.
+
 ## 7. Non-functional requirements
 - macOS 14+, Apple Silicon only. Intel is out of scope: the project is open source, whoever needs it can build it.
 - Offline; no telemetry. Network only for illustrations (6.17): index updates and live search, only to allowlisted domains; the request carries only the search query text.

@@ -89,6 +89,7 @@ proves the behavior deterministically; the test is tagged `@trace FR-n`.
 | FR-39 | MVP | Drafts | "New sermon" with a structure; "To draft" on an illustration card; a marker next to verses mentioned in drafts, linking to them (PRD 6.20). | local-verifiable |
 | FR-40 | MVP | Drafts | "Sermon" mode (text only in a large font, ⌘+ / ⌘−, Esc); export: copy, Markdown, print / PDF (PRD 6.20). | local-verifiable |
 | FR-41 | MVP | Illustrations | Model curation of illustrations: a model (Claude with the user's key; without a key, Apple on-device) writes search queries from the verse's theme, scores candidates (threshold 6, best first) and writes "Why this story" in the translation's language; without a model or on its error, behavior is as before (PRD 6.17). | local-verifiable |
+| FR-42 | MVP | Reading | Visit history: a panel on the right with recently visited verses (reference in the translation's language, translation, text excerpt, time), newest first, deduplicated by translation + verse, persisted in the user database, "Clear history"; a click opens the verse in the translation it was visited in, scrolls to it and highlights it (PRD 6.21). | local-verifiable |
 
 ## 3 Non-Functional Requirements (NFR)
 
