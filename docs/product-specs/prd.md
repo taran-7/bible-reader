@@ -148,7 +148,39 @@ Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:
 - With Popchenko selected, Old Testament books are **hidden** from the book list.
 - Switching to Popchenko while reading an Old Testament book opens **Matthew 1**.
 - Compare and the parallel view show an empty Popchenko cell with a "not in this translation" mark for Old Testament verses; search with the "Old Testament" scope returns 0 results without an error; visit history works as usual.
-- Menu title: **«Попченко Ю.»**, language `uk` (Ukrainian stemmer), but **its own book names**, not the built-in Ohienko ones: Revelation is **«Одкровення»** (owner, 2026-10-17; Ohienko has «Об'явлення»). The names follow the bolls.life `PPCH` book list with mixed Latin letters fixed (it has `Вiд Iоана` with Latin `i`/`I`, which would break search and parsing): Від Матвія, Від Марка, Від Луки, Від Іоана, Дії, До римлян … 1-е / 2-е / 3-е Іоана, Іуда, Одкровення. Abbreviations follow the printed edition's cross-references where seen (`Одк.`, `Ін.`, `Рим.`, `Гал.`, `Кол.`, `Тит.`, `Пет.`, `Тим.`). The manifest `books` field accepts 27 names for a `coverage: nt` module. The reference shows them everywhere (reader title, quotes, visit history: `Одкровення 22:21`), and `Одк 22:21` is parsed as a reference.
+- Menu title: **«Попченко Ю.»**, language `uk` (Ukrainian stemmer), but **its own book names and abbreviations, taken from the table of contents of the owner's printed edition** (photos 2026-10-17), not the built-in Ohienko ones and not the bolls.life list (which has mixed Latin `i`/`I` and other forms: `коринтян`, `солунян`, `Іуда`). The app shows the short name (the print's full title without «Євангеліє» / «Послання апостола (Павла)» / «Перше / Друге / Третє», which becomes 1 / 2 / 3); the full print title is kept for a tooltip. The reference shows the short name everywhere (reader title, quotes, visit history: `Одкровення 22:21`), and the abbreviations are parsed as references (`Одк 22:21`, `Ін. 3:16`). The manifest `books` field accepts 27 entries for a `coverage: nt` module.
+
+  | # | Short name | Abbr. | Print title |
+  |---|---|---|---|
+  | 40 | Від Матвія | Мт. | Євангеліє від Матвія |
+  | 41 | Від Марка | Мк. | Євангеліє від Марка |
+  | 42 | Від Луки | Лк. | Євангеліє від Луки |
+  | 43 | Від Іоана | Ін. | Євангеліє від Іоана |
+  | 44 | Дії апостолів | Дії | Дії апостолів |
+  | 45 | До римлян | Рим. | Послання апостола Павла до римлян |
+  | 46 | 1 до коринфян | 1 Кор. | Перше послання апостола Павла до коринфян |
+  | 47 | 2 до коринфян | 2 Кор. | Друге послання апостола Павла до коринфян |
+  | 48 | До галатів | Гал. | Послання апостола Павла до галатів |
+  | 49 | До ефесян | Еф. | Послання апостола Павла до ефесян |
+  | 50 | До филип’ян | Флп. | Послання апостола Павла до филип’ян |
+  | 51 | До колоссян | Кол. | Послання апостола Павла до колоссян |
+  | 52 | 1 до фессалонікійців | 1 Фес. | Перше послання апостола Павла до фессалонікійців |
+  | 53 | 2 до фессалонікійців | 2 Фес. | Друге послання апостола Павла до фессалонікійців |
+  | 54 | 1 до Тимофія | 1 Тим. | Перше послання апостола Павла до Тимофія |
+  | 55 | 2 до Тимофія | 2 Тим. | Друге послання апостола Павла до Тимофія |
+  | 56 | До Тита | Тит. | Послання апостола Павла до Тита |
+  | 57 | До Филимона | Флм. | Послання апостола Павла до Филимона |
+  | 58 | До євреїв | Євр. | Послання апостола Павла до євреїв |
+  | 59 | Якова | Як. | Послання апостола Якова |
+  | 60 | 1 Петра | 1 Пет. | Перше послання апостола Петра |
+  | 61 | 2 Петра | 2 Пет. | Друге послання апостола Петра |
+  | 62 | 1 Іоана | 1 Ін. | Перше послання апостола Іоана |
+  | 63 | 2 Іоана | 2 Ін. | Друге послання апостола Іоана |
+  | 64 | 3 Іоана | 3 Ін. | Третє послання апостола Іоана |
+  | 65 | Іуди | Іуд. | Послання апостола Іуди |
+  | 66 | Одкровення | Одк. | Одкровення Іоана Богослова |
+
+- The printed edition also contains the Psalms («Книга псалмів», `Пс.`) and a dictionary of biblical names; bolls.life `PPCH` has no Psalms, so they are out of scope unless a digital source appears.
 - Numbering (checked 2026-10-17 on `bolls.life/static/translations/PPCH.zip`, file dated 2024-12-25): 27 books 40–66, 7,957 verses (as many as KJV NT), no tags, no stress marks, `’` apostrophes and «…» quotes. Same as KJV except two places: **3 John 1:15** is a separate verse (KJV keeps it in 14), merged into 14 like Ohienko (the existing `--align-to` rule); **Rev 22:21 is missing** in the source; the owner's printed edition has it (photo 2026-10-17, book title «Одкровення» as on bolls.life), so the local fetch script fills it from the printed text. The print also words 22:20 slightly differently («Так, Я скоро прийду!» vs bolls.life «Так, прийду скоро!»): bolls.life likely carries another edition; only the missing verse is patched, other verses stay as in the source. One source typo: 2 Tim 2:15 has `якому ^чого соромитись`; the owner's printed edition (photo 2026-10-17) reads `якому нічого соромитись`, so the script replaces the whole verse with the printed text (owner, 2026-10-17): «Постарайся представити себе Богу гідним, працівником, якому нічого соромитись, який правильно навчає слову істини.» (without the print's stress mark). The printed 2 Tim 2:15 also differs elsewhere (`гідним` vs `випробуваним`, `правильно навчає слову істини` vs `правильно розділяє слово істини`), confirming bolls.life carries another edition.
 - **Print fixes list.** The fetch script applies a short committed list of fixes, each confirmed by a photo of the owner's printed edition: only verses with a defect in the source (missing, a typo); such a verse is taken whole from the print; verses without a defect keep the bolls.life wording. Today: Rev 22:21 (missing), 2 Tim 2:15 (typo `^чого`, whole verse from the print). After the fixes the converter checks that no `^` and no empty NT verse remain. `scripts/convert_getbible.py` today requires 66 books, so the NT coverage needs a converter change too.
 
