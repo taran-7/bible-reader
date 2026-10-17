@@ -25,7 +25,10 @@ public final class ReaderViewModel {
         didSet { rebuildParallel(); comparison = nil; illustrations = nil }
     }
     /// The first selected verse (from `ChapterView`): switching translation opens exactly this one (FR-27).
-    public var anchorVerse: Int?
+    public var anchorVerse: Int? {
+        // Selecting a verse is a visit (FR-42); clearing the selection is not.
+        didSet { if let anchorVerse, anchorVerse != oldValue { recordVisit(verse: anchorVerse) } }
+    }
     /// Esc in the Edit menu (FR-17): a counter, because the selection lives in `ChapterView`.
     public private(set) var clearSelectionRequest = 0
 
@@ -34,6 +37,37 @@ public final class ReaderViewModel {
 
     public func clearSelection() {
         clearSelectionRequest += 1
+        focusedVerse = nil
+    }
+
+    /// The selection in `ChapterView` changed: the first selected verse is the anchor (FR-27). An empty selection takes the
+    /// semibold emphasis of the jumped-to verse with it, so nothing looks selected after a click on blank space.
+    public func updateSelection(first verse: Int?) {
+        anchorVerse = verse
+        if verse == nil { focusedVerse = nil }
+    }
+
+    /// Esc clears the selection unless something else owns the key: a text field being edited, a sheet or popover, the drafts
+    /// panel (`otherOwnsEscape`), the chapter picker, or search results (the chapter is not on screen then).
+    public func escapeClearsSelection(otherOwnsEscape: Bool = false) -> Bool {
+        !otherOwnsEscape && headerClickClearsSelection() && chapterPicker == nil
+    }
+
+    /// A click on the window header (toolbar, title bar) outside its controls deselects, like a click outside a list.
+    public func headerClickClearsSelection() -> Bool {
+        canClearSelection && results == nil && searchError == nil
+    }
+
+    /// A click anywhere else outside the verse text (the book list, the history panel) deselects too. Not with the drafts
+    /// panel open: the selection is what «В чорнетку» takes, and a click in the draft must not drop it.
+    public func outsideClickClearsSelection(draftsOpen: Bool) -> Bool {
+        !draftsOpen && headerClickClearsSelection()
+    }
+
+    /// Nothing in the app uses Esc now: no text field, sheet or drafts panel (`otherOwnsEscape`), no panel or picker to close.
+    /// In full screen AppKit leaves the mode on an unused Esc, so the window swallows it.
+    public func escapeIsFree(otherOwnsEscape: Bool = false) -> Bool {
+        !otherOwnsEscape && illustrations == nil && comparison == nil && chapterPicker == nil
     }
     /// The second translation alongside (FR-26); `nil` means the parallel view is off.
     public var parallelTranslation: Translation? {
@@ -103,6 +137,7 @@ public final class ReaderViewModel {
     }
 
     @ObservationIgnored private let positionStore: KeyValueStore?
+    @ObservationIgnored private let visitHistory: VisitHistory?
 
     /// The last reading position (FR-25): translation, book, chapter.
     struct Position: Codable {
@@ -114,8 +149,10 @@ public final class ReaderViewModel {
     public static let positionKey = "lastPosition"
 
     /// `positionStore` keeps the last position; without it the app opens at Genesis 1.
-    public init(positionStore: KeyValueStore? = nil, openRepository: () throws -> BibleRepository) {
+    public init(positionStore: KeyValueStore? = nil, visitHistory: VisitHistory? = nil,
+                openRepository: () throws -> BibleRepository) {
         self.positionStore = positionStore
+        self.visitHistory = visitHistory
         do {
             repository = try openRepository()
         } catch {
@@ -176,6 +213,40 @@ public final class ReaderViewModel {
         if verse != nil { focusRequest += 1 }
         reload()
         savePosition()
+        recordVisit(verse: verse)
+    }
+
+    // MARK: Visit history (FR-42)
+
+    /// Visited places in the on-screen order, without translations that have no text on this Mac or no such book.
+    public var historyEntries: [VisitEntry] {
+        (visitHistory?.entries ?? []).filter { availableTranslations.contains($0.translation) && $0.translation.covers(book: $0.book) }
+    }
+
+    public func clearHistory() {
+        visitHistory?.clear()
+    }
+
+    private func recordVisit(verse: Int?) {
+        visitHistory?.record(VisitEntry(translation: translation, book: location.book, chapter: location.chapter, verse: verse))
+    }
+
+    /// A click on a history row: the place in the translation it was visited in. Compare keeps its mode (re-run for the
+    /// entry's verse with the same columns, the entry's translation first); the parallel view rebuilds from the new chapter.
+    public func openVisit(_ entry: VisitEntry) {
+        guard availableTranslations.contains(entry.translation), entry.translation.covers(book: entry.book) else { return }
+        let compared = comparison
+        closeSearch()
+        if translation != entry.translation {
+            // The entry is already in that translation's numbering: no remap to the previous place.
+            keepLocationOnSwitch = true
+            translation = entry.translation
+            keepLocationOnSwitch = false
+        }
+        open(Location(book: entry.book, chapter: entry.chapter), focus: entry.verse)
+        if let compared {
+            showComparison(of: [entry.verse ?? 1], with: compared.translations)
+        }
     }
 
     /// A click on a book: shows its chapters over the text, the current chapter stays open (FR-37).

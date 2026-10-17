@@ -8,6 +8,10 @@ struct ContentView: View {
     @Environment(DraftStore.self) private var drafts
     /// The selected verses for which the "Compare" translation picker is open.
     @State private var compareSelection: CompareSelection?
+    /// Where the verse list is: a click inside it is not "outside the text" (deselecting, FR-17).
+    @State private var readingArea = ReadingAreaTracker()
+    /// With Drafts or Illustrations open the history is hidden unless the toolbar toggle shows it next to them (FR-42).
+    @AppStorage(HistoryLayout.alongsidePanelsKey) private var historyAlongsidePanels = false
 
     private var scale: InterfaceScale { preferences.preferences.interfaceScale }
 
@@ -32,6 +36,18 @@ struct ContentView: View {
         return { [model] in model.retryLoad() }
     }
 
+    private var showsHistory: Bool {
+        !drafts.isPresenting && (!HistoryLayout.sidePanelOpen(drafts: drafts, model: model) || historyAlongsidePanels)
+    }
+
+    /// A click on a history row. If the row's translation is the parallel one, the old main translation takes its place.
+    private func openVisit(_ entry: VisitEntry) {
+        if entry.translation != model.translation, preferences.preferences.parallelTranslation == entry.translation {
+            preferences.preferences.parallelTranslation = model.translation
+        }
+        model.openVisit(entry)
+    }
+
     @ViewBuilder private var content: some View {
         if let error = model.loadError {
             DatabaseErrorView(message: error, retry: retryAction)
@@ -42,30 +58,38 @@ struct ContentView: View {
                          verseFontSize: preferences.preferences.verseFontSize)
                     .navigationSplitViewColumnWidth(min: 180, ideal: 220)
             } detail: {
-                Group {
-                    if model.searchError != nil || model.results != nil {
-                        SearchResultsView(model: model)
-                    } else if let comparison = model.comparison {
-                        CompareView(comparison: comparison, fontSize: preferences.preferences.verseFontSize,
-                                    close: model.closeComparison,
-                                    chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
-                    } else if drafts.isOpen {
-                        // Text on the left, the draft on the right: the same divider as for illustrations.
-                        IllustrationsSplit {
+                // The history is a separate column next to the reading area, never an overlay (FR-42).
+                HStack(spacing: 0) {
+                    Group {
+                        if model.searchError != nil || model.results != nil {
+                            SearchResultsView(model: model)
+                        } else if let comparison = model.comparison {
+                            CompareView(comparison: comparison, fontSize: preferences.preferences.verseFontSize,
+                                        close: model.closeComparison,
+                                        chooseTranslations: { compareSelection = CompareSelection(verses: comparison.highlighted) })
+                        } else if drafts.isOpen {
+                            // Text on the left, the draft on the right: the same divider as for illustrations.
+                            IllustrationsSplit {
+                                chapter
+                            } illustrations: {
+                                DraftsPanel(store: drafts, model: model)
+                            }
+                        } else if let request = model.illustrations {
+                            // Text on the left narrow (35 %), illustrations on the right wider (65 %); the divider is draggable.
+                            IllustrationsSplit {
+                                chapter
+                            } illustrations: {
+                                IllustrationsView(request: request, close: model.closeIllustrations)
+                                    .id(request)
+                            }
+                        } else {
                             chapter
-                        } illustrations: {
-                            DraftsPanel(store: drafts, model: model)
                         }
-                    } else if let request = model.illustrations {
-                        // Text on the left narrow (35 %), illustrations on the right wider (65 %); the divider is draggable.
-                        IllustrationsSplit {
-                            chapter
-                        } illustrations: {
-                            IllustrationsView(request: request, close: model.closeIllustrations)
-                                .id(request)
-                        }
-                    } else {
-                        chapter
+                    }
+                    .frame(maxWidth: .infinity)
+                    if showsHistory {
+                        Divider()
+                        HistoryPanel(model: model, open: openVisit)
                     }
                 }
                 .font(.system(size: scale.systemFontSize))
@@ -96,6 +120,7 @@ struct ContentView: View {
             }
             .modifier(SearchField(query: $model.query))
             .background(SearchFieldStyler())
+            .background(SelectionDismissal(model: model, drafts: drafts, readingArea: readingArea))
             .onSubmit(of: .search) { model.submitSearch() }
             .onChange(of: model.query) { _, query in
                 if query.isEmpty { model.submitSearch() }
@@ -106,7 +131,7 @@ struct ContentView: View {
 
 extension ContentView {
     private var chapter: some View {
-        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize) { verses in
+        ChapterView(model: model, fontSize: preferences.preferences.verseFontSize, readingArea: readingArea) { verses in
             guard !verses.isEmpty else { return }
             compareSelection = CompareSelection(verses: verses)
         }

@@ -1,22 +1,17 @@
 import BibleCore
 import SwiftUI
 
-/// A button on the selection: an icon with a label, the same width for "Illustrations", "Compare", "Copy",
-/// a semi-transparent backing, the verse text does not run under it (FR-17, FR-33, FR-36).
+/// A button on the selection: an icon, with a label where there is room (cards), the same width for all of them,
+/// a semi-transparent backing, the verse text does not run under it (FR-17, FR-33, FR-36). Beside the verses the
+/// buttons are compact: icons only, in the margin to the left of the verse number (the tooltip names them).
 struct SelectionButton: View {
-    /// Each button's width by the interface scale; `compact` means icon only (a narrow text column).
-    static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 32 : 124) * scale.factor }
+    /// Each button's width by the interface scale; `compact` means icon only.
+    static func width(for scale: InterfaceScale, compact: Bool = false) -> CGFloat { (compact ? 28 : 124) * scale.factor }
     static let spacing: CGFloat = 4
 
-    /// The row's right margin for `count` buttons (three; the fourth is "To draft" when drafts are open).
-    static func rowWidth(for scale: InterfaceScale, compact: Bool = false, count: Int = 3) -> CGFloat {
-        CGFloat(count) * width(for: scale, compact: compact) + CGFloat(count - 1) * spacing + 12
-    }
-
-    /// Labels only when the verse text keeps at least 360 pt; otherwise the verse shrinks into a narrow tall
-    /// column, and the buttons above the first selected verse go past the edge when scrolling.
-    static func isCompact(listWidth: CGFloat, scale: InterfaceScale, count: Int = 3) -> Bool {
-        listWidth - rowWidth(for: scale, count: count) < 360 * scale.factor
+    /// The row's left margin for `count` compact buttons (three; the fourth is "To draft" when drafts are open).
+    static func rowWidth(for scale: InterfaceScale, count: Int = 3) -> CGFloat {
+        CGFloat(count) * width(for: scale, compact: true) + CGFloat(count - 1) * spacing + 12
     }
 
     let title: String
@@ -88,6 +83,6 @@ struct CompareButton: View {
 }
 
 extension EnvironmentValues {
-    /// Selection buttons with icons only (a narrow text column); the tooltip stays.
+    /// Selection buttons with icons only (beside the verses); the tooltip stays.
     @Entry var compactSelectionButtons = false
 }

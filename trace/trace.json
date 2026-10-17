@@ -55,7 +55,8 @@
     {
       "id": "FR-1",
       "specs": [
-        "openspec/specs/bible-text-import/spec.md"
+        "openspec/specs/bible-text-import/spec.md",
+        "openspec/changes/strip-synodal-additions/specs/bible-text-import/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -65,12 +66,16 @@
         "Tests/BibleCoreTests/RealDataImportTests.swift",
         "Tests/BibleCoreTests/RealDataImportTests.swift",
         "Tests/BibleCoreTests/RealDataImportTests.swift",
+        "Tests/BibleCoreTests/SynodalTextTests.swift",
+        "Tests/BibleCoreTests/SynodalTextTests.swift",
         "tests/BibleCoreTests/ImporterTests.swift",
         "tests/BibleCoreTests/ImporterTests.swift",
         "tests/BibleCoreTests/ImporterTests.swift",
         "tests/BibleCoreTests/RealDataImportTests.swift",
         "tests/BibleCoreTests/RealDataImportTests.swift",
-        "tests/BibleCoreTests/RealDataImportTests.swift"
+        "tests/BibleCoreTests/RealDataImportTests.swift",
+        "tests/BibleCoreTests/SynodalTextTests.swift",
+        "tests/BibleCoreTests/SynodalTextTests.swift"
       ],
       "recordings": []
     },
@@ -412,7 +417,9 @@
     {
       "id": "FR-17",
       "specs": [
-        "openspec/specs/scripture-reference/spec.md"
+        "openspec/specs/scripture-reference/spec.md",
+        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md",
+        "openspec/changes/move-selection-buttons-left/specs/scripture-reference/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -420,13 +427,29 @@
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/CopyButtonModelTests.swift",
         "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "Tests/BibleCoreTests/ReaderViewModelTests.swift",
         "Tests/BibleReaderUITests/CompareUITests.swift",
+        "Tests/BibleReaderUITests/CompareUITests.swift",
+        "Tests/BibleReaderUITests/ReaderUITests.swift",
         "Tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/CopyButtonModelTests.swift",
         "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
+        "tests/BibleCoreTests/ReaderViewModelTests.swift",
         "tests/BibleReaderUITests/CompareUITests.swift",
+        "tests/BibleReaderUITests/CompareUITests.swift",
+        "tests/BibleReaderUITests/ReaderUITests.swift",
         "tests/BibleReaderUITests/ReaderUITests.swift"
       ],
       "recordings": []
@@ -627,7 +650,9 @@
     {
       "id": "FR-27",
       "specs": [
-        "openspec/specs/parallel-reading/spec.md"
+        "openspec/specs/parallel-reading/spec.md",
+        "openspec/changes/fix-deselect-selection/specs/scripture-reference/spec.md",
+        "openspec/changes/strip-synodal-additions/specs/bible-text-import/spec.md"
       ],
       "planned": true,
       "tests": [
@@ -635,6 +660,7 @@
         "Tests/BibleCoreTests/ParallelTests.swift",
         "Tests/BibleCoreTests/ParallelTests.swift",
         "Tests/BibleCoreTests/ParallelTests.swift",
+        "Tests/BibleCoreTests/SynodalTextTests.swift",
         "Tests/BibleCoreTests/VersificationTests.swift",
         "Tests/BibleCoreTests/VersificationTests.swift",
         "Tests/BibleCoreTests/VersificationTests.swift",
@@ -646,6 +672,7 @@
         "tests/BibleCoreTests/ParallelTests.swift",
         "tests/BibleCoreTests/ParallelTests.swift",
         "tests/BibleCoreTests/ParallelTests.swift",
+        "tests/BibleCoreTests/SynodalTextTests.swift",
         "tests/BibleCoreTests/VersificationTests.swift",
         "tests/BibleCoreTests/VersificationTests.swift",
         "tests/BibleCoreTests/VersificationTests.swift",
@@ -1023,10 +1050,74 @@
     {
       "id": "FR-42",
       "specs": [
-        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md"
+        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md",
+        "openspec/changes/add-visit-history/specs/visit-history/spec.md"
       ],
       "planned": true,
-      "tests": [],
+      "tests": [
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift"
+      ],
       "recordings": []
     },
     {
@@ -1091,10 +1182,6 @@
   ],
   "failures": [],
   "warnings": [
-    {
-      "check": "test-trace",
-      "msg": "FR-42 has no test annotated \"@trace FR-42\""
-    },
     {
       "check": "test-trace",
       "msg": "FR-44 has no test annotated \"@trace FR-44\""
@@ -1278,6 +1365,22 @@
     {
       "check": "active-changes",
       "msg": "active change \"add-popchenko-nt\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"add-visit-history\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"fix-deselect-selection\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"move-selection-buttons-left\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"strip-synodal-additions\" is not archived"
     }
   ]
 }

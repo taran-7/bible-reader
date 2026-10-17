@@ -139,6 +139,23 @@ final class ReaderUITests: XCTestCase {
     }
 
     // @trace FR-17
+    func testSelectionButtonsAreCompactAndLeftOfTheVerse() {
+        launch()
+        search("John 3:16")
+        expectSelected(16)
+        // `verse-N` is the whole list row, so the buttons are checked against its halves, not against the text.
+        let row = verseRow(16)
+        var previousMaxX = row.frame.minX
+        for identifier in ["illustrations-button", "compare-button", "copy-button"] {
+            guard let button = app.visibleButton(identifier) else { return XCTFail("\(identifier) не видно") }
+            XCTAssertLessThan(button.frame.midX, row.frame.midX, "\(identifier) у лівій половині рядка")
+            XCTAssertGreaterThanOrEqual(button.frame.minX, previousMaxX - 1, "\(identifier) правіше за попередню кнопку")
+            XCTAssertLessThan(button.frame.width, 60, "\(identifier) компактна: лише іконка")
+            previousMaxX = button.frame.maxX
+        }
+    }
+
+    // @trace FR-17
     func testCopyButtonCopiesQuote() {
         launch()
         XCTAssertTrue(verseRow(1).waitForExistence(timeout: 5))
@@ -161,22 +178,32 @@ final class ReaderUITests: XCTestCase {
         wait(for: [expectation(for: restored, evaluatedWith: button)], timeout: 4)
 
         // Several verses: the button above the first, copies the whole range.
-        // A range from the keyboard: row 18 is sometimes below the window's bottom edge, and a click on it gets lost.
-        verseRow(16).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
-        expectSelected(16)
+        // Short verses (Genesis 1:3-5): the history panel narrows the text column (FR-42), and a long range such as
+        // John 3:16-18 no longer fits the small CI window, which pushes the buttons above its first verse off screen.
+        // A range from the keyboard: a click on a row below the window's bottom edge gets lost.
+        search("Gen 1:3")
+        expectSelected(3)
+        verseRow(3).coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).click()
+        expectSelected(3)
         app.typeKey(.downArrow, modifierFlags: .shift)
         app.typeKey(.downArrow, modifierFlags: .shift)
-        expectSelected(18)
-        expectSelected(17)
+        expectSelected(5)
+        expectSelected(4)
         NSPasteboard.general.clearContents()
-        guard let visible = app.visibleButton("copy-button") else { return XCTFail("кнопки копіювання не видно") }
+        guard let visible = app.visibleButton("copy-button") else {
+            // The element tree with frames goes to the CI artifact: a screenshot is not attached on failure.
+            let tree = XCTAttachment(string: app.debugDescription)
+            tree.lifetime = .keepAlways
+            add(tree)
+            return XCTFail("кнопки копіювання не видно")
+        }
         visible.click()
         let range = pasteboardText()
-        XCTAssertTrue(range?.hasSuffix("»\n(John 3:16-18)") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.hasSuffix("»\n(Genesis 1:3-5)") == true, range ?? "буфер порожній")
         // A number before each verse, each on a new line.
-        XCTAssertTrue(range?.hasPrefix("«16 For God so loved") == true, range ?? "буфер порожній")
-        XCTAssertTrue(range?.contains("\n17 For God sent not") == true, range ?? "буфер порожній")
-        XCTAssertTrue(range?.contains("\n18 He that believeth") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.hasPrefix("«3 And God said, Let there be light") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.contains("\n4 And God saw the light") == true, range ?? "буфер порожній")
+        XCTAssertTrue(range?.contains("\n5 And God called the light Day") == true, range ?? "буфер порожній")
 
         search("Rom 1")
         expectTitle("Romans 1")

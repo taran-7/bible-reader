@@ -52,6 +52,9 @@ struct ReaderToolbar: ToolbarContent {
             DraftsToolbarButton(scale: scale)
         }
         ToolbarItem {
+            HistoryToolbarButton(model: model, scale: scale)
+        }
+        ToolbarItem {
             let chapter = model.canonicalChapter
             let marked = userData.isBookmarked(chapter)
             Button(marked ? "Прибрати закладку розділу" : "Закладка на розділ",

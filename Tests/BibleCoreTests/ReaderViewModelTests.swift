@@ -372,4 +372,91 @@ extension ReaderViewModelTests {
         model.clearSelection()
         #expect(model.clearSelectionRequest == 1)
     }
+
+    // @trace FR-17
+    @Test func testClearSelectionAlsoRemovesTheJumpEmphasis() {
+        // The verse reached by a jump is shown semibold; after Esc nothing may stay emphasized.
+        let model = makeModel()
+        model.open(Location(book: 43, chapter: 3), focus: 16)
+        model.anchorVerse = 16
+        #expect(model.focusedVerse == 16)
+        model.clearSelection()
+        #expect(model.focusedVerse == nil)
+    }
+
+    // @trace FR-17
+    @Test func testEmptySelectionRemovesTheJumpEmphasis() {
+        // A click on blank space or ⌘-click on the last selected verse empties the selection without Esc.
+        let model = makeModel()
+        model.open(Location(book: 43, chapter: 3), focus: 16)
+        model.updateSelection(first: 17)
+        #expect(model.anchorVerse == 17)
+        #expect(model.focusedVerse == 16, "a selected verse keeps the emphasis of the jump")
+        model.updateSelection(first: nil)
+        #expect(model.anchorVerse == nil)
+        #expect(model.focusedVerse == nil)
+        #expect(!model.canClearSelection)
+    }
+
+    // @trace FR-17
+    @Test func testEscapeClearsSelectionOnlyWhenNothingElseOwnsTheKey() {
+        let model = makeModel()
+        #expect(!model.escapeClearsSelection(), "nothing selected")
+        model.updateSelection(first: 2)
+        #expect(model.escapeClearsSelection())
+        #expect(!model.escapeClearsSelection(otherOwnsEscape: true), "a text field, sheet, popover or the drafts panel")
+        model.pickCurrentBook()
+        #expect(model.chapterPicker != nil)
+        #expect(!model.escapeClearsSelection(), "Esc closes the chapter picker first")
+        model.dismissChapterPicker()
+        model.query = "love"
+        model.submitSearch()
+        #expect(model.results != nil)
+        #expect(!model.escapeClearsSelection(), "the chapter with the selection is not on screen")
+    }
+
+    // @trace FR-17
+    @Test func testClickOnTheHeaderClearsSelectionOnlyWithoutSidePanels() {
+        let model = makeModel()
+        #expect(!model.headerClickClearsSelection(), "nothing selected")
+        model.updateSelection(first: 2)
+        #expect(model.headerClickClearsSelection())
+        model.showIllustrations(for: [2])
+        #expect(!model.headerClickClearsSelection() || model.illustrations == nil)
+        model.closeIllustrations()
+        model.query = "love"
+        model.submitSearch()
+        #expect(!model.headerClickClearsSelection(), "the chapter with the selection is not on screen")
+    }
+
+    // @trace FR-17
+    @Test func testClickOutsideTheTextKeepsSelectionWhileDraftsAreOpen() {
+        // With the drafts panel open the selection is what «В чорнетку» takes, so a click in the draft must not drop it.
+        let model = makeModel()
+        #expect(!model.outsideClickClearsSelection(draftsOpen: false), "nothing selected")
+        model.updateSelection(first: 2)
+        #expect(model.outsideClickClearsSelection(draftsOpen: false))
+        #expect(!model.outsideClickClearsSelection(draftsOpen: true))
+    }
+
+    // @trace FR-17
+    @Test func testEscapeIsFreeOnlyWhenNothingUsesIt() {
+        // A free Esc is swallowed in full screen: AppKit would leave the mode on it.
+        let model = makeModel()
+        #expect(model.escapeIsFree())
+        #expect(!model.escapeIsFree(otherOwnsEscape: true), "a text field, sheet or the drafts panel")
+        model.showIllustrations(for: [2])
+        #expect(!model.escapeIsFree() || model.illustrations == nil)
+        model.closeIllustrations()
+        #expect(model.escapeIsFree())
+        model.showComparison(of: [2], with: [.synodal])
+        #expect(model.comparison != nil)
+        #expect(!model.escapeIsFree(), "Esc closes the comparison")
+        model.closeComparison()
+        #expect(model.escapeIsFree())
+        model.pickCurrentBook()
+        #expect(!model.escapeIsFree(), "Esc closes the chapter picker")
+        model.dismissChapterPicker()
+        #expect(model.escapeIsFree())
+    }
 }
