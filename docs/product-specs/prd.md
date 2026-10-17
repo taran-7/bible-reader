@@ -139,6 +139,18 @@ Criterion: a draft with John 3:16 survives a restart; "1 Кор 13:4-7" in the t
 
 Criterion: visit Ohienko Ів. 3:16, switch to KJV, click the row `Івана 3:16`: Ohienko opens at 3:16 with the verse highlighted; the row is still there after a restart; after 51 different visits the list holds 50 and the first visit is gone.
 
+### v2.5 Popchenko New Testament (personal use)
+**6.22 Yuriy Popchenko's translation, New Testament only.** Source: bolls.life `PPCH` (https://bolls.life/PPCH/40/1/), 27 books. A modern translation under copyright, no license stated on bolls.life; the owner uses it for personal use only. Owner request and decisions 2026-10-17:
+- **The text is never committed** (the repository is public). A local script (`scripts/fetch_ppch.sh`) downloads it from bolls.life and converts it with `scripts/convert_getbible.py` into a git-ignored file on the owner's Mac. The manifest entry is `optional`: without the file `make db` skips the translation, and CI stays green without it.
+- **New Testament-only modules:** the manifest gets a coverage field (e.g. `"coverage": "nt"`); the import accepts 27 books.
+- With Popchenko selected, Old Testament books are **hidden** from the book list.
+- Switching to Popchenko while reading an Old Testament book opens **Matthew 1**.
+- Compare and the parallel view show an empty Popchenko cell with a "not in this translation" mark for Old Testament verses; search with the "Old Testament" scope returns 0 results without an error; visit history works as usual.
+- Menu title: **«Попченко Ю.»**, language `uk` (built-in Ukrainian book names and stemmer).
+- Numbering: checked against KJV after the first local download (this session could not reach bolls.life); a mismatch is handled by `--align-to` or a `versification` table.
+
+Criterion: without the file the app and CI work as before; after the script and `make db`, «Попченко Ю.» shows 27 books, Ів. 3:16 opens, switching to it from Genesis 1 opens Matthew 1, and `git status` shows no Popchenko text.
+
 ## 7. Non-functional requirements
 - macOS 14+, Apple Silicon only. Intel is out of scope: the project is open source, whoever needs it can build it.
 - Offline; no telemetry. Network only for illustrations (6.17): index updates and live search, only to allowlisted domains; the request carries only the search query text.
