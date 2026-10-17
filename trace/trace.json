@@ -1023,10 +1023,70 @@
     {
       "id": "FR-42",
       "specs": [
-        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md"
+        "openspec/changes/add-popchenko-nt/specs/translation-modules/spec.md",
+        "openspec/changes/add-visit-history/specs/visit-history/spec.md"
       ],
       "planned": true,
-      "tests": [],
+      "tests": [
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleCoreTests/VisitHistoryTests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "Tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleCoreTests/VisitHistoryTests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift",
+        "tests/BibleReaderUITests/HistoryUITests.swift"
+      ],
       "recordings": []
     },
     {
@@ -1091,10 +1151,6 @@
   ],
   "failures": [],
   "warnings": [
-    {
-      "check": "test-trace",
-      "msg": "FR-42 has no test annotated \"@trace FR-42\""
-    },
     {
       "check": "test-trace",
       "msg": "FR-44 has no test annotated \"@trace FR-44\""
@@ -1278,6 +1334,10 @@
     {
       "check": "active-changes",
       "msg": "active change \"add-popchenko-nt\" is not archived"
+    },
+    {
+      "check": "active-changes",
+      "msg": "active change \"add-visit-history\" is not archived"
     }
   ]
 }

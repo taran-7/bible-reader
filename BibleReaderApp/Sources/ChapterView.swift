@@ -48,7 +48,6 @@ struct ChapterView: View {
                     }
                         // One translation: a centered ~75-character column (FR-15): long lines are hard to read.
                         .frame(maxWidth: parallel.isEmpty ? ReadingPreferences.readingColumnWidth(fontSize: fontSize) : .infinity)
-                        .frame(maxWidth: .infinity)
                         // A wide right margin only in the row with the copy button, otherwise a narrow window loses a quarter of its width.
                         // The same right margin in all rows: selection buttons do not overlap the text,
                         // and the selected verse does not shift (owner request 2026-09-28).
@@ -66,6 +65,9 @@ struct ChapterView: View {
                                 }
                             }
                         }
+                        // Centered after the buttons are attached: they stand right after the ~75-character column, not at
+                        // the window edge; in the parallel view (full width) and in a narrow window they are at the right edge (FR-42).
+                        .frame(maxWidth: .infinity)
                         .listRowBackground(rowBackground(verse.verse, marks[verse.verse]?.highlight))
                         .listRowSeparator(.hidden)
                         .tag(verse.verse)

@@ -173,6 +173,16 @@ public final class UserDatabase: Sendable {
                 );
                 """)
         }
+        // Visit history (FR-42): the id is the order; verse = 0 means a chapter without a verse.
+        migrator.registerMigration("v3") { db in
+            try db.execute(sql: """
+                CREATE TABLE visit (
+                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  translation TEXT NOT NULL, book INTEGER NOT NULL, chapter INTEGER NOT NULL, verse INTEGER NOT NULL,
+                  UNIQUE (translation, book, chapter, verse)
+                );
+                """)
+        }
         return migrator
     }
 }

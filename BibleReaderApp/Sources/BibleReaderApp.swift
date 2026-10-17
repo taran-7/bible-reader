@@ -15,10 +15,13 @@ struct BibleReaderApp: App {
         #endif
         return try UserDatabase(path: UserDatabase.defaultURL(profile: profile))
     }
+    /// Visit history in the same user database (FR-42); the model records into it.
+    private static let visitHistory = VisitHistory(database: try? BibleReaderApp.userDatabase.get())
     @State private var userData = BibleReaderApp.makeUserData()
     /// Sermon drafts in the same user database (FR-38).
     @State private var drafts = DraftStore(database: try? BibleReaderApp.userDatabase.get())
-    @State private var model = ReaderViewModel(positionStore: try? BibleReaderApp.userDatabase.get()) {
+    @State private var model = ReaderViewModel(positionStore: try? BibleReaderApp.userDatabase.get(),
+                                               visitHistory: BibleReaderApp.visitHistory) {
         #if DEBUG
         let environment = ProcessInfo.processInfo.environment // BIBLE_READER_DB for UI tests
         #else

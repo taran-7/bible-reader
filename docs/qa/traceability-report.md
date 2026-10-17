@@ -49,7 +49,7 @@ Result: PASS, 47 warning(s)
 | FR-39 | yes | yes | 6 | - |
 | FR-40 | yes | yes | 4 | - |
 | FR-41 | yes | yes | 20 | - |
-| FR-42 | yes | yes | - | - |
+| FR-42 | yes | yes | 58 | - |
 | FR-43 | yes | yes | 40 | - |
 | FR-44 | yes | yes | - | - |
 
@@ -59,7 +59,6 @@ None.
 
 ## Warnings
 
-- **test-trace**: FR-42 has no test annotated "@trace FR-42"
 - **test-trace**: FR-44 has no test annotated "@trace FR-44"
 - **recording-evidence**: FR-1 is not referenced by any recording manifest under docs/qa/
 - **recording-evidence**: FR-2 is not referenced by any recording manifest under docs/qa/
@@ -106,3 +105,4 @@ None.
 - **recording-evidence**: FR-43 is not referenced by any recording manifest under docs/qa/
 - **recording-evidence**: FR-44 is not referenced by any recording manifest under docs/qa/
 - **active-changes**: active change "add-popchenko-nt" is not archived
+- **active-changes**: active change "add-visit-history" is not archived

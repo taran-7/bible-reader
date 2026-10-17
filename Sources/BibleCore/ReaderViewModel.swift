@@ -25,7 +25,10 @@ public final class ReaderViewModel {
         didSet { rebuildParallel(); comparison = nil; illustrations = nil }
     }
     /// The first selected verse (from `ChapterView`): switching translation opens exactly this one (FR-27).
-    public var anchorVerse: Int?
+    public var anchorVerse: Int? {
+        // Selecting a verse is a visit (FR-42); clearing the selection is not.
+        didSet { if let anchorVerse, anchorVerse != oldValue { recordVisit(verse: anchorVerse) } }
+    }
     /// Esc in the Edit menu (FR-17): a counter, because the selection lives in `ChapterView`.
     public private(set) var clearSelectionRequest = 0
 
@@ -103,6 +106,7 @@ public final class ReaderViewModel {
     }
 
     @ObservationIgnored private let positionStore: KeyValueStore?
+    @ObservationIgnored private let visitHistory: VisitHistory?
 
     /// The last reading position (FR-25): translation, book, chapter.
     struct Position: Codable {
@@ -114,8 +118,10 @@ public final class ReaderViewModel {
     public static let positionKey = "lastPosition"
 
     /// `positionStore` keeps the last position; without it the app opens at Genesis 1.
-    public init(positionStore: KeyValueStore? = nil, openRepository: () throws -> BibleRepository) {
+    public init(positionStore: KeyValueStore? = nil, visitHistory: VisitHistory? = nil,
+                openRepository: () throws -> BibleRepository) {
         self.positionStore = positionStore
+        self.visitHistory = visitHistory
         do {
             repository = try openRepository()
         } catch {
@@ -173,6 +179,40 @@ public final class ReaderViewModel {
         if verse != nil { focusRequest += 1 }
         reload()
         savePosition()
+        recordVisit(verse: verse)
+    }
+
+    // MARK: Visit history (FR-42)
+
+    /// Visited places in the on-screen order, without translations that have no text on this Mac or no such book.
+    public var historyEntries: [VisitEntry] {
+        (visitHistory?.entries ?? []).filter { availableTranslations.contains($0.translation) && $0.translation.covers(book: $0.book) }
+    }
+
+    public func clearHistory() {
+        visitHistory?.clear()
+    }
+
+    private func recordVisit(verse: Int?) {
+        visitHistory?.record(VisitEntry(translation: translation, book: location.book, chapter: location.chapter, verse: verse))
+    }
+
+    /// A click on a history row: the place in the translation it was visited in. Compare keeps its mode (re-run for the
+    /// entry's verse with the same columns, the entry's translation first); the parallel view rebuilds from the new chapter.
+    public func openVisit(_ entry: VisitEntry) {
+        guard availableTranslations.contains(entry.translation), entry.translation.covers(book: entry.book) else { return }
+        let compared = comparison
+        closeSearch()
+        if translation != entry.translation {
+            // The entry is already in that translation's numbering: no remap to the previous place.
+            keepLocationOnSwitch = true
+            translation = entry.translation
+            keepLocationOnSwitch = false
+        }
+        open(Location(book: entry.book, chapter: entry.chapter), focus: entry.verse)
+        if let compared {
+            showComparison(of: [entry.verse ?? 1], with: compared.translations)
+        }
     }
 
     /// A click on a book: shows its chapters over the text, the current chapter stays open (FR-37).
